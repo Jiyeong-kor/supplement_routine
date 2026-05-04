@@ -1,10 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'today_provider.dart';
 
-class TodayScreen extends StatelessWidget {
+class TodayScreen extends ConsumerWidget {
   const TodayScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final todayList = ref.watch(todayListProvider);
+    
+    // 완료 개수 계산
+    final doneCount = todayList.where((item) => item.record.isDone).length;
+    final totalCount = todayList.length;
+
+    // 날짜 포맷 (예: 2024년 5월 20일 월요일)
+    final now = DateTime.now();
+    final weekDays = ['월', '화', '수', '목', '금', '토', '일'];
+    final dateString = '${now.year}년 ${now.month}월 ${now.day}일 ${weekDays[now.weekday - 1]}요일';
+
+    // 메모가 있는 항목 찾기 (첫 번째 항목의 메모를 "오늘의 한 줄"로 표시하는 예시)
+    final memoItem = todayList.firstWhere(
+      (item) => item.supplement.memo != null && item.supplement.memo!.isNotEmpty,
+      orElse: () => todayList.first,
+    );
+    final quoteText = memoItem.supplement.memo != null 
+        ? '내 메모 · ${memoItem.supplement.name}: ${memoItem.supplement.memo}'
+        : '복용 후 바로 체크하면 오늘 기록이 더 정확해집니다.';
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('오늘의 복용'),
@@ -15,21 +37,21 @@ class TodayScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 1. 오늘 날짜
-            const Text(
-              '2024년 5월 20일 월요일',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+            Text(
+              dateString,
+              style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const SizedBox(height: 16),
 
-            // 2. 오늘의 한 줄 카드 (사용자 메모 예시)
+            // 2. 오늘의 한 줄 카드
             _buildQuoteCard(
               icon: Icons.edit_note,
-              text: '내 메모 · 비타민 D: 커피랑 같이 먹지 않기',
+              text: quoteText,
             ),
             const SizedBox(height: 24),
 
             // 3. 완료 현황
-            _buildProgressSection(done: 1, total: 3),
+            _buildProgressSection(done: doneCount, total: totalCount),
             const SizedBox(height: 32),
 
             // 4. 시간순 복용 목록
@@ -38,31 +60,18 @@ class TodayScreen extends StatelessWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-            _buildSupplementItem(
-              time: '08:00',
-              name: '비타민 D',
-              condition: '식후',
-              isDone: false,
-              memo: '커피랑 같이 먹지 않기',
-            ),
-            _buildSupplementItem(
-              time: '12:30',
-              name: '오메가3',
-              condition: '식후',
-              isDone: true,
-            ),
-            _buildSupplementItem(
-              time: '21:00',
-              name: '마그네슘',
-              condition: '취침 전',
-              isDone: false,
-            ),
+            ...todayList.map((item) => _buildSupplementItem(
+                  time: item.record.scheduledTime.format(context),
+                  name: item.supplement.name,
+                  condition: item.supplement.condition.label,
+                  isDone: item.record.isDone,
+                  memo: item.supplement.memo,
+                )),
           ],
         ),
       ),
-      // 5. 영양제 추가 버튼
       floatingActionButton: FloatingActionButton(
-        onPressed: () {}, // 7단계에서 구현 예정
+        onPressed: () {},
         child: const Icon(Icons.add),
       ),
     );
@@ -133,16 +142,14 @@ class TodayScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // 시간 표시
           SizedBox(
-            width: 50,
+            width: 60,
             child: Text(
               time,
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
           ),
           const SizedBox(width: 12),
-          // 영양제 정보
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,7 +178,6 @@ class TodayScreen extends StatelessWidget {
               ],
             ),
           ),
-          // 체크 아이콘 (임시)
           Icon(
             isDone ? Icons.check_circle : Icons.radio_button_unchecked,
             color: isDone ? Colors.blue : Colors.grey[400],
