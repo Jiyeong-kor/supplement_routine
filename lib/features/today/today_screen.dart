@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supplement_routine/features/today/today_provider.dart';
+import 'package:supplement_routine/core/constants/habit_quotes.dart';
 
 class TodayScreen extends ConsumerWidget {
   const TodayScreen({super.key});
@@ -18,14 +19,24 @@ class TodayScreen extends ConsumerWidget {
     final weekDays = ['월', '화', '수', '목', '금', '토', '일'];
     final dateString = '${now.year}년 ${now.month}월 ${now.day}일 ${weekDays[now.weekday - 1]}요일';
 
-    // 오늘의 한 줄 로직 개선
+    // 오늘의 한 줄 로직 구현
     final memoItems = todayList.where(
       (item) => item.supplement.memo != null && item.supplement.memo!.trim().isNotEmpty,
     );
 
-    final quoteText = memoItems.isNotEmpty
-        ? '내 메모 · ${memoItems.first.supplement.name}: ${memoItems.first.supplement.memo}'
-        : '복용 후 바로 체크하면 오늘 기록이 더 정확해집니다.';
+    final String quoteText;
+    final IconData quoteIcon;
+
+    if (memoItems.isNotEmpty) {
+      final firstMemo = memoItems.first;
+      quoteText = '내 메모 · ${firstMemo.supplement.name}: ${firstMemo.supplement.memo}';
+      quoteIcon = Icons.edit_note;
+    } else {
+      // 메모가 없으면 날짜를 기반으로 일관된 랜덤 문구 선택
+      final quoteIndex = now.day % HabitQuotes.quotes.length;
+      quoteText = HabitQuotes.quotes[quoteIndex];
+      quoteIcon = Icons.auto_awesome;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -45,7 +56,7 @@ class TodayScreen extends ConsumerWidget {
 
             // 2. 오늘의 한 줄 카드
             _buildQuoteCard(
-              icon: Icons.edit_note,
+              icon: quoteIcon,
               text: quoteText,
             ),
             const SizedBox(height: 24),
