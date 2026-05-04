@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'intake_method.dart';
-import 'intake_condition.dart';
-import 'meal_type.dart';
+import 'package:supplement_routine/core/models/intake_method.dart';
+import 'package:supplement_routine/core/models/intake_condition.dart';
+import 'package:supplement_routine/core/models/meal_type.dart';
 
 class Supplement {
   final String id;

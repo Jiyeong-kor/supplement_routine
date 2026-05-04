@@ -34,4 +34,22 @@ class IntakeRecord {
       takenAt: takenAt ?? this.takenAt,
     );
   }
+
+  IntakeRecord markDone() {
+    return copyWith(
+      isDone: true,
+      takenAt: DateTime.now(),
+    );
+  }
+
+  IntakeRecord markUndone() {
+    return IntakeRecord(
+      id: id,
+      supplementId: supplementId,
+      date: date,
+      scheduledTime: scheduledTime,
+      isDone: false,
+      takenAt: null,
+    );
+  }
 }

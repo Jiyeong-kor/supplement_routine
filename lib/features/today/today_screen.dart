@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'today_provider.dart';
+import 'package:supplement_routine/features/today/today_provider.dart';
 
 class TodayScreen extends ConsumerWidget {
   const TodayScreen({super.key});
@@ -18,13 +18,13 @@ class TodayScreen extends ConsumerWidget {
     final weekDays = ['월', '화', '수', '목', '금', '토', '일'];
     final dateString = '${now.year}년 ${now.month}월 ${now.day}일 ${weekDays[now.weekday - 1]}요일';
 
-    // 메모가 있는 항목 찾기 (첫 번째 항목의 메모를 "오늘의 한 줄"로 표시하는 예시)
-    final memoItem = todayList.firstWhere(
-      (item) => item.supplement.memo != null && item.supplement.memo!.isNotEmpty,
-      orElse: () => todayList.first,
+    // 오늘의 한 줄 로직 개선
+    final memoItems = todayList.where(
+      (item) => item.supplement.memo != null && item.supplement.memo!.trim().isNotEmpty,
     );
-    final quoteText = memoItem.supplement.memo != null 
-        ? '내 메모 · ${memoItem.supplement.name}: ${memoItem.supplement.memo}'
+
+    final quoteText = memoItems.isNotEmpty
+        ? '내 메모 · ${memoItems.first.supplement.name}: ${memoItems.first.supplement.memo}'
         : '복용 후 바로 체크하면 오늘 기록이 더 정확해집니다.';
 
     return Scaffold(
@@ -66,6 +66,7 @@ class TodayScreen extends ConsumerWidget {
                   condition: item.supplement.condition.label,
                   isDone: item.record.isDone,
                   memo: item.supplement.memo,
+                  onTap: () => ref.read(todayListProvider.notifier).toggleRecord(item.record.id),
                 )),
           ],
         ),
@@ -130,60 +131,64 @@ class TodayScreen extends ConsumerWidget {
     required String name,
     required String condition,
     required bool isDone,
+    required VoidCallback onTap,
     String? memo,
   }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
-      ),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 60,
-            child: Text(
-              time,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey[200]!),
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 60,
+              child: Text(
+                time,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              ),
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    decoration: isDone ? TextDecoration.lineThrough : null,
-                    color: isDone ? Colors.grey : Colors.black,
-                  ),
-                ),
-                Text(
-                  condition,
-                  style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-                ),
-                if (memo != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(
-                      'ㄴ $memo',
-                      style: const TextStyle(fontSize: 12, color: Colors.blueGrey),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      decoration: isDone ? TextDecoration.lineThrough : null,
+                      color: isDone ? Colors.grey : Colors.black,
                     ),
                   ),
-              ],
+                  Text(
+                    condition,
+                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                  ),
+                  if (memo != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        'ㄴ $memo',
+                        style: const TextStyle(fontSize: 12, color: Colors.blueGrey),
+                      ),
+                    ),
+                ],
+              ),
             ),
-          ),
-          Icon(
-            isDone ? Icons.check_circle : Icons.radio_button_unchecked,
-            color: isDone ? Colors.blue : Colors.grey[400],
-            size: 28,
-          ),
-        ],
+            Icon(
+              isDone ? Icons.check_circle : Icons.radio_button_unchecked,
+              color: isDone ? Colors.blue : Colors.grey[400],
+              size: 28,
+            ),
+          ],
+        ),
       ),
     );
   }

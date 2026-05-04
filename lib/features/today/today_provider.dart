@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/models/supplement.dart';
-import '../../core/models/intake_record.dart';
-import '../../core/models/intake_method.dart';
-import '../../core/models/intake_condition.dart';
+import 'package:supplement_routine/core/models/supplement.dart';
+import 'package:supplement_routine/core/models/intake_record.dart';
+import 'package:supplement_routine/core/models/intake_method.dart';
+import 'package:supplement_routine/core/models/intake_condition.dart';
 
 // UI 표시를 위한 편의용 클래스
 class TodayDisplayItem {
@@ -16,7 +16,6 @@ class TodayDisplayItem {
 class TodayListNotifier extends Notifier<List<TodayDisplayItem>> {
   @override
   List<TodayDisplayItem> build() {
-    // 4단계: 더미 데이터 생성
     final now = DateTime.now();
     
     final dummySupplements = [
@@ -79,6 +78,19 @@ class TodayListNotifier extends Notifier<List<TodayDisplayItem>> {
           isDone: false,
         ),
       ),
+    ];
+  }
+
+  void toggleRecord(String recordId) {
+    state = [
+      for (final item in state)
+        if (item.record.id == recordId)
+          TodayDisplayItem(
+            supplement: item.supplement,
+            record: item.record.isDone ? item.record.markUndone() : item.record.markDone(),
+          )
+        else
+          item,
     ];
   }
 }
