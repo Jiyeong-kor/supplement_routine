@@ -10,16 +10,19 @@ class TodayScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final todayList = ref.watch(todayListProvider);
-    
+
     final doneCount = todayList.where((item) => item.record.isDone).length;
     final totalCount = todayList.length;
 
     final now = DateTime.now();
     final weekDays = ['월', '화', '수', '목', '금', '토', '일'];
-    final dateString = '${now.year}년 ${now.month}월 ${now.day}일 ${weekDays[now.weekday - 1]}요일';
+    final dateString =
+        '${now.year}년 ${now.month}월 ${now.day}일 ${weekDays[now.weekday - 1]}요일';
 
     final memoItems = todayList.where(
-      (item) => item.supplement.memo != null && item.supplement.memo!.trim().isNotEmpty,
+      (item) =>
+          item.supplement.memo != null &&
+          item.supplement.memo!.trim().isNotEmpty,
     );
 
     final String quoteText;
@@ -61,16 +64,21 @@ class TodayScreen extends ConsumerWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-            ...todayList.map((item) => _buildSupplementItem(
-                  time: item.record.scheduledTime.format(context),
-                  name: item.supplement.name,
-                  label: item.label,
-                  dosageUnit: item.supplement.dosageUnit,
-                  dosageValue: item.supplement.dosageValue,
-                  isDone: item.record.isDone,
-                  memo: item.supplement.memo,
-                  onTap: () => ref.read(todayListProvider.notifier).toggleRecord(item.record.id),
-                )),
+            if (todayList.isEmpty)
+              const _TodayEmptyState()
+            else
+              ...todayList.map((item) => _buildSupplementItem(
+                    time: item.record.scheduledTime.format(context),
+                    name: item.supplement.name,
+                    label: item.label,
+                    dosageUnit: item.supplement.dosageUnit,
+                    dosageValue: item.supplement.dosageValue,
+                    isDone: item.record.isDone,
+                    memo: item.supplement.memo,
+                    onTap: () => ref
+                        .read(todayListProvider.notifier)
+                        .toggleRecord(item.record.id),
+                  )),
           ],
         ),
       ),
@@ -118,8 +126,14 @@ class TodayScreen extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('오늘의 성취도', style: TextStyle(fontWeight: FontWeight.w600)),
-            Text('$done / $total 완료', style: const TextStyle(fontWeight: FontWeight.bold)),
+            const Text(
+              '오늘의 성취도',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+            Text(
+              '$done / $total 완료',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
           ],
         ),
         const SizedBox(height: 8),
@@ -145,8 +159,8 @@ class TodayScreen extends ConsumerWidget {
     String? memo,
   }) {
     // 1.5 개 -> 1.5개, 1.0 개 -> 1개 처리
-    final dosageStr = dosageValue == dosageValue.toInt() 
-        ? dosageValue.toInt().toString() 
+    final dosageStr = dosageValue == dosageValue.toInt()
+        ? dosageValue.toInt().toString()
         : dosageValue.toString();
 
     return GestureDetector(
@@ -204,6 +218,39 @@ class TodayScreen extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _TodayEmptyState extends StatelessWidget {
+  const _TodayEmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 28),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[200]!),
+      ),
+      child: Column(
+        children: [
+          Icon(Icons.medication_outlined, size: 36, color: Colors.grey[500]),
+          const SizedBox(height: 12),
+          const Text(
+            '등록된 복용 일정이 없습니다',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            '오른쪽 아래 + 버튼으로 영양제를 등록해보세요.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+          ),
+        ],
       ),
     );
   }
