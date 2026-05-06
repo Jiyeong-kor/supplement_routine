@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'today/today_screen.dart';
+import 'supplement/supplement_list_screen.dart';
 import 'history/history_screen.dart';
 import 'settings/settings_screen.dart';
 
@@ -15,6 +16,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   final List<Widget> _screens = [
     const TodayScreen(),
+    const SupplementListScreen(),
     const HistoryScreen(),
     const SettingsScreen(),
   ];
@@ -22,10 +24,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _screens,
-      ),
+      body: IndexedStack(index: _selectedIndex, children: _screens),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: (index) {
@@ -38,6 +37,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             icon: Icon(Icons.today_outlined),
             selectedIcon: Icon(Icons.today),
             label: '오늘',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.medication_outlined),
+            selectedIcon: Icon(Icons.medication),
+            label: '영양제',
           ),
           NavigationDestination(
             icon: Icon(Icons.calendar_month_outlined),

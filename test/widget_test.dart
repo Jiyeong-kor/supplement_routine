@@ -38,6 +38,33 @@ void main() {
     expect(find.text('1회 복용량은 0보다 큰 숫자로 입력해주세요.'), findsOneWidget);
   });
 
+  testWidgets('영양제 화면은 등록된 영양제 목록을 표시한다', (WidgetTester tester) async {
+    await tester.pumpWidget(const ProviderScope(child: SupplementRoutineApp()));
+
+    await tester.tap(find.text('영양제'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('등록된 영양제가 없습니다'), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.today_outlined));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField).first, '비타민 D');
+    await tester.tap(find.text('기상 직후(공복)'));
+    await tester.ensureVisible(find.text('등록 완료'));
+    await tester.tap(find.text('등록 완료'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('영양제'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('비타민 D'), findsOneWidget);
+    expect(find.text('식사 기준 · 하루 1회'), findsOneWidget);
+    expect(find.text('1회 1 개'), findsOneWidget);
+  });
+
   testWidgets('기록 화면은 오늘 복용 체크 상태를 완료율로 표시한다', (WidgetTester tester) async {
     await tester.pumpWidget(const ProviderScope(child: SupplementRoutineApp()));
 

@@ -12,6 +12,7 @@ class SupplementListNotifier extends Notifier<List<Supplement>> {
   }
 }
 
-final supplementListProvider = NotifierProvider<SupplementListNotifier, List<Supplement>>(() {
-  return SupplementListNotifier();
-});
+final supplementListProvider =
+    NotifierProvider<SupplementListNotifier, List<Supplement>>(() {
+      return SupplementListNotifier();
+    });

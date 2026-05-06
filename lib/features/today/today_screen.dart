@@ -81,6 +81,7 @@ class TodayScreen extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'today_add_supplement',
         onPressed: () {
           Navigator.push(
             context,
