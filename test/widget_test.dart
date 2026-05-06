@@ -30,4 +30,25 @@ void main() {
 
     expect(find.text('1회 복용량은 0보다 큰 숫자로 입력해주세요.'), findsOneWidget);
   });
+
+  testWidgets('기록 화면은 오늘 복용 체크 상태를 완료율로 표시한다', (WidgetTester tester) async {
+    await tester.pumpWidget(const ProviderScope(child: SupplementRoutineApp()));
+
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField).first, '비타민 D');
+    await tester.tap(find.text('기상 직후(공복)'));
+    await tester.ensureVisible(find.text('등록 완료'));
+    await tester.tap(find.text('등록 완료'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('비타민 D'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.calendar_month_outlined));
+    await tester.pumpAndSettle();
+
+    expect(find.text('완료율 100% (1/1)'), findsOneWidget);
+  });
 }
