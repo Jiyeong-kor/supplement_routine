@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supplement_routine/core/models/supplement.dart';
 import 'package:supplement_routine/core/models/intake_record.dart';
@@ -26,7 +25,7 @@ class TodayListNotifier extends Notifier<List<TodayDisplayItem>> {
 
     for (final s in supplements) {
       final scheduledIntakes = SchedulingService.calculateIntakeTimes(s);
-      
+
       for (int i = 0; i < scheduledIntakes.length; i++) {
         final intake = scheduledIntakes[i];
         items.add(
@@ -46,8 +45,10 @@ class TodayListNotifier extends Notifier<List<TodayDisplayItem>> {
     }
 
     items.sort((a, b) {
-      final aTime = a.record.scheduledTime.hour * 60 + a.record.scheduledTime.minute;
-      final bTime = b.record.scheduledTime.hour * 60 + b.record.scheduledTime.minute;
+      final aTime =
+          a.record.scheduledTime.hour * 60 + a.record.scheduledTime.minute;
+      final bTime =
+          b.record.scheduledTime.hour * 60 + b.record.scheduledTime.minute;
       return aTime.compareTo(bTime);
     });
 
@@ -61,7 +62,9 @@ class TodayListNotifier extends Notifier<List<TodayDisplayItem>> {
           TodayDisplayItem(
             supplement: item.supplement,
             label: item.label,
-            record: item.record.isDone ? item.record.markUndone() : item.record.markDone(),
+            record: item.record.isDone
+                ? item.record.markUndone()
+                : item.record.markDone(),
           )
         else
           item,
@@ -69,6 +72,7 @@ class TodayListNotifier extends Notifier<List<TodayDisplayItem>> {
   }
 }
 
-final todayListProvider = NotifierProvider<TodayListNotifier, List<TodayDisplayItem>>(() {
-  return TodayListNotifier();
-});
+final todayListProvider =
+    NotifierProvider<TodayListNotifier, List<TodayDisplayItem>>(() {
+      return TodayListNotifier();
+    });

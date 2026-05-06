@@ -30,7 +30,8 @@ class TodayScreen extends ConsumerWidget {
 
     if (memoItems.isNotEmpty) {
       final firstMemo = memoItems.first;
-      quoteText = '내 메모 · ${firstMemo.supplement.name}: ${firstMemo.supplement.memo}';
+      quoteText =
+          '내 메모 · ${firstMemo.supplement.name}: ${firstMemo.supplement.memo}';
       quoteIcon = Icons.edit_note;
     } else {
       final quoteIndex = now.day % HabitQuotes.quotes.length;
@@ -39,9 +40,7 @@ class TodayScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('오늘의 복용'),
-      ),
+      appBar: AppBar(title: const Text('오늘의 복용')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -52,10 +51,7 @@ class TodayScreen extends ConsumerWidget {
               style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const SizedBox(height: 16),
-            _buildQuoteCard(
-              icon: quoteIcon,
-              text: quoteText,
-            ),
+            _buildQuoteCard(icon: quoteIcon, text: quoteText),
             const SizedBox(height: 24),
             _buildProgressSection(done: doneCount, total: totalCount),
             const SizedBox(height: 32),
@@ -67,18 +63,20 @@ class TodayScreen extends ConsumerWidget {
             if (todayList.isEmpty)
               const _TodayEmptyState()
             else
-              ...todayList.map((item) => _buildSupplementItem(
-                    time: item.record.scheduledTime.format(context),
-                    name: item.supplement.name,
-                    label: item.label,
-                    dosageUnit: item.supplement.dosageUnit,
-                    dosageValue: item.supplement.dosageValue,
-                    isDone: item.record.isDone,
-                    memo: item.supplement.memo,
-                    onTap: () => ref
-                        .read(todayListProvider.notifier)
-                        .toggleRecord(item.record.id),
-                  )),
+              ...todayList.map(
+                (item) => _buildSupplementItem(
+                  time: item.record.scheduledTime.format(context),
+                  name: item.supplement.name,
+                  label: item.label,
+                  dosageUnit: item.supplement.dosageUnit,
+                  dosageValue: item.supplement.dosageValue,
+                  isDone: item.record.isDone,
+                  memo: item.supplement.memo,
+                  onTap: () => ref
+                      .read(todayListProvider.notifier)
+                      .toggleRecord(item.record.id),
+                ),
+              ),
           ],
         ),
       ),
@@ -86,7 +84,9 @@ class TodayScreen extends ConsumerWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const SupplementAddScreen()),
+            MaterialPageRoute(
+              builder: (context) => const SupplementAddScreen(),
+            ),
           );
         },
         child: const Icon(Icons.add),
@@ -179,7 +179,10 @@ class TodayScreen extends ConsumerWidget {
               width: 60,
               child: Text(
                 time,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -205,7 +208,10 @@ class TodayScreen extends ConsumerWidget {
                       padding: const EdgeInsets.only(top: 4),
                       child: Text(
                         'ㄴ $memo',
-                        style: const TextStyle(fontSize: 12, color: Colors.blueGrey),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.blueGrey,
+                        ),
                       ),
                     ),
                 ],
