@@ -86,9 +86,13 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
   void _saveSupplement() {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('영양제 이름을 입력해주세요.')));
+      _showSnackBar('영양제 이름을 입력해주세요.');
+      return;
+    }
+
+    final dosageValue = double.tryParse(_dosageValueController.text.trim());
+    if (dosageValue == null || dosageValue <= 0) {
+      _showSnackBar('1회 복용량은 0보다 큰 숫자로 입력해주세요.');
       return;
     }
 
@@ -99,9 +103,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
       method = IntakeMethod.mealBased;
       dailyCount = _selectedSlots.length;
       if (dailyCount == 0) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('복용 시간대를 하나 이상 선택해주세요.')));
+        _showSnackBar('복용 시간대를 하나 이상 선택해주세요.');
         return;
       }
     } else {
@@ -120,7 +122,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
       dailyCount: dailyCount,
       method: method,
       dosageUnit: _unit,
-      dosageValue: double.tryParse(_dosageValueController.text) ?? 1.0,
+      dosageValue: dosageValue,
       selectedSlots: method == IntakeMethod.mealBased
           ? _selectedSlots.toList()
           : null,
@@ -135,6 +137,12 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
 
     ref.read(supplementListProvider.notifier).addSupplement(newSupplement);
     Navigator.pop(context);
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -177,7 +185,9 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
                       _buildSectionTitle('1회 복용량'),
                       TextField(
                         controller: _dosageValueController,
-                        keyboardType: TextInputType.number,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
                         textAlign: TextAlign.center,
                         decoration: InputDecoration(
                           filled: true,
