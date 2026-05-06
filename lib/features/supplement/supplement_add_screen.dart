@@ -8,7 +8,9 @@ import 'package:supplement_routine/features/settings/settings_provider.dart';
 import 'package:supplement_routine/features/supplement/supplement_provider.dart';
 
 class SupplementAddScreen extends ConsumerStatefulWidget {
-  const SupplementAddScreen({super.key});
+  const SupplementAddScreen({super.key, this.initialSupplement});
+
+  final Supplement? initialSupplement;
 
   @override
   ConsumerState<SupplementAddScreen> createState() =>
@@ -39,10 +41,32 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
 
   bool _isNotificationEnabled = true;
 
+  bool get _isEditMode => widget.initialSupplement != null;
+
   @override
   void initState() {
     super.initState();
-    _isNotificationEnabled = ref.read(notificationSettingsProvider);
+    final initialSupplement = widget.initialSupplement;
+    if (initialSupplement == null) {
+      _isNotificationEnabled = ref.read(notificationSettingsProvider);
+      return;
+    }
+
+    _nameController.text = initialSupplement.name;
+    _memoController.text = initialSupplement.memo ?? '';
+    _dosageValueController.text = _formatDosage(initialSupplement.dosageValue);
+    _unit = initialSupplement.dosageUnit;
+    _isNotificationEnabled = initialSupplement.isNotificationEnabled;
+    _isRoutineBased = initialSupplement.method == IntakeMethod.mealBased;
+    _isSpecificTime = initialSupplement.method != IntakeMethod.interval;
+    _selectedSlots.addAll(initialSupplement.selectedSlots ?? []);
+    _fixedTimes = initialSupplement.fixedTimes ?? _fixedTimes;
+    _fixedCount = _fixedTimes.length;
+    _startTime = initialSupplement.startTime ?? _startTime;
+    _intervalHours = initialSupplement.intervalHours ?? _intervalHours;
+    _intervalCount = initialSupplement.method == IntakeMethod.interval
+        ? initialSupplement.dailyCount
+        : _intervalCount;
   }
 
   @override
@@ -123,8 +147,10 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
       }
     }
 
-    final newSupplement = Supplement(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+    final supplement = Supplement(
+      id:
+          widget.initialSupplement?.id ??
+          DateTime.now().millisecondsSinceEpoch.toString(),
       name: name,
       dailyCount: dailyCount,
       method: method,
@@ -142,8 +168,20 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
           : _memoController.text.trim(),
     );
 
-    ref.read(supplementListProvider.notifier).addSupplement(newSupplement);
+    if (_isEditMode) {
+      ref.read(supplementListProvider.notifier).updateSupplement(supplement);
+    } else {
+      ref.read(supplementListProvider.notifier).addSupplement(supplement);
+    }
     Navigator.pop(context);
+  }
+
+  String _formatDosage(double value) {
+    if (value == value.toInt()) {
+      return value.toInt().toString();
+    }
+
+    return value.toString();
   }
 
   void _showSnackBar(String message) {
@@ -157,9 +195,9 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          '영양제 등록',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          _isEditMode ? '영양제 수정' : '영양제 등록',
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
@@ -282,9 +320,12 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
                   ),
                   elevation: 0,
                 ),
-                child: const Text(
-                  '등록 완료',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                child: Text(
+                  _isEditMode ? '수정 완료' : '등록 완료',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),

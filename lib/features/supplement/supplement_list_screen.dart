@@ -23,6 +23,9 @@ class SupplementListScreen extends ConsumerWidget {
                 final supplement = supplements[index];
                 return _SupplementListItem(
                   supplement: supplement,
+                  onEdit: () {
+                    _openEditScreen(context, supplement);
+                  },
                   onDelete: () {
                     _showDeleteDialog(context, ref, supplement);
                   },
@@ -40,6 +43,16 @@ class SupplementListScreen extends ConsumerWidget {
           );
         },
         child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  void _openEditScreen(BuildContext context, Supplement supplement) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            SupplementAddScreen(initialSupplement: supplement),
       ),
     );
   }
@@ -75,9 +88,14 @@ class SupplementListScreen extends ConsumerWidget {
 }
 
 class _SupplementListItem extends StatelessWidget {
-  const _SupplementListItem({required this.supplement, required this.onDelete});
+  const _SupplementListItem({
+    required this.supplement,
+    required this.onEdit,
+    required this.onDelete,
+  });
 
   final Supplement supplement;
+  final VoidCallback onEdit;
   final VoidCallback onDelete;
 
   @override
@@ -110,6 +128,13 @@ class _SupplementListItem extends StatelessWidget {
                       : Icons.notifications_off_outlined,
                   size: 20,
                   color: Colors.grey[600],
+                ),
+                const SizedBox(width: 4),
+                IconButton(
+                  tooltip: '수정',
+                  onPressed: onEdit,
+                  icon: const Icon(Icons.edit_outlined),
+                  color: Colors.grey[700],
                 ),
                 const SizedBox(width: 4),
                 IconButton(

@@ -76,6 +76,34 @@ void main() {
     expect(find.text('비타민 D'), findsNothing);
   });
 
+  testWidgets('영양제 목록에서 등록된 영양제를 수정한다', (WidgetTester tester) async {
+    await tester.pumpWidget(const ProviderScope(child: SupplementRoutineApp()));
+
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField).first, '비타민 D');
+    await tester.tap(find.text('기상 직후(공복)'));
+    await tester.ensureVisible(find.text('등록 완료'));
+    await tester.tap(find.text('등록 완료'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('영양제'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('수정'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('영양제 수정'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextField).first, '비타민 C');
+    await tester.ensureVisible(find.text('수정 완료'));
+    await tester.tap(find.text('수정 완료'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('비타민 C'), findsOneWidget);
+    expect(find.text('비타민 D'), findsNothing);
+  });
+
   testWidgets('기록 화면은 오늘 복용 체크 상태를 완료율로 표시한다', (WidgetTester tester) async {
     await tester.pumpWidget(const ProviderScope(child: SupplementRoutineApp()));
 
