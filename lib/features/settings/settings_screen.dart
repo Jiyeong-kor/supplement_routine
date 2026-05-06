@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supplement_routine/core/utils/time_utils.dart';
 import 'package:supplement_routine/features/settings/settings_provider.dart';
+import 'package:supplement_routine/features/supplement/supplement_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -41,7 +42,7 @@ class SettingsScreen extends ConsumerWidget {
             leading: const Icon(Icons.delete_forever, color: Colors.red),
             title: const Text('데이터 초기화', style: TextStyle(color: Colors.red)),
             onTap: () {
-              _showResetDialog(context);
+              _showResetDialog(context, ref);
             },
           ),
           const Divider(),
@@ -154,7 +155,7 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  void _showResetDialog(BuildContext context) {
+  void _showResetDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -166,7 +167,13 @@ class SettingsScreen extends ConsumerWidget {
             child: const Text('취소'),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              ref.read(supplementListProvider.notifier).clearSupplements();
+              Navigator.pop(context);
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('데이터가 초기화되었습니다.')));
+            },
             child: const Text('초기화', style: TextStyle(color: Colors.red)),
           ),
         ],

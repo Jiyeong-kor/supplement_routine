@@ -97,6 +97,40 @@ void main() {
     expect(find.text('완료율 100% (1/1)'), findsOneWidget);
   });
 
+  testWidgets('설정 화면 데이터 초기화는 등록된 영양제를 모두 삭제한다', (WidgetTester tester) async {
+    await tester.pumpWidget(const ProviderScope(child: SupplementRoutineApp()));
+
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField).first, '비타민 D');
+    await tester.tap(find.text('기상 직후(공복)'));
+    await tester.ensureVisible(find.text('등록 완료'));
+    await tester.tap(find.text('등록 완료'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('비타민 D'), findsOneWidget);
+
+    await tester.tap(find.text('설정'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('데이터 초기화'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('초기화'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('데이터가 초기화되었습니다.'), findsOneWidget);
+
+    await tester.tap(find.text('오늘'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('등록된 복용 일정이 없습니다'), findsOneWidget);
+
+    await tester.tap(find.text('영양제'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('등록된 영양제가 없습니다'), findsOneWidget);
+  });
+
   test('식사 시간 설정 변경은 오늘 루틴 일정에 반영된다', () {
     final container = ProviderContainer();
     addTearDown(container.dispose);

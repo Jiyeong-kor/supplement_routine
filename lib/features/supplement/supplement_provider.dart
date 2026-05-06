@@ -17,6 +17,10 @@ class SupplementListNotifier extends Notifier<List<Supplement>> {
         if (supplement.id != supplementId) supplement,
     ];
   }
+
+  void clearSupplements() {
+    state = [];
+  }
 }
 
 final supplementListProvider =
