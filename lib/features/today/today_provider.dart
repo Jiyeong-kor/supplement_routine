@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supplement_routine/core/models/supplement.dart';
 import 'package:supplement_routine/core/models/intake_record.dart';
 import 'package:supplement_routine/core/services/scheduling_service.dart';
+import 'package:supplement_routine/features/history/intake_record_provider.dart';
 import 'package:supplement_routine/features/settings/settings_provider.dart';
 import 'package:supplement_routine/features/supplement/supplement_provider.dart';
 
@@ -22,6 +23,7 @@ class TodayListNotifier extends Notifier<List<TodayDisplayItem>> {
   List<TodayDisplayItem> build() {
     final supplements = ref.watch(supplementListProvider);
     final mealTimeSettings = ref.watch(mealTimeSettingsProvider);
+    ref.watch(intakeRecordProvider);
     final now = DateTime.now();
     List<TodayDisplayItem> items = [];
 
@@ -33,17 +35,18 @@ class TodayListNotifier extends Notifier<List<TodayDisplayItem>> {
 
       for (int i = 0; i < scheduledIntakes.length; i++) {
         final intake = scheduledIntakes[i];
+        final record = IntakeRecord(
+          id: 'r_${s.id}_${now.day}_$i',
+          supplementId: s.id,
+          date: now,
+          scheduledTime: intake.time,
+          isDone: false,
+        );
         items.add(
           TodayDisplayItem(
             supplement: s,
             label: intake.label,
-            record: IntakeRecord(
-              id: 'r_${s.id}_${now.day}_$i',
-              supplementId: s.id,
-              date: now,
-              scheduledTime: intake.time,
-              isDone: false,
-            ),
+            record: ref.read(intakeRecordProvider.notifier).getOrCreate(record),
           ),
         );
       }
@@ -61,19 +64,19 @@ class TodayListNotifier extends Notifier<List<TodayDisplayItem>> {
   }
 
   void toggleRecord(String recordId) {
-    state = [
-      for (final item in state)
-        if (item.record.id == recordId)
-          TodayDisplayItem(
-            supplement: item.supplement,
-            label: item.label,
-            record: item.record.isDone
-                ? item.record.markUndone()
-                : item.record.markDone(),
-          )
-        else
-          item,
-    ];
+    IntakeRecord? record;
+    for (final item in state) {
+      if (item.record.id == recordId) {
+        record = item.record;
+        break;
+      }
+    }
+
+    if (record == null) {
+      return;
+    }
+
+    ref.read(intakeRecordProvider.notifier).toggleRecord(record);
   }
 }
 

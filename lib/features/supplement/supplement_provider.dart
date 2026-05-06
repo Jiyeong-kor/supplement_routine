@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supplement_routine/core/models/supplement.dart';
+import 'package:supplement_routine/features/history/intake_record_provider.dart';
 
 class SupplementListNotifier extends Notifier<List<Supplement>> {
   @override
@@ -26,10 +27,14 @@ class SupplementListNotifier extends Notifier<List<Supplement>> {
       for (final supplement in state)
         if (supplement.id != supplementId) supplement,
     ];
+    ref
+        .read(intakeRecordProvider.notifier)
+        .clearRecordsForSupplement(supplementId);
   }
 
   void clearSupplements() {
     state = [];
+    ref.read(intakeRecordProvider.notifier).clearAll();
   }
 }
 

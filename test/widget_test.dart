@@ -239,4 +239,49 @@ void main() {
       30,
     );
   });
+
+  test('복용 체크 기록은 오늘 일정 재계산 후에도 유지된다', () {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+
+    container
+        .read(supplementListProvider.notifier)
+        .addSupplement(
+          const Supplement(
+            id: 'test_supplement',
+            name: '비타민 D',
+            dailyCount: 1,
+            method: IntakeMethod.mealBased,
+            dosageUnit: '개',
+            dosageValue: 1,
+            selectedSlots: [
+              IntakeSlot(
+                mealType: MealType.breakfast,
+                condition: IntakeCondition.afterMeal,
+              ),
+            ],
+            isNotificationEnabled: true,
+          ),
+        );
+
+    final recordId = container.read(todayListProvider).first.record.id;
+
+    container.read(todayListProvider.notifier).toggleRecord(recordId);
+
+    expect(container.read(todayListProvider).first.record.isDone, isTrue);
+    expect(
+      container.read(todayListProvider).first.record.scheduledTime.hour,
+      8,
+    );
+
+    container
+        .read(mealTimeSettingsProvider.notifier)
+        .updateBreakfastTime(const TimeOfDay(hour: 9, minute: 0));
+
+    expect(container.read(todayListProvider).first.record.isDone, isTrue);
+    expect(
+      container.read(todayListProvider).first.record.scheduledTime.hour,
+      9,
+    );
+  });
 }
