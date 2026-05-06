@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supplement_routine/features/today/today_provider.dart';
 import 'package:supplement_routine/core/constants/habit_quotes.dart';
 
+import 'package:supplement_routine/features/supplement/supplement_add_screen.dart';
+
 class TodayScreen extends ConsumerWidget {
   const TodayScreen({super.key});
 
@@ -83,7 +85,12 @@ class TodayScreen extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const SupplementAddScreen()),
+          );
+        },
         child: const Icon(Icons.add),
       ),
     );
