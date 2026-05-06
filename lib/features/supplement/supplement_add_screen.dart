@@ -206,18 +206,10 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSectionTitle('영양제 이름'),
-            TextField(
+            const _SectionTitle('영양제 이름'),
+            _SupplementTextField(
               controller: _nameController,
-              decoration: InputDecoration(
-                hintText: '예: 비타민 D, 오메가3',
-                filled: true,
-                fillColor: Colors.grey[100],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-              ),
+              hintText: '예: 비타민 D, 오메가3',
             ),
             const SizedBox(height: 24),
 
@@ -227,21 +219,13 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildSectionTitle('1회 복용량'),
-                      TextField(
+                      const _SectionTitle('1회 복용량'),
+                      _SupplementTextField(
                         controller: _dosageValueController,
                         keyboardType: const TextInputType.numberWithOptions(
                           decimal: true,
                         ),
                         textAlign: TextAlign.center,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
                       ),
                     ],
                   ),
@@ -251,7 +235,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildSectionTitle('단위'),
+                      const _SectionTitle('단위'),
                       DropdownButtonFormField<String>(
                         initialValue: _unit,
                         decoration: InputDecoration(
@@ -276,14 +260,14 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
             ),
             const SizedBox(height: 24),
 
-            _buildSectionTitle('복용 방식 선택'),
+            const _SectionTitle('복용 방식 선택'),
             _buildTopMethodSelector(),
             const SizedBox(height: 24),
 
             _buildDetailSection(),
 
             const SizedBox(height: 24),
-            _buildSectionTitle('기타 설정'),
+            const _SectionTitle('기타 설정'),
             SwitchListTile(
               title: const Text('복용 알림 받기'),
               value: _isNotificationEnabled,
@@ -291,59 +275,19 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
               onChanged: (v) => setState(() => _isNotificationEnabled = v),
             ),
             const SizedBox(height: 12),
-            _buildSectionTitle('메모 (선택)'),
-            TextField(
+            const _SectionTitle('메모 (선택)'),
+            _SupplementTextField(
               controller: _memoController,
               maxLines: 2,
-              decoration: InputDecoration(
-                hintText: '주의사항 등을 적어주세요',
-                filled: true,
-                fillColor: Colors.grey[100],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-              ),
+              hintText: '주의사항 등을 적어주세요',
             ),
             const SizedBox(height: 40),
 
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                onPressed: _saveSupplement,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 0,
-                ),
-                child: Text(
-                  _isEditMode ? '수정 완료' : '등록 완료',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
+            _SaveSupplementButton(
+              label: _isEditMode ? '수정 완료' : '등록 완료',
+              onPressed: _saveSupplement,
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.bold,
-          color: Colors.blueGrey,
         ),
       ),
     );
@@ -405,7 +349,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionTitle('언제 복용하시나요? (다중 선택)'),
+          const _SectionTitle('언제 복용하시나요? (다중 선택)'),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -631,6 +575,92 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
           ],
         ),
       ],
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle(this.title);
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          color: Colors.blueGrey,
+        ),
+      ),
+    );
+  }
+}
+
+class _SupplementTextField extends StatelessWidget {
+  const _SupplementTextField({
+    required this.controller,
+    this.hintText,
+    this.keyboardType,
+    this.textAlign = TextAlign.start,
+    this.maxLines = 1,
+  });
+
+  final TextEditingController controller;
+  final String? hintText;
+  final TextInputType? keyboardType;
+  final TextAlign textAlign;
+  final int maxLines;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      textAlign: textAlign,
+      maxLines: maxLines,
+      decoration: InputDecoration(
+        hintText: hintText,
+        filled: true,
+        fillColor: Colors.grey[100],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+      ),
+    );
+  }
+}
+
+class _SaveSupplementButton extends StatelessWidget {
+  const _SaveSupplementButton({required this.label, required this.onPressed});
+
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          elevation: 0,
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+      ),
     );
   }
 }
