@@ -6,6 +6,7 @@ import 'package:supplement_routine/core/models/intake_condition.dart';
 import 'package:supplement_routine/core/models/intake_method.dart';
 import 'package:supplement_routine/core/models/meal_type.dart';
 import 'package:supplement_routine/core/models/supplement.dart';
+import 'package:supplement_routine/features/history/history_summary_provider.dart';
 import 'package:supplement_routine/features/settings/settings_provider.dart';
 import 'package:supplement_routine/features/supplement/supplement_provider.dart';
 import 'package:supplement_routine/features/today/today_provider.dart';
@@ -283,5 +284,40 @@ void main() {
       container.read(todayListProvider).first.record.scheduledTime.hour,
       9,
     );
+  });
+
+  test('오늘 기록 요약은 완료 개수와 완료율을 계산한다', () {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+
+    container
+        .read(supplementListProvider.notifier)
+        .addSupplement(
+          const Supplement(
+            id: 'test_supplement',
+            name: '비타민 D',
+            dailyCount: 1,
+            method: IntakeMethod.mealBased,
+            dosageUnit: '개',
+            dosageValue: 1,
+            selectedSlots: [
+              IntakeSlot(
+                mealType: MealType.breakfast,
+                condition: IntakeCondition.afterMeal,
+              ),
+            ],
+            isNotificationEnabled: true,
+          ),
+        );
+
+    final recordId = container.read(todayListProvider).first.record.id;
+
+    container.read(todayListProvider.notifier).toggleRecord(recordId);
+
+    final summary = container.read(todayHistorySummaryProvider);
+
+    expect(summary.doneCount, 1);
+    expect(summary.totalCount, 1);
+    expect(summary.completionRate, 1);
   });
 }

@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supplement_routine/features/today/today_provider.dart';
+import 'package:supplement_routine/features/history/history_summary_provider.dart';
 
 class HistoryScreen extends ConsumerWidget {
   const HistoryScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final todayList = ref.watch(todayListProvider);
-    final done = todayList.where((item) => item.record.isDone).length;
-    final total = todayList.length;
-    final completion = total > 0 ? done / total : 0.0;
-    final today = DateTime.now();
+    final summary = ref.watch(todayHistorySummaryProvider);
+    final today = summary.date;
     final weekDays = ['월', '화', '수', '목', '금', '토', '일'];
     final dateText =
         '${today.month}월 ${today.day}일 ${weekDays[today.weekday - 1]}요일';
@@ -23,11 +20,11 @@ class HistoryScreen extends ConsumerWidget {
         children: [
           _HistoryItem(
             dateText: '오늘 · $dateText',
-            done: done,
-            total: total,
-            completion: completion,
+            done: summary.doneCount,
+            total: summary.totalCount,
+            completion: summary.completionRate,
           ),
-          if (total == 0) ...[
+          if (summary.isEmpty) ...[
             const SizedBox(height: 12),
             const _HistoryEmptyState(),
           ],
