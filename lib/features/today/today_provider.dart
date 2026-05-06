@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supplement_routine/core/models/supplement.dart';
 import 'package:supplement_routine/core/models/intake_record.dart';
 import 'package:supplement_routine/core/services/scheduling_service.dart';
+import 'package:supplement_routine/features/settings/settings_provider.dart';
 import 'package:supplement_routine/features/supplement/supplement_provider.dart';
 
 class TodayDisplayItem {
@@ -20,11 +21,15 @@ class TodayListNotifier extends Notifier<List<TodayDisplayItem>> {
   @override
   List<TodayDisplayItem> build() {
     final supplements = ref.watch(supplementListProvider);
+    final mealTimeSettings = ref.watch(mealTimeSettingsProvider);
     final now = DateTime.now();
     List<TodayDisplayItem> items = [];
 
     for (final s in supplements) {
-      final scheduledIntakes = SchedulingService.calculateIntakeTimes(s);
+      final scheduledIntakes = SchedulingService.calculateIntakeTimes(
+        s,
+        mealTimeSettings: mealTimeSettings,
+      );
 
       for (int i = 0; i < scheduledIntakes.length; i++) {
         final intake = scheduledIntakes[i];

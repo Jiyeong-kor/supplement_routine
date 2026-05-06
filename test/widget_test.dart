@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supplement_routine/app/supplement_routine_app.dart';
+import 'package:supplement_routine/core/models/intake_condition.dart';
+import 'package:supplement_routine/core/models/intake_method.dart';
+import 'package:supplement_routine/core/models/meal_type.dart';
+import 'package:supplement_routine/core/models/supplement.dart';
+import 'package:supplement_routine/features/settings/settings_provider.dart';
+import 'package:supplement_routine/features/supplement/supplement_provider.dart';
+import 'package:supplement_routine/features/today/today_provider.dart';
 
 void main() {
   testWidgets('앱 시작 화면에 오늘 탭이 표시된다', (WidgetTester tester) async {
@@ -50,5 +57,52 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('완료율 100% (1/1)'), findsOneWidget);
+  });
+
+  test('식사 시간 설정 변경은 오늘 루틴 일정에 반영된다', () {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+
+    container
+        .read(supplementListProvider.notifier)
+        .addSupplement(
+          const Supplement(
+            id: 'test_supplement',
+            name: '비타민 D',
+            dailyCount: 1,
+            method: IntakeMethod.mealBased,
+            dosageUnit: '개',
+            dosageValue: 1,
+            selectedSlots: [
+              IntakeSlot(
+                mealType: MealType.breakfast,
+                condition: IntakeCondition.afterMeal,
+              ),
+            ],
+            isNotificationEnabled: true,
+          ),
+        );
+
+    expect(
+      container.read(todayListProvider).first.record.scheduledTime.hour,
+      8,
+    );
+    expect(
+      container.read(todayListProvider).first.record.scheduledTime.minute,
+      30,
+    );
+
+    container
+        .read(mealTimeSettingsProvider.notifier)
+        .updateBreakfastTime(const TimeOfDay(hour: 9, minute: 0));
+
+    expect(
+      container.read(todayListProvider).first.record.scheduledTime.hour,
+      9,
+    );
+    expect(
+      container.read(todayListProvider).first.record.scheduledTime.minute,
+      30,
+    );
   });
 }
