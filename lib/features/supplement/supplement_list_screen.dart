@@ -20,7 +20,13 @@ class SupplementListScreen extends ConsumerWidget {
               itemCount: supplements.length,
               separatorBuilder: (context, index) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
-                return _SupplementListItem(supplement: supplements[index]);
+                final supplement = supplements[index];
+                return _SupplementListItem(
+                  supplement: supplement,
+                  onDelete: () {
+                    _showDeleteDialog(context, ref, supplement);
+                  },
+                );
               },
             ),
       floatingActionButton: FloatingActionButton(
@@ -37,12 +43,42 @@ class SupplementListScreen extends ConsumerWidget {
       ),
     );
   }
+
+  void _showDeleteDialog(
+    BuildContext context,
+    WidgetRef ref,
+    Supplement supplement,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('영양제 삭제'),
+        content: Text('${supplement.name}을(를) 삭제하시겠습니까?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () {
+              ref
+                  .read(supplementListProvider.notifier)
+                  .removeSupplement(supplement.id);
+              Navigator.pop(context);
+            },
+            child: const Text('삭제', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _SupplementListItem extends StatelessWidget {
-  const _SupplementListItem({required this.supplement});
+  const _SupplementListItem({required this.supplement, required this.onDelete});
 
   final Supplement supplement;
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -74,6 +110,13 @@ class _SupplementListItem extends StatelessWidget {
                       : Icons.notifications_off_outlined,
                   size: 20,
                   color: Colors.grey[600],
+                ),
+                const SizedBox(width: 4),
+                IconButton(
+                  tooltip: '삭제',
+                  onPressed: onDelete,
+                  icon: const Icon(Icons.delete_outline),
+                  color: Colors.red,
                 ),
               ],
             ),

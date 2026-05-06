@@ -10,6 +10,13 @@ class SupplementListNotifier extends Notifier<List<Supplement>> {
   void addSupplement(Supplement supplement) {
     state = [...state, supplement];
   }
+
+  void removeSupplement(String supplementId) {
+    state = [
+      for (final supplement in state)
+        if (supplement.id != supplementId) supplement,
+    ];
+  }
 }
 
 final supplementListProvider =

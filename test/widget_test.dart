@@ -63,6 +63,17 @@ void main() {
     expect(find.text('비타민 D'), findsOneWidget);
     expect(find.text('식사 기준 · 하루 1회'), findsOneWidget);
     expect(find.text('1회 1 개'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('삭제'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('영양제 삭제'), findsOneWidget);
+
+    await tester.tap(find.text('삭제'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('등록된 영양제가 없습니다'), findsOneWidget);
+    expect(find.text('비타민 D'), findsNothing);
   });
 
   testWidgets('기록 화면은 오늘 복용 체크 상태를 완료율로 표시한다', (WidgetTester tester) async {
