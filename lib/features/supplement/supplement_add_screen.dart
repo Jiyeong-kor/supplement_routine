@@ -4,6 +4,7 @@ import 'package:supplement_routine/core/models/supplement.dart';
 import 'package:supplement_routine/core/models/intake_method.dart';
 import 'package:supplement_routine/core/models/intake_condition.dart';
 import 'package:supplement_routine/core/models/meal_type.dart';
+import 'package:supplement_routine/features/settings/settings_provider.dart';
 import 'package:supplement_routine/features/supplement/supplement_provider.dart';
 
 class SupplementAddScreen extends ConsumerStatefulWidget {
@@ -37,6 +38,12 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
   int _intervalCount = 1;
 
   bool _isNotificationEnabled = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _isNotificationEnabled = ref.read(notificationSettingsProvider);
+  }
 
   @override
   void dispose() {

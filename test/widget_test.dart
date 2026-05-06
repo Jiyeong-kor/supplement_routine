@@ -131,6 +131,40 @@ void main() {
     expect(find.text('등록된 영양제가 없습니다'), findsOneWidget);
   });
 
+  testWidgets('알림 설정은 새 영양제 등록 기본값에 반영된다', (WidgetTester tester) async {
+    await tester.pumpWidget(const ProviderScope(child: SupplementRoutineApp()));
+
+    await tester.tap(find.text('설정'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(SwitchListTile, '알림 설정'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('오늘'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+
+    expect(
+      tester
+          .widget<SwitchListTile>(
+            find.widgetWithText(SwitchListTile, '복용 알림 받기'),
+          )
+          .value,
+      isFalse,
+    );
+
+    await tester.enterText(find.byType(TextField).first, '비타민 D');
+    await tester.tap(find.text('기상 직후(공복)'));
+    await tester.ensureVisible(find.text('등록 완료'));
+    await tester.tap(find.text('등록 완료'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('영양제'));
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.notifications_off_outlined), findsOneWidget);
+  });
+
   test('식사 시간 설정 변경은 오늘 루틴 일정에 반영된다', () {
     final container = ProviderContainer();
     addTearDown(container.dispose);

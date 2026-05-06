@@ -25,3 +25,19 @@ final mealTimeSettingsProvider =
     NotifierProvider<MealTimeSettingsNotifier, MealTimeSettings>(() {
       return MealTimeSettingsNotifier();
     });
+
+class NotificationSettingsNotifier extends Notifier<bool> {
+  @override
+  bool build() {
+    return true;
+  }
+
+  void updateEnabled(bool isEnabled) {
+    state = isEnabled;
+  }
+}
+
+final notificationSettingsProvider =
+    NotifierProvider<NotificationSettingsNotifier, bool>(() {
+      return NotificationSettingsNotifier();
+    });

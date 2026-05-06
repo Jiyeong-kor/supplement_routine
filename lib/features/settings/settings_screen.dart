@@ -10,6 +10,7 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final mealTimeSettings = ref.watch(mealTimeSettingsProvider);
+    final isNotificationEnabled = ref.watch(notificationSettingsProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('설정')),
@@ -29,12 +30,20 @@ class SettingsScreen extends ConsumerWidget {
               _showMealTimeSheet(context);
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.notifications),
+          SwitchListTile(
+            secondary: const Icon(Icons.notifications),
             title: const Text('알림 설정'),
-            subtitle: const Text('푸시 알림 및 소리를 설정합니다'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {},
+            subtitle: Text(
+              isNotificationEnabled
+                  ? '새 영양제 등록 시 알림을 기본으로 켭니다'
+                  : '새 영양제 등록 시 알림을 기본으로 끕니다',
+            ),
+            value: isNotificationEnabled,
+            onChanged: (value) {
+              ref
+                  .read(notificationSettingsProvider.notifier)
+                  .updateEnabled(value);
+            },
           ),
           const Divider(),
           _buildSectionTitle('데이터 관리'),
