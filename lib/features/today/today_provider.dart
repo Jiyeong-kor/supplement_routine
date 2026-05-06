@@ -2,83 +2,56 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supplement_routine/core/models/supplement.dart';
 import 'package:supplement_routine/core/models/intake_record.dart';
-import 'package:supplement_routine/core/models/intake_method.dart';
-import 'package:supplement_routine/core/models/intake_condition.dart';
+import 'package:supplement_routine/core/services/scheduling_service.dart';
+import 'package:supplement_routine/features/supplement/supplement_provider.dart';
 
-// UI 표시를 위한 편의용 클래스
 class TodayDisplayItem {
   final Supplement supplement;
   final IntakeRecord record;
+  final String label;
 
-  TodayDisplayItem({required this.supplement, required this.record});
+  TodayDisplayItem({
+    required this.supplement,
+    required this.record,
+    required this.label,
+  });
 }
 
 class TodayListNotifier extends Notifier<List<TodayDisplayItem>> {
   @override
   List<TodayDisplayItem> build() {
+    final supplements = ref.watch(supplementListProvider);
     final now = DateTime.now();
-    
-    final dummySupplements = [
-      Supplement(
-        id: '1',
-        name: '비타민 D',
-        dailyCount: 1,
-        method: IntakeMethod.mealBased,
-        condition: IntakeCondition.afterMeal,
-        isNotificationEnabled: true,
-        memo: '커피랑 같이 먹지 않기',
-      ),
-      Supplement(
-        id: '2',
-        name: '오메가3',
-        dailyCount: 1,
-        method: IntakeMethod.mealBased,
-        condition: IntakeCondition.afterMeal,
-        isNotificationEnabled: true,
-      ),
-      Supplement(
-        id: '3',
-        name: '마그네슘',
-        dailyCount: 1,
-        method: IntakeMethod.fixedTime,
-        condition: IntakeCondition.beforeSleep,
-        isNotificationEnabled: true,
-      ),
-    ];
+    List<TodayDisplayItem> items = [];
 
-    return [
-      TodayDisplayItem(
-        supplement: dummySupplements[0],
-        record: IntakeRecord(
-          id: 'r1',
-          supplementId: '1',
-          date: now,
-          scheduledTime: const TimeOfDay(hour: 8, minute: 0),
-          isDone: false,
-        ),
-      ),
-      TodayDisplayItem(
-        supplement: dummySupplements[1],
-        record: IntakeRecord(
-          id: 'r2',
-          supplementId: '2',
-          date: now,
-          scheduledTime: const TimeOfDay(hour: 12, minute: 30),
-          isDone: true,
-          takenAt: now,
-        ),
-      ),
-      TodayDisplayItem(
-        supplement: dummySupplements[2],
-        record: IntakeRecord(
-          id: 'r3',
-          supplementId: '3',
-          date: now,
-          scheduledTime: const TimeOfDay(hour: 21, minute: 0),
-          isDone: false,
-        ),
-      ),
-    ];
+    for (final s in supplements) {
+      final scheduledIntakes = SchedulingService.calculateIntakeTimes(s);
+      
+      for (int i = 0; i < scheduledIntakes.length; i++) {
+        final intake = scheduledIntakes[i];
+        items.add(
+          TodayDisplayItem(
+            supplement: s,
+            label: intake.label,
+            record: IntakeRecord(
+              id: 'r_${s.id}_${now.day}_$i',
+              supplementId: s.id,
+              date: now,
+              scheduledTime: intake.time,
+              isDone: false,
+            ),
+          ),
+        );
+      }
+    }
+
+    items.sort((a, b) {
+      final aTime = a.record.scheduledTime.hour * 60 + a.record.scheduledTime.minute;
+      final bTime = b.record.scheduledTime.hour * 60 + b.record.scheduledTime.minute;
+      return aTime.compareTo(bTime);
+    });
+
+    return items;
   }
 
   void toggleRecord(String recordId) {
@@ -87,6 +60,7 @@ class TodayListNotifier extends Notifier<List<TodayDisplayItem>> {
         if (item.record.id == recordId)
           TodayDisplayItem(
             supplement: item.supplement,
+            label: item.label,
             record: item.record.isDone ? item.record.markUndone() : item.record.markDone(),
           )
         else

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supplement_routine/features/today/today_provider.dart';
 import 'package:supplement_routine/core/constants/habit_quotes.dart';
-
 import 'package:supplement_routine/features/supplement/supplement_add_screen.dart';
 
 class TodayScreen extends ConsumerWidget {
@@ -12,16 +11,13 @@ class TodayScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final todayList = ref.watch(todayListProvider);
     
-    // 완료 개수 계산
     final doneCount = todayList.where((item) => item.record.isDone).length;
     final totalCount = todayList.length;
 
-    // 날짜 포맷 (예: 2024년 5월 20일 월요일)
     final now = DateTime.now();
     final weekDays = ['월', '화', '수', '목', '금', '토', '일'];
     final dateString = '${now.year}년 ${now.month}월 ${now.day}일 ${weekDays[now.weekday - 1]}요일';
 
-    // 오늘의 한 줄 로직 구현
     final memoItems = todayList.where(
       (item) => item.supplement.memo != null && item.supplement.memo!.trim().isNotEmpty,
     );
@@ -34,7 +30,6 @@ class TodayScreen extends ConsumerWidget {
       quoteText = '내 메모 · ${firstMemo.supplement.name}: ${firstMemo.supplement.memo}';
       quoteIcon = Icons.edit_note;
     } else {
-      // 메모가 없으면 날짜를 기반으로 일관된 랜덤 문구 선택
       final quoteIndex = now.day % HabitQuotes.quotes.length;
       quoteText = HabitQuotes.quotes[quoteIndex];
       quoteIcon = Icons.auto_awesome;
@@ -49,25 +44,18 @@ class TodayScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 1. 오늘 날짜
             Text(
               dateString,
               style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const SizedBox(height: 16),
-
-            // 2. 오늘의 한 줄 카드
             _buildQuoteCard(
               icon: quoteIcon,
               text: quoteText,
             ),
             const SizedBox(height: 24),
-
-            // 3. 완료 현황
             _buildProgressSection(done: doneCount, total: totalCount),
             const SizedBox(height: 32),
-
-            // 4. 시간순 복용 목록
             const Text(
               '복용 목록',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -76,7 +64,9 @@ class TodayScreen extends ConsumerWidget {
             ...todayList.map((item) => _buildSupplementItem(
                   time: item.record.scheduledTime.format(context),
                   name: item.supplement.name,
-                  condition: item.supplement.condition.label,
+                  label: item.label,
+                  dosageUnit: item.supplement.dosageUnit,
+                  dosageValue: item.supplement.dosageValue,
                   isDone: item.record.isDone,
                   memo: item.supplement.memo,
                   onTap: () => ref.read(todayListProvider.notifier).toggleRecord(item.record.id),
@@ -147,11 +137,18 @@ class TodayScreen extends ConsumerWidget {
   Widget _buildSupplementItem({
     required String time,
     required String name,
-    required String condition,
+    required String label,
+    required String dosageUnit,
+    required double dosageValue,
     required bool isDone,
     required VoidCallback onTap,
     String? memo,
   }) {
+    // 1.5 개 -> 1.5개, 1.0 개 -> 1개 처리
+    final dosageStr = dosageValue == dosageValue.toInt() 
+        ? dosageValue.toInt().toString() 
+        : dosageValue.toString();
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -186,7 +183,7 @@ class TodayScreen extends ConsumerWidget {
                     ),
                   ),
                   Text(
-                    condition,
+                    '$label | $dosageStr $dosageUnit',
                     style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                   ),
                   if (memo != null)
