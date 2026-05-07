@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supplement_routine/core/models/intake_record.dart';
 import 'package:supplement_routine/core/models/meal_time_settings.dart';
 import 'package:supplement_routine/core/models/supplement.dart';
 import 'package:supplement_routine/core/models/intake_method.dart';
@@ -11,6 +12,18 @@ class ScheduledIntake {
   final String label;
 
   ScheduledIntake(this.time, this.label);
+}
+
+class ScheduledIntakeRecord {
+  final Supplement supplement;
+  final IntakeRecord record;
+  final String label;
+
+  ScheduledIntakeRecord({
+    required this.supplement,
+    required this.record,
+    required this.label,
+  });
 }
 
 class SchedulingService {
@@ -83,6 +96,48 @@ class SchedulingService {
 
       return ScheduledIntake(scheduledTime, slot.label);
     }).toList();
+  }
+
+  static List<ScheduledIntakeRecord> createDailyIntakeRecords({
+    required List<Supplement> supplements,
+    required DateTime date,
+    MealTimeSettings mealTimeSettings = const MealTimeSettings(),
+  }) {
+    final records = <ScheduledIntakeRecord>[];
+
+    for (final supplement in supplements) {
+      final scheduledIntakes = calculateIntakeTimes(
+        supplement,
+        mealTimeSettings: mealTimeSettings,
+      );
+
+      for (int i = 0; i < scheduledIntakes.length; i++) {
+        final intake = scheduledIntakes[i];
+        records.add(
+          ScheduledIntakeRecord(
+            supplement: supplement,
+            label: intake.label,
+            record: IntakeRecord(
+              id: 'r_${supplement.id}_${date.day}_$i',
+              supplementId: supplement.id,
+              date: date,
+              scheduledTime: intake.time,
+              isDone: false,
+            ),
+          ),
+        );
+      }
+    }
+
+    records.sort((a, b) {
+      final aTime =
+          a.record.scheduledTime.hour * 60 + a.record.scheduledTime.minute;
+      final bTime =
+          b.record.scheduledTime.hour * 60 + b.record.scheduledTime.minute;
+      return aTime.compareTo(bTime);
+    });
+
+    return records;
   }
 
   static TimeOfDay _midpoint(TimeOfDay start, TimeOfDay end) {

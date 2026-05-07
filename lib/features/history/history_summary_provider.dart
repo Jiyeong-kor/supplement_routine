@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supplement_routine/core/models/intake_record.dart';
 import 'package:supplement_routine/core/services/scheduling_service.dart';
 import 'package:supplement_routine/features/history/intake_record_provider.dart';
 import 'package:supplement_routine/features/settings/settings_provider.dart';
@@ -36,27 +35,18 @@ final todayHistorySummaryProvider = Provider<DailyHistorySummary>((ref) {
   var doneCount = 0;
   var totalCount = 0;
 
-  for (final supplement in supplements) {
-    final scheduledIntakes = SchedulingService.calculateIntakeTimes(
-      supplement,
-      mealTimeSettings: mealTimeSettings,
-    );
+  final scheduledRecords = SchedulingService.createDailyIntakeRecords(
+    supplements: supplements,
+    date: today,
+    mealTimeSettings: mealTimeSettings,
+  );
 
-    for (int i = 0; i < scheduledIntakes.length; i++) {
-      final intake = scheduledIntakes[i];
-      final record = IntakeRecord(
-        id: 'r_${supplement.id}_${today.day}_$i',
-        supplementId: supplement.id,
-        date: today,
-        scheduledTime: intake.time,
-        isDone: false,
-      );
-      final savedRecord = records[record.id];
+  for (final item in scheduledRecords) {
+    final savedRecord = records[item.record.id];
 
-      totalCount++;
-      if (savedRecord?.isDone ?? false) {
-        doneCount++;
-      }
+    totalCount++;
+    if (savedRecord?.isDone ?? false) {
+      doneCount++;
     }
   }
 

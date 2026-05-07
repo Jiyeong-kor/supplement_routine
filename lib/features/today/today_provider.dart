@@ -25,42 +25,20 @@ class TodayListNotifier extends Notifier<List<TodayDisplayItem>> {
     final mealTimeSettings = ref.watch(mealTimeSettingsProvider);
     ref.watch(intakeRecordProvider);
     final now = DateTime.now();
-    List<TodayDisplayItem> items = [];
 
-    for (final s in supplements) {
-      final scheduledIntakes = SchedulingService.calculateIntakeTimes(
-        s,
-        mealTimeSettings: mealTimeSettings,
+    return SchedulingService.createDailyIntakeRecords(
+      supplements: supplements,
+      date: now,
+      mealTimeSettings: mealTimeSettings,
+    ).map((item) {
+      return TodayDisplayItem(
+        supplement: item.supplement,
+        label: item.label,
+        record: ref
+            .read(intakeRecordProvider.notifier)
+            .getOrCreate(item.record),
       );
-
-      for (int i = 0; i < scheduledIntakes.length; i++) {
-        final intake = scheduledIntakes[i];
-        final record = IntakeRecord(
-          id: 'r_${s.id}_${now.day}_$i',
-          supplementId: s.id,
-          date: now,
-          scheduledTime: intake.time,
-          isDone: false,
-        );
-        items.add(
-          TodayDisplayItem(
-            supplement: s,
-            label: intake.label,
-            record: ref.read(intakeRecordProvider.notifier).getOrCreate(record),
-          ),
-        );
-      }
-    }
-
-    items.sort((a, b) {
-      final aTime =
-          a.record.scheduledTime.hour * 60 + a.record.scheduledTime.minute;
-      final bTime =
-          b.record.scheduledTime.hour * 60 + b.record.scheduledTime.minute;
-      return aTime.compareTo(bTime);
-    });
-
-    return items;
+    }).toList();
   }
 
   void toggleRecord(String recordId) {
