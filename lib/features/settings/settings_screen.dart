@@ -11,14 +11,15 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final mealTimeSettings = ref.watch(mealTimeSettingsProvider);
     final isNotificationEnabled = ref.watch(notificationSettingsProvider);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(title: const Text('설정')),
       body: ListView(
         children: [
-          _buildSectionTitle('기본 설정'),
+          _buildSectionTitle(context, '기본 설정'),
           ListTile(
-            leading: const Icon(Icons.restaurant),
+            leading: Icon(Icons.restaurant, color: colorScheme.primary),
             title: const Text('식사 시간 설정'),
             subtitle: Text(
               '아침 ${mealTimeSettings.breakfastTime.to24hString()} · '
@@ -31,7 +32,7 @@ class SettingsScreen extends ConsumerWidget {
             },
           ),
           SwitchListTile(
-            secondary: const Icon(Icons.notifications),
+            secondary: Icon(Icons.notifications, color: colorScheme.primary),
             title: const Text('알림 설정'),
             subtitle: Text(
               isNotificationEnabled
@@ -46,31 +47,37 @@ class SettingsScreen extends ConsumerWidget {
             },
           ),
           const Divider(),
-          _buildSectionTitle('데이터 관리'),
+          _buildSectionTitle(context, '데이터 관리'),
           ListTile(
-            leading: const Icon(Icons.delete_forever, color: Colors.red),
-            title: const Text('데이터 초기화', style: TextStyle(color: Colors.red)),
+            leading: Icon(Icons.delete_forever, color: colorScheme.error),
+            title: Text('데이터 초기화', style: TextStyle(color: colorScheme.error)),
             onTap: () {
               _showResetDialog(context, ref);
             },
           ),
           const Divider(),
-          _buildSectionTitle('정보'),
+          _buildSectionTitle(context, '정보'),
           ListTile(
-            leading: const Icon(Icons.help_outline),
+            leading: Icon(Icons.help_outline, color: colorScheme.primary),
             title: const Text('앱 사용 가이드'),
             onTap: () {
               _showUsageGuideDialog(context);
             },
           ),
           ListTile(
-            leading: const Icon(Icons.info_outline),
+            leading: Icon(Icons.info_outline, color: colorScheme.primary),
             title: const Text('면책 고지'),
             onTap: () {
               _showDisclaimerDialog(context);
             },
           ),
-          const ListTile(title: Text('앱 버전'), trailing: Text('1.0.0')),
+          ListTile(
+            title: const Text('앱 버전'),
+            trailing: Text(
+              '1.0.0',
+              style: TextStyle(color: colorScheme.onSurfaceVariant),
+            ),
+          ),
         ],
       ),
     );
@@ -91,12 +98,17 @@ class SettingsScreen extends ConsumerWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const ListTile(
-                      title: Text(
+                    ListTile(
+                      title: const Text(
                         '식사 시간 설정',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      subtitle: Text('오늘 일정 계산에 사용할 기본 식사 시간입니다'),
+                      subtitle: Text(
+                        '오늘 일정 계산에 사용할 기본 식사 시간입니다',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
                     ),
                     _MealTimeTile(
                       title: '아침',
@@ -157,15 +169,14 @@ class SettingsScreen extends ConsumerWidget {
     return showTimePicker(context: context, initialTime: initialTime);
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Text(
         title,
-        style: const TextStyle(
-          fontSize: 14,
+        style: Theme.of(context).textTheme.labelLarge?.copyWith(
           fontWeight: FontWeight.bold,
-          color: Colors.blue,
+          color: Theme.of(context).colorScheme.primary,
         ),
       ),
     );
@@ -231,7 +242,10 @@ class SettingsScreen extends ConsumerWidget {
                 context,
               ).showSnackBar(const SnackBar(content: Text('데이터가 초기화되었습니다.')));
             },
-            child: const Text('초기화', style: TextStyle(color: Colors.red)),
+            child: Text(
+              '초기화',
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
           ),
         ],
       ),
@@ -268,14 +282,26 @@ class _GuideItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(
+            title,
+            style: Theme.of(
+              context,
+            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 4),
-          Text(description),
+          Text(
+            description,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
         ],
       ),
     );
@@ -295,11 +321,16 @@ class _MealTimeTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return ListTile(
       title: Text(title),
       trailing: Text(
         time.to24hString(),
-        style: const TextStyle(fontWeight: FontWeight.bold),
+        style: TextStyle(
+          color: colorScheme.primary,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       onTap: onTap,
     );
