@@ -17,7 +17,7 @@ class SettingsScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('설정')),
       body: ListView(
         children: [
-          _buildSectionTitle(context, '기본 설정'),
+          const _SettingsSectionTitle('기본 설정'),
           ListTile(
             leading: Icon(Icons.restaurant, color: colorScheme.primary),
             title: const Text('식사 시간 설정'),
@@ -47,7 +47,7 @@ class SettingsScreen extends ConsumerWidget {
             },
           ),
           const Divider(),
-          _buildSectionTitle(context, '데이터 관리'),
+          const _SettingsSectionTitle('데이터 관리'),
           ListTile(
             leading: Icon(Icons.delete_forever, color: colorScheme.error),
             title: Text('데이터 초기화', style: TextStyle(color: colorScheme.error)),
@@ -56,7 +56,7 @@ class SettingsScreen extends ConsumerWidget {
             },
           ),
           const Divider(),
-          _buildSectionTitle(context, '정보'),
+          const _SettingsSectionTitle('정보'),
           ListTile(
             leading: Icon(Icons.help_outline, color: colorScheme.primary),
             title: const Text('앱 사용 가이드'),
@@ -88,98 +88,13 @@ class SettingsScreen extends ConsumerWidget {
       context: context,
       showDragHandle: true,
       builder: (context) {
-        return Consumer(
-          builder: (context, ref, child) {
-            final currentSettings = ref.watch(mealTimeSettingsProvider);
-
-            return SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ListTile(
-                      title: const Text(
-                        '식사 시간 설정',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Text(
-                        '오늘 일정 계산에 사용할 기본 식사 시간입니다',
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                    _MealTimeTile(
-                      title: '아침',
-                      time: currentSettings.breakfastTime,
-                      onTap: () async {
-                        final picked = await _pickTime(
-                          context,
-                          currentSettings.breakfastTime,
-                        );
-                        if (picked != null) {
-                          ref
-                              .read(mealTimeSettingsProvider.notifier)
-                              .updateBreakfastTime(picked);
-                        }
-                      },
-                    ),
-                    _MealTimeTile(
-                      title: '점심',
-                      time: currentSettings.lunchTime,
-                      onTap: () async {
-                        final picked = await _pickTime(
-                          context,
-                          currentSettings.lunchTime,
-                        );
-                        if (picked != null) {
-                          ref
-                              .read(mealTimeSettingsProvider.notifier)
-                              .updateLunchTime(picked);
-                        }
-                      },
-                    ),
-                    _MealTimeTile(
-                      title: '저녁',
-                      time: currentSettings.dinnerTime,
-                      onTap: () async {
-                        final picked = await _pickTime(
-                          context,
-                          currentSettings.dinnerTime,
-                        );
-                        if (picked != null) {
-                          ref
-                              .read(mealTimeSettingsProvider.notifier)
-                              .updateDinnerTime(picked);
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
+        return _MealTimeSheetContent(pickTime: _pickTime);
       },
     );
   }
 
   Future<TimeOfDay?> _pickTime(BuildContext context, TimeOfDay initialTime) {
     return showTimePicker(context: context, initialTime: initialTime);
-  }
-
-  Widget _buildSectionTitle(BuildContext context, String title) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-          fontWeight: FontWeight.bold,
-          color: Theme.of(context).colorScheme.primary,
-        ),
-      ),
-    );
   }
 
   void _showUsageGuideDialog(BuildContext context) {
@@ -269,6 +184,105 @@ class SettingsScreen extends ConsumerWidget {
             child: const Text('확인'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _SettingsSectionTitle extends StatelessWidget {
+  const _SettingsSectionTitle(this.title);
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+      ),
+    );
+  }
+}
+
+class _MealTimeSheetContent extends ConsumerWidget {
+  const _MealTimeSheetContent({required this.pickTime});
+
+  final Future<TimeOfDay?> Function(BuildContext context, TimeOfDay initialTime)
+  pickTime;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentSettings = ref.watch(mealTimeSettingsProvider);
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: const Text(
+                '식사 시간 설정',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(
+                '오늘 일정 계산에 사용할 기본 식사 시간입니다',
+                style: TextStyle(color: colorScheme.onSurfaceVariant),
+              ),
+            ),
+            _MealTimeTile(
+              title: '아침',
+              time: currentSettings.breakfastTime,
+              onTap: () async {
+                final picked = await pickTime(
+                  context,
+                  currentSettings.breakfastTime,
+                );
+                if (picked != null) {
+                  ref
+                      .read(mealTimeSettingsProvider.notifier)
+                      .updateBreakfastTime(picked);
+                }
+              },
+            ),
+            _MealTimeTile(
+              title: '점심',
+              time: currentSettings.lunchTime,
+              onTap: () async {
+                final picked = await pickTime(
+                  context,
+                  currentSettings.lunchTime,
+                );
+                if (picked != null) {
+                  ref
+                      .read(mealTimeSettingsProvider.notifier)
+                      .updateLunchTime(picked);
+                }
+              },
+            ),
+            _MealTimeTile(
+              title: '저녁',
+              time: currentSettings.dinnerTime,
+              onTap: () async {
+                final picked = await pickTime(
+                  context,
+                  currentSettings.dinnerTime,
+                );
+                if (picked != null) {
+                  ref
+                      .read(mealTimeSettingsProvider.notifier)
+                      .updateDinnerTime(picked);
+                }
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
