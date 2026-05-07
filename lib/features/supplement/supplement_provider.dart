@@ -1,40 +1,40 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supplement_routine/core/models/supplement.dart';
 import 'package:supplement_routine/features/history/intake_record_provider.dart';
-import 'package:supplement_routine/features/supplement/data/mock_supplements.dart';
+import 'package:supplement_routine/features/supplement/data/mock_supplement_repository.dart';
+import 'package:supplement_routine/features/supplement/data/supplement_repository.dart';
+
+final supplementRepositoryProvider = Provider<SupplementRepository>((ref) {
+  return MockSupplementRepository();
+});
 
 class SupplementListNotifier extends Notifier<List<Supplement>> {
   @override
   List<Supplement> build() {
-    return mockSupplements;
+    return ref.read(supplementRepositoryProvider).getSupplements();
   }
 
   void addSupplement(Supplement supplement) {
-    state = [...state, supplement];
+    state = ref.read(supplementRepositoryProvider).addSupplement(supplement);
   }
 
   void updateSupplement(Supplement updatedSupplement) {
-    state = [
-      for (final supplement in state)
-        if (supplement.id == updatedSupplement.id)
-          updatedSupplement
-        else
-          supplement,
-    ];
+    state = ref
+        .read(supplementRepositoryProvider)
+        .updateSupplement(updatedSupplement);
   }
 
   void removeSupplement(String supplementId) {
-    state = [
-      for (final supplement in state)
-        if (supplement.id != supplementId) supplement,
-    ];
+    state = ref
+        .read(supplementRepositoryProvider)
+        .removeSupplement(supplementId);
     ref
         .read(intakeRecordProvider.notifier)
         .clearRecordsForSupplement(supplementId);
   }
 
   void clearSupplements() {
-    state = [];
+    state = ref.read(supplementRepositoryProvider).clearSupplements();
     ref.read(intakeRecordProvider.notifier).clearAll();
   }
 }
