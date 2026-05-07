@@ -66,7 +66,7 @@ class IntakeNotificationService {
         await _notifications.zonedSchedule(
           id: _notificationId(item.record.id),
           title: _notificationTitle,
-          body: '${item.supplement.name} 기록할 시간입니다.',
+          body: reminderBody(item.supplement.name),
           scheduledDate: _nextSchedule(item),
           notificationDetails: _notificationDetails,
           androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
@@ -88,6 +88,10 @@ class IntakeNotificationService {
         >();
 
     await androidImplementation?.requestNotificationsPermission();
+  }
+
+  static String reminderBody(String supplementName) {
+    return '$supplementName 복용할 시간이에요.';
   }
 
   static NotificationDetails get _notificationDetails {
