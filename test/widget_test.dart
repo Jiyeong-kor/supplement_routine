@@ -8,6 +8,7 @@ import 'package:supplement_routine/core/models/meal_type.dart';
 import 'package:supplement_routine/core/models/supplement.dart';
 import 'package:supplement_routine/core/services/scheduling_service.dart';
 import 'package:supplement_routine/features/history/history_summary_provider.dart';
+import 'package:supplement_routine/features/history/history_view_model.dart';
 import 'package:supplement_routine/features/settings/settings_provider.dart';
 import 'package:supplement_routine/features/supplement/supplement_provider.dart';
 import 'package:supplement_routine/features/today/today_provider.dart';
@@ -365,6 +366,17 @@ void main() {
     expect(summaries, hasLength(14));
     expect(summaries.first.date.day, DateTime.now().day);
     expect(summaries.skip(1).any((summary) => summary.doneCount > 0), isTrue);
+  });
+
+  test('기록 ViewModel은 오늘 요약과 최근 기록을 화면 상태로 제공한다', () {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+
+    final state = container.read(historyViewModelProvider);
+
+    expect(state.todaySummary.date.day, DateTime.now().day);
+    expect(state.recentSummaries, hasLength(13));
+    expect(state.isEmpty, isFalse);
   });
 
   test('복용 기록 ID는 연월일을 포함해 날짜별로 구분된다', () {

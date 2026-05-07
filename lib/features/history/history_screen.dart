@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supplement_routine/features/history/history_summary_provider.dart';
+import 'package:supplement_routine/features/history/history_view_model.dart';
 import 'package:supplement_routine/l10n/generated/app_localizations.dart';
 
 class HistoryScreen extends ConsumerWidget {
@@ -9,16 +10,14 @@ class HistoryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final summaries = ref.watch(historySummariesProvider);
-    final todaySummary = summaries.first;
-    final recentSummaries = summaries.skip(1).toList();
+    final state = ref.watch(historyViewModelProvider);
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.historyTitle)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _HistoryOverviewCard(summary: todaySummary),
+          _HistoryOverviewCard(summary: state.todaySummary),
           const SizedBox(height: 24),
           Text(
             l10n.historyRecentTitle,
@@ -34,10 +33,10 @@ class HistoryScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 12),
-          if (summaries.every((summary) => summary.isEmpty))
+          if (state.isEmpty)
             const _HistoryEmptyState()
           else
-            ...recentSummaries.map(
+            ...state.recentSummaries.map(
               (summary) => _HistoryItem(
                 dateText: _dateLabel(l10n, summary.date),
                 done: summary.doneCount,
