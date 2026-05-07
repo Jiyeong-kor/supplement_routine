@@ -137,6 +137,8 @@ void main() {
     await tester.tap(find.byIcon(Icons.calendar_month_outlined));
     await tester.pumpAndSettle();
 
+    expect(find.text('오늘 기록'), findsOneWidget);
+    expect(find.text('최근 2주 기록'), findsOneWidget);
     expect(find.text('완료율 20% (1/5)'), findsOneWidget);
   });
 
@@ -352,6 +354,17 @@ void main() {
     expect(summary.doneCount, 1);
     expect(summary.totalCount, 1);
     expect(summary.completionRate, 1);
+  });
+
+  test('기록 요약은 최근 2주 날짜별 완료율을 제공한다', () {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+
+    final summaries = container.read(historySummariesProvider);
+
+    expect(summaries, hasLength(14));
+    expect(summaries.first.date.day, DateTime.now().day);
+    expect(summaries.skip(1).any((summary) => summary.doneCount > 0), isTrue);
   });
 
   test('복용 기록 ID는 연월일을 포함해 날짜별로 구분된다', () {

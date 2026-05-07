@@ -198,6 +198,25 @@ class AppLocalizationsKo extends AppLocalizations {
   String get historyTitle => '기록';
 
   @override
+  String get historyTodayOverviewTitle => '오늘 기록';
+
+  @override
+  String historyPercent(int percent) {
+    return '$percent%';
+  }
+
+  @override
+  String get historyRecentTitle => '최근 2주 기록';
+
+  @override
+  String get historyRecentDescription => '입력한 복용 규칙을 기준으로 날짜별 완료 여부를 확인합니다.';
+
+  @override
+  String historyDate(int month, int day, String weekday) {
+    return '$month월 $day일 $weekday요일';
+  }
+
+  @override
   String historyTodayDate(int month, int day, String weekday) {
     return '오늘 · $month월 $day일 $weekday요일';
   }

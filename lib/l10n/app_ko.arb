@@ -95,6 +95,23 @@
   "supplementDosageInvalid": "1회 복용량은 0보다 큰 숫자로 입력해주세요.",
   "supplementTimingRequired": "복용 시간대를 하나 이상 선택해주세요.",
   "historyTitle": "기록",
+  "historyTodayOverviewTitle": "오늘 기록",
+  "historyPercent": "{percent}%",
+  "@historyPercent": {
+    "placeholders": {
+      "percent": { "type": "int" }
+    }
+  },
+  "historyRecentTitle": "최근 2주 기록",
+  "historyRecentDescription": "입력한 복용 규칙을 기준으로 날짜별 완료 여부를 확인합니다.",
+  "historyDate": "{month}월 {day}일 {weekday}요일",
+  "@historyDate": {
+    "placeholders": {
+      "month": { "type": "int" },
+      "day": { "type": "int" },
+      "weekday": { "type": "String" }
+    }
+  },
   "historyTodayDate": "오늘 · {month}월 {day}일 {weekday}요일",
   "@historyTodayDate": {
     "placeholders": {

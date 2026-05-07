@@ -1,10 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supplement_routine/core/models/intake_record.dart';
+import 'package:supplement_routine/features/history/data/mock_intake_records.dart';
 
 class IntakeRecordNotifier extends Notifier<Map<String, IntakeRecord>> {
   @override
   Map<String, IntakeRecord> build() {
-    return {};
+    return createMockIntakeRecords();
   }
 
   IntakeRecord getOrCreate(IntakeRecord record) {

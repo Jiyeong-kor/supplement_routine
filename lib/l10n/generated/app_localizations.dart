@@ -448,6 +448,36 @@ abstract class AppLocalizations {
   /// **'기록'**
   String get historyTitle;
 
+  /// No description provided for @historyTodayOverviewTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'오늘 기록'**
+  String get historyTodayOverviewTitle;
+
+  /// No description provided for @historyPercent.
+  ///
+  /// In ko, this message translates to:
+  /// **'{percent}%'**
+  String historyPercent(int percent);
+
+  /// No description provided for @historyRecentTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'최근 2주 기록'**
+  String get historyRecentTitle;
+
+  /// No description provided for @historyRecentDescription.
+  ///
+  /// In ko, this message translates to:
+  /// **'입력한 복용 규칙을 기준으로 날짜별 완료 여부를 확인합니다.'**
+  String get historyRecentDescription;
+
+  /// No description provided for @historyDate.
+  ///
+  /// In ko, this message translates to:
+  /// **'{month}월 {day}일 {weekday}요일'**
+  String historyDate(int month, int day, String weekday);
+
   /// No description provided for @historyTodayDate.
   ///
   /// In ko, this message translates to:

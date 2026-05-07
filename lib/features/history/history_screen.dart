@@ -9,31 +9,52 @@ class HistoryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final summary = ref.watch(todayHistorySummaryProvider);
-    final today = summary.date;
-    final dateText = l10n.historyTodayDate(
-      today.month,
-      today.day,
-      _weekdayLabel(l10n, today.weekday),
-    );
+    final summaries = ref.watch(historySummariesProvider);
+    final todaySummary = summaries.first;
+    final recentSummaries = summaries.skip(1).toList();
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.historyTitle)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _HistoryItem(
-            dateText: dateText,
-            done: summary.doneCount,
-            total: summary.totalCount,
-            completion: summary.completionRate,
+          _HistoryOverviewCard(summary: todaySummary),
+          const SizedBox(height: 24),
+          Text(
+            l10n.historyRecentTitle,
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
-          if (summary.isEmpty) ...[
-            const SizedBox(height: 12),
-            const _HistoryEmptyState(),
-          ],
+          const SizedBox(height: 4),
+          Text(
+            l10n.historyRecentDescription,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 12),
+          if (summaries.every((summary) => summary.isEmpty))
+            const _HistoryEmptyState()
+          else
+            ...recentSummaries.map(
+              (summary) => _HistoryItem(
+                dateText: _dateLabel(l10n, summary.date),
+                done: summary.doneCount,
+                total: summary.totalCount,
+                completion: summary.completionRate,
+              ),
+            ),
         ],
       ),
+    );
+  }
+
+  String _dateLabel(AppLocalizations l10n, DateTime date) {
+    return l10n.historyDate(
+      date.month,
+      date.day,
+      _weekdayLabel(l10n, date.weekday),
     );
   }
 
@@ -48,6 +69,68 @@ class HistoryScreen extends ConsumerWidget {
       DateTime.sunday => l10n.weekdaySunday,
       _ => '',
     };
+  }
+}
+
+class _HistoryOverviewCard extends StatelessWidget {
+  const _HistoryOverviewCard({required this.summary});
+
+  final DailyHistorySummary summary;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final percent = (summary.completionRate * 100).round();
+
+    return Card.filled(
+      margin: EdgeInsets.zero,
+      color: colorScheme.primaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.historyTodayOverviewTitle,
+              style: textTheme.titleSmall?.copyWith(
+                color: colorScheme.onPrimaryContainer,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              l10n.historyPercent(percent),
+              style: textTheme.displaySmall?.copyWith(
+                color: colorScheme.onPrimaryContainer,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              summary.isEmpty
+                  ? l10n.historyEmptyToday
+                  : l10n.historyCompletion(
+                      percent,
+                      summary.doneCount,
+                      summary.totalCount,
+                    ),
+              style: textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onPrimaryContainer,
+              ),
+            ),
+            const SizedBox(height: 16),
+            LinearProgressIndicator(
+              value: summary.completionRate,
+              minHeight: 10,
+              borderRadius: BorderRadius.circular(999),
+              backgroundColor: colorScheme.primary.withValues(alpha: 0.18),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -70,13 +153,33 @@ class _HistoryItem extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return Card(
-      margin: EdgeInsets.zero,
+    return Card.outlined(
+      margin: const EdgeInsets.only(bottom: 10),
       color: colorScheme.surfaceContainerLow,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Row(
           children: [
+            SizedBox(
+              width: 44,
+              height: 44,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: _statusColor(colorScheme, completion),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    '${(completion * 100).round()}',
+                    style: textTheme.labelLarge?.copyWith(
+                      color: colorScheme.onPrimary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,24 +202,30 @@ class _HistoryItem extends StatelessWidget {
                       color: colorScheme.onSurfaceVariant,
                     ),
                   ),
+                  const SizedBox(height: 10),
+                  LinearProgressIndicator(
+                    value: completion,
+                    minHeight: 6,
+                    borderRadius: BorderRadius.circular(999),
+                    backgroundColor: colorScheme.surfaceContainerHighest,
+                  ),
                 ],
-              ),
-            ),
-            SizedBox(
-              width: 40,
-              height: 40,
-              child: CircularProgressIndicator(
-                value: completion,
-                backgroundColor: colorScheme.surfaceContainerHighest,
-                color: colorScheme.primary,
-                strokeWidth: 6,
-                strokeCap: StrokeCap.round,
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  Color _statusColor(ColorScheme colorScheme, double completion) {
+    if (completion >= 0.8) {
+      return colorScheme.primary;
+    }
+    if (completion >= 0.4) {
+      return colorScheme.tertiary;
+    }
+    return colorScheme.outline;
   }
 }
 
