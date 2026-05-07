@@ -46,18 +46,17 @@ class TodayScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              dateString,
-              style: const TextStyle(fontSize: 16, color: Colors.grey),
-            ),
+            Text(dateString, style: Theme.of(context).textTheme.bodyMedium),
             const SizedBox(height: 16),
-            _buildQuoteCard(icon: quoteIcon, text: quoteText),
+            _buildQuoteCard(context, icon: quoteIcon, text: quoteText),
             const SizedBox(height: 24),
-            _buildProgressSection(done: doneCount, total: totalCount),
+            _buildProgressSection(context, done: doneCount, total: totalCount),
             const SizedBox(height: 32),
-            const Text(
+            Text(
               '복용 목록',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             if (todayList.isEmpty)
@@ -65,6 +64,7 @@ class TodayScreen extends ConsumerWidget {
             else
               ...todayList.map(
                 (item) => _buildSupplementItem(
+                  context: context,
                   time: item.record.scheduledTime.format(context),
                   name: item.supplement.name,
                   label: item.label,
@@ -95,61 +95,88 @@ class TodayScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildQuoteCard({required IconData icon, required String text}) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[300]!),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: Colors.grey[700]),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              text,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+  Widget _buildQuoteCard(
+    BuildContext context, {
+    required IconData icon,
+    required String text,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Card.filled(
+      margin: EdgeInsets.zero,
+      color: colorScheme.secondaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Icon(icon, color: colorScheme.onSecondaryContainer),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                text,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSecondaryContainer,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildProgressSection({required int done, required int total}) {
+  Widget _buildProgressSection(
+    BuildContext context, {
+    required int done,
+    required int total,
+  }) {
     final double percent = total > 0 ? done / total : 0;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Card(
+      margin: EdgeInsets.zero,
+      color: colorScheme.surfaceContainerLow,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              '오늘의 성취도',
-              style: TextStyle(fontWeight: FontWeight.w600),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '오늘의 루틴',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  '$done / $total 완료',
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
-            Text(
-              '$done / $total 완료',
-              style: const TextStyle(fontWeight: FontWeight.bold),
+            const SizedBox(height: 12),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(999),
+              child: LinearProgressIndicator(
+                value: percent,
+                minHeight: 10,
+                backgroundColor: colorScheme.surfaceContainerHighest,
+              ),
             ),
           ],
         ),
-        const SizedBox(height: 8),
-        LinearProgressIndicator(
-          value: percent,
-          minHeight: 8,
-          backgroundColor: Colors.grey[200],
-          valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
-          borderRadius: BorderRadius.circular(4),
-        ),
-      ],
+      ),
     );
   }
 
   Widget _buildSupplementItem({
+    required BuildContext context,
     required String time,
     required String name,
     required String label,
@@ -163,67 +190,69 @@ class TodayScreen extends ConsumerWidget {
     final dosageStr = dosageValue == dosageValue.toInt()
         ? dosageValue.toInt().toString()
         : dosageValue.toString();
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey[200]!),
-        ),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 60,
-              child: Text(
-                time,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      color: isDone ? colorScheme.surfaceContainerHighest : null,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 60,
+                child: Text(
+                  time,
+                  style: textTheme.labelLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.primary,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      decoration: isDone ? TextDecoration.lineThrough : null,
-                      color: isDone ? Colors.grey : Colors.black,
-                    ),
-                  ),
-                  Text(
-                    '$label | $dosageStr $dosageUnit',
-                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-                  ),
-                  if (memo != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Text(
-                        'ㄴ $memo',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.blueGrey,
-                        ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: isDone
+                            ? colorScheme.onSurfaceVariant
+                            : colorScheme.onSurface,
                       ),
                     ),
-                ],
+                    Text(
+                      '$label | $dosageStr $dosageUnit',
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    if (memo != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(
+                          memo,
+                          style: textTheme.bodySmall?.copyWith(
+                            color: colorScheme.tertiary,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            ),
-            Icon(
-              isDone ? Icons.check_circle : Icons.radio_button_unchecked,
-              color: isDone ? Colors.blue : Colors.grey[400],
-              size: 28,
-            ),
-          ],
+              Icon(
+                isDone ? Icons.check_circle : Icons.radio_button_unchecked,
+                color: isDone ? colorScheme.primary : colorScheme.outline,
+                size: 28,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -235,29 +264,37 @@ class _TodayEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 28),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
-      ),
-      child: Column(
-        children: [
-          Icon(Icons.medication_outlined, size: 36, color: Colors.grey[500]),
-          const SizedBox(height: 12),
-          const Text(
-            '등록된 복용 일정이 없습니다',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            '오른쪽 아래 + 버튼으로 영양제를 등록해보세요.',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-          ),
-        ],
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Card(
+      margin: EdgeInsets.zero,
+      color: colorScheme.surfaceContainerLow,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 28),
+        child: Column(
+          children: [
+            Icon(
+              Icons.event_available_outlined,
+              size: 36,
+              color: colorScheme.outline,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              '등록된 복용 일정이 없습니다',
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              '오른쪽 아래 + 버튼으로 영양제를 등록해보세요.',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
