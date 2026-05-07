@@ -4,9 +4,8 @@ import 'package:supplement_routine/app/app_radius.dart';
 import 'package:supplement_routine/app/app_spacing.dart';
 import 'package:supplement_routine/core/models/supplement.dart';
 import 'package:supplement_routine/core/models/intake_method.dart';
-import 'package:supplement_routine/core/models/intake_condition.dart';
-import 'package:supplement_routine/core/models/meal_type.dart';
 import 'package:supplement_routine/features/settings/settings_provider.dart';
+import 'package:supplement_routine/features/supplement/application/supplement_form_policy.dart';
 import 'package:supplement_routine/features/supplement/supplement_provider.dart';
 import 'package:supplement_routine/l10n/generated/app_localizations.dart';
 
@@ -23,9 +22,11 @@ class SupplementAddScreen extends ConsumerStatefulWidget {
 class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
   final _nameController = TextEditingController();
   final _memoController = TextEditingController();
-  final _dosageValueController = TextEditingController(text: '1');
+  final _dosageValueController = TextEditingController(
+    text: SupplementFormPolicy.defaultDosageText,
+  );
 
-  String _unit = '개';
+  String _unit = SupplementFormPolicy.defaultUnit;
 
   // 큰 분류: 루틴 기준(true) vs 직접 시간 지정(false)
   bool _isRoutineBased = true;
@@ -35,12 +36,12 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
 
   final Set<IntakeSlot> _selectedSlots = {};
 
-  int _fixedCount = 1;
-  List<TimeOfDay> _fixedTimes = [const TimeOfDay(hour: 8, minute: 0)];
+  int _fixedCount = SupplementFormPolicy.defaultCount;
+  List<TimeOfDay> _fixedTimes = [SupplementFormPolicy.defaultTime];
 
-  TimeOfDay _startTime = const TimeOfDay(hour: 8, minute: 0);
-  int _intervalHours = 8;
-  int _intervalCount = 1;
+  TimeOfDay _startTime = SupplementFormPolicy.defaultTime;
+  int _intervalHours = SupplementFormPolicy.defaultIntervalHours;
+  int _intervalCount = SupplementFormPolicy.defaultCount;
 
   bool _isNotificationEnabled = true;
 
@@ -57,7 +58,9 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
 
     _nameController.text = initialSupplement.name;
     _memoController.text = initialSupplement.memo ?? '';
-    _dosageValueController.text = _formatDosage(initialSupplement.dosageValue);
+    _dosageValueController.text = SupplementFormPolicy.formatDosage(
+      initialSupplement.dosageValue,
+    );
     _unit = initialSupplement.dosageUnit;
     _isNotificationEnabled = initialSupplement.isNotificationEnabled;
     _isRoutineBased = initialSupplement.method == IntakeMethod.mealBased;
@@ -80,54 +83,25 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
     super.dispose();
   }
 
-  final List<IntakeSlot> _allSlots = [
-    const IntakeSlot(condition: IntakeCondition.fasting),
-    const IntakeSlot(
-      mealType: MealType.breakfast,
-      condition: IntakeCondition.beforeMeal,
-    ),
-    const IntakeSlot(
-      mealType: MealType.breakfast,
-      condition: IntakeCondition.afterMeal,
-    ),
-    const IntakeSlot(
-      mealType: MealType.breakfast,
-      condition: IntakeCondition.betweenMeals,
-    ),
-    const IntakeSlot(
-      mealType: MealType.lunch,
-      condition: IntakeCondition.beforeMeal,
-    ),
-    const IntakeSlot(
-      mealType: MealType.lunch,
-      condition: IntakeCondition.afterMeal,
-    ),
-    const IntakeSlot(
-      mealType: MealType.lunch,
-      condition: IntakeCondition.betweenMeals,
-    ),
-    const IntakeSlot(
-      mealType: MealType.dinner,
-      condition: IntakeCondition.beforeMeal,
-    ),
-    const IntakeSlot(
-      mealType: MealType.dinner,
-      condition: IntakeCondition.afterMeal,
-    ),
-    const IntakeSlot(condition: IntakeCondition.beforeSleep),
-  ];
-
   void _saveSupplement() {
     final l10n = AppLocalizations.of(context);
     final name = _nameController.text.trim();
-    if (name.isEmpty) {
-      _showSnackBar(l10n.supplementNameRequired);
+    final nameError = SupplementFormPolicy.validateName(name);
+    if (nameError != null) {
+      _showSnackBar(_messageForValidationError(l10n, nameError));
       return;
     }
 
-    final dosageValue = double.tryParse(_dosageValueController.text.trim());
-    if (dosageValue == null || dosageValue <= 0) {
-      _showSnackBar(l10n.supplementDosageInvalid);
+    final dosageValue = SupplementFormPolicy.parseDosage(
+      _dosageValueController.text,
+    );
+    if (dosageValue == null) {
+      _showSnackBar(
+        _messageForValidationError(
+          l10n,
+          SupplementFormValidationError.invalidDosage,
+        ),
+      );
       return;
     }
 
@@ -137,8 +111,11 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
     if (_isRoutineBased) {
       method = IntakeMethod.mealBased;
       dailyCount = _selectedSlots.length;
-      if (dailyCount == 0) {
-        _showSnackBar(l10n.supplementTimingRequired);
+      final routineError = SupplementFormPolicy.validateRoutineSlots(
+        _selectedSlots,
+      );
+      if (routineError != null) {
+        _showSnackBar(_messageForValidationError(l10n, routineError));
         return;
       }
     } else {
@@ -180,12 +157,17 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
     Navigator.pop(context);
   }
 
-  String _formatDosage(double value) {
-    if (value == value.toInt()) {
-      return value.toInt().toString();
-    }
-
-    return value.toString();
+  String _messageForValidationError(
+    AppLocalizations l10n,
+    SupplementFormValidationError error,
+  ) {
+    return switch (error) {
+      SupplementFormValidationError.emptyName => l10n.supplementNameRequired,
+      SupplementFormValidationError.invalidDosage =>
+        l10n.supplementDosageInvalid,
+      SupplementFormValidationError.emptyRoutineSlots =>
+        l10n.supplementTimingRequired,
+    };
   }
 
   void _showSnackBar(String message) {
@@ -250,7 +232,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
                             borderSide: BorderSide.none,
                           ),
                         ),
-                        items: ['개', 'ml']
+                        items: SupplementFormPolicy.dosageUnits
                             .map(
                               (u) => DropdownMenuItem(value: u, child: Text(u)),
                             )
@@ -370,7 +352,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: _allSlots.map((slot) {
+            children: SupplementFormPolicy.routineSlots.map((slot) {
               final isSelected = _selectedSlots.contains(slot);
               return FilterChip(
                 label: Text(slot.label),
@@ -551,8 +533,8 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
             l10n.supplementIntervalHoursLabel,
             _intervalHours,
             (v) => setState(() => _intervalHours = v),
-            min: 1,
-            max: 24,
+            min: SupplementFormPolicy.minIntervalHours,
+            max: SupplementFormPolicy.maxIntervalHours,
           ),
           const SizedBox(height: 12),
           Text(l10n.supplementIntervalNotice),
@@ -565,8 +547,8 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
     String title,
     int value,
     ValueChanged<int> onChanged, {
-    int min = 1,
-    int max = 10,
+    int min = SupplementFormPolicy.minCount,
+    int max = SupplementFormPolicy.maxCount,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
