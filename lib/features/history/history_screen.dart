@@ -49,12 +49,12 @@ class _HistoryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey[200]!),
-      ),
+      margin: EdgeInsets.zero,
+      color: colorScheme.surfaceContainerLow,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
@@ -65,15 +65,17 @@ class _HistoryItem extends StatelessWidget {
                 children: [
                   Text(
                     dateText,
-                    style: const TextStyle(
+                    style: textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     '완료율 ${(completion * 100).toInt()}% ($done/$total)',
-                    style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
@@ -83,7 +85,8 @@ class _HistoryItem extends StatelessWidget {
               height: 40,
               child: CircularProgressIndicator(
                 value: completion,
-                backgroundColor: Colors.grey[200],
+                backgroundColor: colorScheme.surfaceContainerHighest,
+                color: colorScheme.primary,
                 strokeWidth: 6,
                 strokeCap: StrokeCap.round,
               ),
@@ -100,18 +103,30 @@ class _HistoryEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
-      ),
-      child: Text(
-        '오늘 등록된 복용 일정이 없습니다.',
-        textAlign: TextAlign.center,
-        style: TextStyle(color: Colors.grey[600]),
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Card(
+      margin: EdgeInsets.zero,
+      color: colorScheme.surfaceContainerLow,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        child: Column(
+          children: [
+            Icon(
+              Icons.calendar_month_outlined,
+              size: 36,
+              color: colorScheme.outline,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              '오늘 등록된 복용 일정이 없습니다.',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
