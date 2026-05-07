@@ -48,9 +48,9 @@ class TodayScreen extends ConsumerWidget {
           children: [
             Text(dateString, style: Theme.of(context).textTheme.bodyMedium),
             const SizedBox(height: 16),
-            _buildQuoteCard(context, icon: quoteIcon, text: quoteText),
+            _TodayQuoteCard(icon: quoteIcon, text: quoteText),
             const SizedBox(height: 24),
-            _buildProgressSection(context, done: doneCount, total: totalCount),
+            _TodayProgressCard(done: doneCount, total: totalCount),
             const SizedBox(height: 32),
             Text(
               '복용 목록',
@@ -63,8 +63,7 @@ class TodayScreen extends ConsumerWidget {
               const _TodayEmptyState()
             else
               ...todayList.map(
-                (item) => _buildSupplementItem(
-                  context: context,
+                (item) => _TodaySupplementItem(
                   time: item.record.scheduledTime.format(context),
                   name: item.supplement.name,
                   label: item.label,
@@ -94,12 +93,16 @@ class TodayScreen extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Widget _buildQuoteCard(
-    BuildContext context, {
-    required IconData icon,
-    required String text,
-  }) {
+class _TodayQuoteCard extends StatelessWidget {
+  const _TodayQuoteCard({required this.icon, required this.text});
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Card.filled(
@@ -125,12 +128,16 @@ class TodayScreen extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Widget _buildProgressSection(
-    BuildContext context, {
-    required int done,
-    required int total,
-  }) {
+class _TodayProgressCard extends StatelessWidget {
+  const _TodayProgressCard({required this.done, required this.total});
+
+  final int done;
+  final int total;
+
+  @override
+  Widget build(BuildContext context) {
     final double percent = total > 0 ? done / total : 0;
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -174,24 +181,38 @@ class TodayScreen extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Widget _buildSupplementItem({
-    required BuildContext context,
-    required String time,
-    required String name,
-    required String label,
-    required String dosageUnit,
-    required double dosageValue,
-    required bool isDone,
-    required VoidCallback onTap,
-    String? memo,
-  }) {
+class _TodaySupplementItem extends StatelessWidget {
+  const _TodaySupplementItem({
+    required this.time,
+    required this.name,
+    required this.label,
+    required this.dosageUnit,
+    required this.dosageValue,
+    required this.isDone,
+    required this.onTap,
+    this.memo,
+  });
+
+  final String time;
+  final String name;
+  final String label;
+  final String dosageUnit;
+  final double dosageValue;
+  final bool isDone;
+  final VoidCallback onTap;
+  final String? memo;
+
+  @override
+  Widget build(BuildContext context) {
     // 1.5 개 -> 1.5개, 1.0 개 -> 1개 처리
     final dosageStr = dosageValue == dosageValue.toInt()
         ? dosageValue.toInt().toString()
         : dosageValue.toString();
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final memoText = memo;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -233,11 +254,11 @@ class TodayScreen extends ConsumerWidget {
                         color: colorScheme.onSurfaceVariant,
                       ),
                     ),
-                    if (memo != null)
+                    if (memoText != null)
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
-                          memo,
+                          memoText,
                           style: textTheme.bodySmall?.copyWith(
                             color: colorScheme.tertiary,
                           ),
