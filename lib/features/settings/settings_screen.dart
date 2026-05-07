@@ -57,6 +57,13 @@ class SettingsScreen extends ConsumerWidget {
           const Divider(),
           _buildSectionTitle('정보'),
           ListTile(
+            leading: const Icon(Icons.help_outline),
+            title: const Text('앱 사용 가이드'),
+            onTap: () {
+              _showUsageGuideDialog(context);
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.info_outline),
             title: const Text('면책 고지'),
             onTap: () {
@@ -164,6 +171,47 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
+  void _showUsageGuideDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('앱 사용 가이드'),
+        content: const SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _GuideItem(
+                title: '1. 영양제를 등록하세요',
+                description: '이름, 복용 방식, 복용 조건, 알림 여부, 메모를 직접 입력합니다.',
+              ),
+              _GuideItem(
+                title: '2. 오늘 화면에서 확인하세요',
+                description: '입력한 규칙을 기준으로 오늘의 복용 일정과 진행률을 확인합니다.',
+              ),
+              _GuideItem(
+                title: '3. 복용 후 체크하세요',
+                description: '복용을 완료하면 오늘 목록에서 해당 일정을 체크합니다.',
+              ),
+              _GuideItem(
+                title: '4. 기록 화면에서 돌아보세요',
+                description: '오늘 완료 개수와 완료율을 확인해 복용 기록을 관리합니다.',
+              ),
+              SizedBox(height: 8),
+              Text('Supplement Routine은 영양제를 추천하거나 의료 조언을 제공하지 않습니다.'),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('확인'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showResetDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
@@ -206,6 +254,28 @@ class SettingsScreen extends ConsumerWidget {
             onPressed: () => Navigator.pop(context),
             child: const Text('확인'),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _GuideItem extends StatelessWidget {
+  const _GuideItem({required this.title, required this.description});
+
+  final String title;
+  final String description;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 4),
+          Text(description),
         ],
       ),
     );

@@ -199,6 +199,22 @@ void main() {
     expect(find.byIcon(Icons.notifications_off_outlined), findsWidgets);
   });
 
+  testWidgets('설정 화면에서 앱 사용 가이드를 확인한다', (WidgetTester tester) async {
+    await tester.pumpWidget(const ProviderScope(child: SupplementRoutineApp()));
+
+    await tester.tap(find.text('설정'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('앱 사용 가이드'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('1. 영양제를 등록하세요'), findsOneWidget);
+    expect(find.text('2. 오늘 화면에서 확인하세요'), findsOneWidget);
+    expect(
+      find.text('Supplement Routine은 영양제를 추천하거나 의료 조언을 제공하지 않습니다.'),
+      findsOneWidget,
+    );
+  });
+
   test('식사 시간 설정 변경은 오늘 루틴 일정에 반영된다', () {
     final container = ProviderContainer();
     addTearDown(container.dispose);
