@@ -5,6 +5,7 @@ import 'package:supplement_routine/app/app_spacing.dart';
 import 'package:supplement_routine/core/models/supplement.dart';
 import 'package:supplement_routine/core/models/intake_method.dart';
 import 'package:supplement_routine/features/settings/settings_provider.dart';
+import 'package:supplement_routine/features/supplement/application/supplement_form_mapper.dart';
 import 'package:supplement_routine/features/supplement/application/supplement_form_policy.dart';
 import 'package:supplement_routine/features/supplement/supplement_provider.dart';
 import 'package:supplement_routine/l10n/generated/app_localizations.dart';
@@ -105,12 +106,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
       return;
     }
 
-    IntakeMethod method;
-    int dailyCount;
-
     if (_isRoutineBased) {
-      method = IntakeMethod.mealBased;
-      dailyCount = _selectedSlots.length;
       final routineError = SupplementFormPolicy.validateRoutineSlots(
         _selectedSlots,
       );
@@ -118,35 +114,28 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
         _showSnackBar(_messageForValidationError(l10n, routineError));
         return;
       }
-    } else {
-      if (_isSpecificTime) {
-        method = IntakeMethod.fixedTime;
-        dailyCount = _fixedCount;
-      } else {
-        method = IntakeMethod.interval;
-        dailyCount = _intervalCount;
-      }
     }
 
-    final supplement = Supplement(
-      id:
-          widget.initialSupplement?.id ??
-          DateTime.now().millisecondsSinceEpoch.toString(),
+    final formInput = SupplementFormInput(
       name: name,
-      dailyCount: dailyCount,
-      method: method,
       dosageUnit: _unit,
       dosageValue: dosageValue,
-      selectedSlots: method == IntakeMethod.mealBased
-          ? _selectedSlots.toList()
-          : null,
-      fixedTimes: method == IntakeMethod.fixedTime ? _fixedTimes : null,
-      startTime: method == IntakeMethod.interval ? _startTime : null,
-      intervalHours: method == IntakeMethod.interval ? _intervalHours : null,
+      isRoutineBased: _isRoutineBased,
+      isSpecificTime: _isSpecificTime,
+      selectedSlots: _selectedSlots,
+      fixedCount: _fixedCount,
+      fixedTimes: _fixedTimes,
+      startTime: _startTime,
+      intervalHours: _intervalHours,
+      intervalCount: _intervalCount,
       isNotificationEnabled: _isNotificationEnabled,
       memo: _memoController.text.trim().isEmpty
           ? null
           : _memoController.text.trim(),
+    );
+    final supplement = SupplementFormMapper.toSupplement(
+      input: formInput,
+      initialSupplement: widget.initialSupplement,
     );
 
     if (_isEditMode) {
