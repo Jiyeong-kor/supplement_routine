@@ -8,6 +8,7 @@ import 'package:supplement_routine/core/models/intake_condition.dart';
 import 'package:supplement_routine/core/models/meal_type.dart';
 import 'package:supplement_routine/features/settings/settings_provider.dart';
 import 'package:supplement_routine/features/supplement/supplement_provider.dart';
+import 'package:supplement_routine/l10n/generated/app_localizations.dart';
 
 class SupplementAddScreen extends ConsumerStatefulWidget {
   const SupplementAddScreen({super.key, this.initialSupplement});
@@ -117,15 +118,16 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
   ];
 
   void _saveSupplement() {
+    final l10n = AppLocalizations.of(context);
     final name = _nameController.text.trim();
     if (name.isEmpty) {
-      _showSnackBar('영양제 이름을 입력해주세요.');
+      _showSnackBar(l10n.supplementNameRequired);
       return;
     }
 
     final dosageValue = double.tryParse(_dosageValueController.text.trim());
     if (dosageValue == null || dosageValue <= 0) {
-      _showSnackBar('1회 복용량은 0보다 큰 숫자로 입력해주세요.');
+      _showSnackBar(l10n.supplementDosageInvalid);
       return;
     }
 
@@ -136,7 +138,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
       method = IntakeMethod.mealBased;
       dailyCount = _selectedSlots.length;
       if (dailyCount == 0) {
-        _showSnackBar('복용 시간대를 하나 이상 선택해주세요.');
+        _showSnackBar(l10n.supplementTimingRequired);
         return;
       }
     } else {
@@ -194,12 +196,13 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          _isEditMode ? '영양제 수정' : '영양제 등록',
+          _isEditMode ? l10n.supplementEditTitle : l10n.supplementAddTitle,
           style: textTheme.titleLarge,
         ),
       ),
@@ -208,10 +211,10 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const _SectionTitle('영양제 이름'),
+            _SectionTitle(l10n.supplementNameSection),
             _SupplementTextField(
               controller: _nameController,
-              hintText: '예: 비타민 D, 오메가3',
+              hintText: l10n.supplementNameHint,
             ),
             const SizedBox(height: 24),
 
@@ -221,7 +224,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const _SectionTitle('1회 복용량'),
+                      _SectionTitle(l10n.supplementDosageSection),
                       _SupplementTextField(
                         controller: _dosageValueController,
                         keyboardType: const TextInputType.numberWithOptions(
@@ -237,7 +240,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const _SectionTitle('단위'),
+                      _SectionTitle(l10n.supplementUnitSection),
                       DropdownButtonFormField<String>(
                         initialValue: _unit,
                         decoration: InputDecoration(
@@ -261,31 +264,33 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
             ),
             const SizedBox(height: 24),
 
-            const _SectionTitle('복용 방식 선택'),
+            _SectionTitle(l10n.supplementMethodSection),
             _buildTopMethodSelector(),
             const SizedBox(height: 24),
 
             _buildDetailSection(),
 
             const SizedBox(height: 24),
-            const _SectionTitle('기타 설정'),
+            _SectionTitle(l10n.supplementOtherSettingsSection),
             SwitchListTile(
-              title: const Text('복용 알림 받기'),
+              title: Text(l10n.supplementNotificationSwitch),
               value: _isNotificationEnabled,
               contentPadding: EdgeInsets.zero,
               onChanged: (v) => setState(() => _isNotificationEnabled = v),
             ),
             const SizedBox(height: 12),
-            const _SectionTitle('메모 (선택)'),
+            _SectionTitle(l10n.supplementMemoSection),
             _SupplementTextField(
               controller: _memoController,
               maxLines: 2,
-              hintText: '주의사항 등을 적어주세요',
+              hintText: l10n.supplementMemoHint,
             ),
             const SizedBox(height: 40),
 
             _SaveSupplementButton(
-              label: _isEditMode ? '수정 완료' : '등록 완료',
+              label: _isEditMode
+                  ? l10n.supplementEditDone
+                  : l10n.supplementAddDone,
               onPressed: _saveSupplement,
             ),
           ],
@@ -295,6 +300,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
   }
 
   Widget _buildTopMethodSelector() {
+    final l10n = AppLocalizations.of(context);
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
@@ -306,12 +312,12 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
       child: Row(
         children: [
           _buildTopMethodItem(
-            '식사/생활 루틴',
+            l10n.supplementRoutineMethod,
             _isRoutineBased,
             () => setState(() => _isRoutineBased = true),
           ),
           _buildTopMethodItem(
-            '직접 시간 지정',
+            l10n.supplementManualTimeMethod,
             !_isRoutineBased,
             () => setState(() => _isRoutineBased = false),
           ),
@@ -353,13 +359,14 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
   }
 
   Widget _buildDetailSection() {
+    final l10n = AppLocalizations.of(context);
     final colorScheme = Theme.of(context).colorScheme;
 
     if (_isRoutineBased) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _SectionTitle('언제 복용하시나요? (다중 선택)'),
+          _SectionTitle(l10n.supplementTimingSection),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -395,12 +402,12 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
             child: Row(
               children: [
                 _buildSubMethodItem(
-                  '특정 시각 지정',
+                  l10n.supplementSpecificTimeMethod,
                   _isSpecificTime,
                   () => setState(() => _isSpecificTime = true),
                 ),
                 _buildSubMethodItem(
-                  '일정 간격 반복',
+                  l10n.supplementIntervalMethod,
                   !_isSpecificTime,
                   () => setState(() => _isSpecificTime = false),
                 ),
@@ -455,10 +462,12 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
   }
 
   Widget _buildFixedTimeUI() {
+    final l10n = AppLocalizations.of(context);
+
     return Column(
       children: [
         _buildCounterRow(
-          '하루 복용 횟수',
+          l10n.supplementDailyCountLabel,
           _fixedCount,
           (v) => setState(() {
             _fixedCount = v;
@@ -475,7 +484,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
           (index) => Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
             child: ListTile(
-              title: Text('복용 시각 ${index + 1}'),
+              title: Text(l10n.supplementScheduledTimeLabel(index + 1)),
               trailing: Text(
                 _fixedTimes[index].format(context),
                 style: Theme.of(context).textTheme.labelLarge,
@@ -499,6 +508,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
   }
 
   Widget _buildIntervalUI() {
+    final l10n = AppLocalizations.of(context);
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
@@ -511,14 +521,14 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
       child: Column(
         children: [
           _buildCounterRow(
-            '하루 복용 횟수',
+            l10n.supplementDailyCountLabel,
             _intervalCount,
             (v) => setState(() => _intervalCount = v),
           ),
           const Divider(height: 24),
           ListTile(
             title: Text(
-              '첫 복용 시작 시각',
+              l10n.supplementStartTimeLabel,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             trailing: Text(
@@ -538,14 +548,14 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
           ),
           const Divider(height: 24),
           _buildCounterRow(
-            '반복 간격(시간)',
+            l10n.supplementIntervalHoursLabel,
             _intervalHours,
             (v) => setState(() => _intervalHours = v),
             min: 1,
             max: 24,
           ),
           const SizedBox(height: 12),
-          const Text('※ 오늘 자정 전까지만 일정이 생성됩니다.'),
+          Text(l10n.supplementIntervalNotice),
         ],
       ),
     );

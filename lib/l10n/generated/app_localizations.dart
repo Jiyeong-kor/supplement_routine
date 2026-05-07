@@ -292,6 +292,162 @@ abstract class AppLocalizations {
   /// **'오른쪽 아래 + 버튼으로 영양제를 등록해보세요.'**
   String get supplementEmptyDescription;
 
+  /// No description provided for @supplementAddTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'영양제 등록'**
+  String get supplementAddTitle;
+
+  /// No description provided for @supplementEditTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'영양제 수정'**
+  String get supplementEditTitle;
+
+  /// No description provided for @supplementNameSection.
+  ///
+  /// In ko, this message translates to:
+  /// **'영양제 이름'**
+  String get supplementNameSection;
+
+  /// No description provided for @supplementNameHint.
+  ///
+  /// In ko, this message translates to:
+  /// **'예: 비타민 D, 오메가3'**
+  String get supplementNameHint;
+
+  /// No description provided for @supplementDosageSection.
+  ///
+  /// In ko, this message translates to:
+  /// **'1회 복용량'**
+  String get supplementDosageSection;
+
+  /// No description provided for @supplementUnitSection.
+  ///
+  /// In ko, this message translates to:
+  /// **'단위'**
+  String get supplementUnitSection;
+
+  /// No description provided for @supplementMethodSection.
+  ///
+  /// In ko, this message translates to:
+  /// **'복용 방식 선택'**
+  String get supplementMethodSection;
+
+  /// No description provided for @supplementRoutineMethod.
+  ///
+  /// In ko, this message translates to:
+  /// **'식사/생활 루틴'**
+  String get supplementRoutineMethod;
+
+  /// No description provided for @supplementManualTimeMethod.
+  ///
+  /// In ko, this message translates to:
+  /// **'직접 시간 지정'**
+  String get supplementManualTimeMethod;
+
+  /// No description provided for @supplementTimingSection.
+  ///
+  /// In ko, this message translates to:
+  /// **'언제 복용하시나요? (다중 선택)'**
+  String get supplementTimingSection;
+
+  /// No description provided for @supplementSpecificTimeMethod.
+  ///
+  /// In ko, this message translates to:
+  /// **'특정 시각 지정'**
+  String get supplementSpecificTimeMethod;
+
+  /// No description provided for @supplementIntervalMethod.
+  ///
+  /// In ko, this message translates to:
+  /// **'일정 간격 반복'**
+  String get supplementIntervalMethod;
+
+  /// No description provided for @supplementDailyCountLabel.
+  ///
+  /// In ko, this message translates to:
+  /// **'하루 복용 횟수'**
+  String get supplementDailyCountLabel;
+
+  /// No description provided for @supplementScheduledTimeLabel.
+  ///
+  /// In ko, this message translates to:
+  /// **'복용 시각 {index}'**
+  String supplementScheduledTimeLabel(int index);
+
+  /// No description provided for @supplementStartTimeLabel.
+  ///
+  /// In ko, this message translates to:
+  /// **'첫 복용 시작 시각'**
+  String get supplementStartTimeLabel;
+
+  /// No description provided for @supplementIntervalHoursLabel.
+  ///
+  /// In ko, this message translates to:
+  /// **'반복 간격(시간)'**
+  String get supplementIntervalHoursLabel;
+
+  /// No description provided for @supplementIntervalNotice.
+  ///
+  /// In ko, this message translates to:
+  /// **'※ 오늘 자정 전까지만 일정이 생성됩니다.'**
+  String get supplementIntervalNotice;
+
+  /// No description provided for @supplementOtherSettingsSection.
+  ///
+  /// In ko, this message translates to:
+  /// **'기타 설정'**
+  String get supplementOtherSettingsSection;
+
+  /// No description provided for @supplementNotificationSwitch.
+  ///
+  /// In ko, this message translates to:
+  /// **'복용 알림 받기'**
+  String get supplementNotificationSwitch;
+
+  /// No description provided for @supplementMemoSection.
+  ///
+  /// In ko, this message translates to:
+  /// **'메모 (선택)'**
+  String get supplementMemoSection;
+
+  /// No description provided for @supplementMemoHint.
+  ///
+  /// In ko, this message translates to:
+  /// **'주의사항 등을 적어주세요'**
+  String get supplementMemoHint;
+
+  /// No description provided for @supplementAddDone.
+  ///
+  /// In ko, this message translates to:
+  /// **'등록 완료'**
+  String get supplementAddDone;
+
+  /// No description provided for @supplementEditDone.
+  ///
+  /// In ko, this message translates to:
+  /// **'수정 완료'**
+  String get supplementEditDone;
+
+  /// No description provided for @supplementNameRequired.
+  ///
+  /// In ko, this message translates to:
+  /// **'영양제 이름을 입력해주세요.'**
+  String get supplementNameRequired;
+
+  /// No description provided for @supplementDosageInvalid.
+  ///
+  /// In ko, this message translates to:
+  /// **'1회 복용량은 0보다 큰 숫자로 입력해주세요.'**
+  String get supplementDosageInvalid;
+
+  /// No description provided for @supplementTimingRequired.
+  ///
+  /// In ko, this message translates to:
+  /// **'복용 시간대를 하나 이상 선택해주세요.'**
+  String get supplementTimingRequired;
+
   /// No description provided for @historyTitle.
   ///
   /// In ko, this message translates to:

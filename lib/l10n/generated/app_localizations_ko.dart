@@ -120,6 +120,86 @@ class AppLocalizationsKo extends AppLocalizations {
   String get supplementEmptyDescription => '오른쪽 아래 + 버튼으로 영양제를 등록해보세요.';
 
   @override
+  String get supplementAddTitle => '영양제 등록';
+
+  @override
+  String get supplementEditTitle => '영양제 수정';
+
+  @override
+  String get supplementNameSection => '영양제 이름';
+
+  @override
+  String get supplementNameHint => '예: 비타민 D, 오메가3';
+
+  @override
+  String get supplementDosageSection => '1회 복용량';
+
+  @override
+  String get supplementUnitSection => '단위';
+
+  @override
+  String get supplementMethodSection => '복용 방식 선택';
+
+  @override
+  String get supplementRoutineMethod => '식사/생활 루틴';
+
+  @override
+  String get supplementManualTimeMethod => '직접 시간 지정';
+
+  @override
+  String get supplementTimingSection => '언제 복용하시나요? (다중 선택)';
+
+  @override
+  String get supplementSpecificTimeMethod => '특정 시각 지정';
+
+  @override
+  String get supplementIntervalMethod => '일정 간격 반복';
+
+  @override
+  String get supplementDailyCountLabel => '하루 복용 횟수';
+
+  @override
+  String supplementScheduledTimeLabel(int index) {
+    return '복용 시각 $index';
+  }
+
+  @override
+  String get supplementStartTimeLabel => '첫 복용 시작 시각';
+
+  @override
+  String get supplementIntervalHoursLabel => '반복 간격(시간)';
+
+  @override
+  String get supplementIntervalNotice => '※ 오늘 자정 전까지만 일정이 생성됩니다.';
+
+  @override
+  String get supplementOtherSettingsSection => '기타 설정';
+
+  @override
+  String get supplementNotificationSwitch => '복용 알림 받기';
+
+  @override
+  String get supplementMemoSection => '메모 (선택)';
+
+  @override
+  String get supplementMemoHint => '주의사항 등을 적어주세요';
+
+  @override
+  String get supplementAddDone => '등록 완료';
+
+  @override
+  String get supplementEditDone => '수정 완료';
+
+  @override
+  String get supplementNameRequired => '영양제 이름을 입력해주세요.';
+
+  @override
+  String get supplementDosageInvalid => '1회 복용량은 0보다 큰 숫자로 입력해주세요.';
+
+  @override
+  String get supplementTimingRequired => '복용 시간대를 하나 이상 선택해주세요.';
+
+  @override
   String get historyTitle => '기록';
 
   @override
