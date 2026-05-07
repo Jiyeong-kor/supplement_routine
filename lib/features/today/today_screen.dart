@@ -24,32 +24,13 @@ class TodayScreen extends ConsumerWidget {
       _weekdayLabel(l10n, now.weekday),
     );
 
-    final memoItems = todayList.where(
-      (item) =>
-          item.supplement.memo != null &&
-          item.supplement.memo!.trim().isNotEmpty,
-    );
-
-    final String quoteText;
-    final IconData quoteIcon;
-
-    if (memoItems.isNotEmpty) {
-      final firstMemo = memoItems.first;
-      quoteText = l10n.todayMemoQuote(
-        firstMemo.supplement.name,
-        firstMemo.supplement.memo!,
-      );
-      quoteIcon = Icons.edit_note;
-    } else {
-      final quotes = [
-        l10n.habitQuoteCheckAfterTaking,
-        l10n.habitQuoteFixedRoutine,
-        l10n.habitQuoteReviewToday,
-      ];
-      final quoteIndex = now.day % quotes.length;
-      quoteText = quotes[quoteIndex];
-      quoteIcon = Icons.auto_awesome;
-    }
+    final quotes = [
+      l10n.habitQuoteCheckAfterTaking,
+      l10n.habitQuoteFixedRoutine,
+      l10n.habitQuoteReviewToday,
+    ];
+    final quoteIndex = now.day % quotes.length;
+    final quoteText = quotes[quoteIndex];
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.todayAppBarTitle)),
@@ -60,7 +41,7 @@ class TodayScreen extends ConsumerWidget {
           children: [
             Text(dateString, style: Theme.of(context).textTheme.bodyMedium),
             const SizedBox(height: 16),
-            _TodayQuoteCard(icon: quoteIcon, text: quoteText),
+            _TodayQuoteCard(icon: Icons.auto_awesome, text: quoteText),
             const SizedBox(height: 24),
             _TodayProgressCard(done: doneCount, total: totalCount),
             const SizedBox(height: 32),

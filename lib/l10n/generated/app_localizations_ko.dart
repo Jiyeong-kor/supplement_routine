@@ -53,11 +53,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get weekdaySunday => '일';
 
   @override
-  String todayMemoQuote(String supplementName, String memo) {
-    return '내 메모 · $supplementName: $memo';
-  }
-
-  @override
   String get habitQuoteCheckAfterTaking => '복용 후 바로 체크하면 오늘 기록이 더 정확해집니다.';
 
   @override

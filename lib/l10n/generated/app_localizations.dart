@@ -178,12 +178,6 @@ abstract class AppLocalizations {
   /// **'일'**
   String get weekdaySunday;
 
-  /// No description provided for @todayMemoQuote.
-  ///
-  /// In ko, this message translates to:
-  /// **'내 메모 · {supplementName}: {memo}'**
-  String todayMemoQuote(String supplementName, String memo);
-
   /// No description provided for @habitQuoteCheckAfterTaking.
   ///
   /// In ko, this message translates to:

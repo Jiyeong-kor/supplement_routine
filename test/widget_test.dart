@@ -23,6 +23,15 @@ void main() {
     // 초기 화면인 '오늘' 화면의 AppBar 타이틀과 mock 일정이 있는지 확인합니다.
     expect(find.text('오늘의 복용'), findsOneWidget);
     expect(find.text('비타민 D'), findsOneWidget);
+    expect(find.textContaining('내 메모'), findsNothing);
+    expect(
+      [
+        '복용 후 바로 체크하면 오늘 기록이 더 정확해집니다.',
+        '복용 시간을 고정하면 루틴을 확인하기 쉽습니다.',
+        '오늘 복용할 항목을 확인하고 완료 여부를 기록해보세요.',
+      ].any((quote) => find.text(quote).evaluate().isNotEmpty),
+      isTrue,
+    );
   });
 
   testWidgets('영양제 등록 시 복용량은 0보다 큰 숫자여야 한다', (WidgetTester tester) async {
