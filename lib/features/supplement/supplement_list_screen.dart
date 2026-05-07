@@ -3,16 +3,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supplement_routine/core/models/supplement.dart';
 import 'package:supplement_routine/features/supplement/supplement_add_screen.dart';
 import 'package:supplement_routine/features/supplement/supplement_provider.dart';
+import 'package:supplement_routine/l10n/generated/app_localizations.dart';
 
 class SupplementListScreen extends ConsumerWidget {
   const SupplementListScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final supplements = ref.watch(supplementListProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('영양제')),
+      appBar: AppBar(title: Text(l10n.supplementListTitle)),
       body: _SupplementListBody(
         supplements: supplements,
         onEdit: (supplement) {
@@ -55,12 +57,14 @@ class SupplementListScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('영양제 삭제'),
-        content: Text('${supplement.name}을(를) 삭제하시겠습니까?'),
+        title: Text(AppLocalizations.of(context).deleteSupplementTitle),
+        content: Text(
+          AppLocalizations.of(context).deleteSupplementMessage(supplement.name),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('취소'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           TextButton(
             onPressed: () {
@@ -69,7 +73,10 @@ class SupplementListScreen extends ConsumerWidget {
                   .removeSupplement(supplement.id);
               Navigator.pop(context);
             },
-            child: const Text('삭제', style: TextStyle(color: Colors.red)),
+            child: Text(
+              AppLocalizations.of(context).delete,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
           ),
         ],
       ),
@@ -128,6 +135,7 @@ class _SupplementListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -159,14 +167,20 @@ class _SupplementListItem extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              '${supplement.method.label} · 하루 ${supplement.dailyCount}회',
+              l10n.supplementDailyCount(
+                supplement.method.label,
+                supplement.dailyCount,
+              ),
               style: textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 4),
             Text(
-              '1회 ${_formatDosage(supplement.dosageValue)} ${supplement.dosageUnit}',
+              l10n.supplementDosage(
+                _formatDosage(supplement.dosageValue),
+                supplement.dosageUnit,
+              ),
               style: textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -208,6 +222,7 @@ class _SupplementItemActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final colorScheme = Theme.of(context).colorScheme;
 
     return Row(
@@ -224,14 +239,14 @@ class _SupplementItemActions extends StatelessWidget {
         ),
         const SizedBox(width: 4),
         IconButton(
-          tooltip: '수정',
+          tooltip: l10n.edit,
           onPressed: onEdit,
           icon: const Icon(Icons.edit_outlined),
           color: colorScheme.onSurfaceVariant,
         ),
         const SizedBox(width: 4),
         IconButton(
-          tooltip: '삭제',
+          tooltip: l10n.delete,
           onPressed: onDelete,
           icon: const Icon(Icons.delete_outline),
           color: colorScheme.error,
@@ -246,6 +261,7 @@ class _SupplementEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final colorScheme = Theme.of(context).colorScheme;
 
     return Center(
@@ -261,14 +277,14 @@ class _SupplementEmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              '등록된 영양제가 없습니다',
+              l10n.supplementEmptyTitle,
               style: Theme.of(
                 context,
               ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 6),
             Text(
-              '오른쪽 아래 + 버튼으로 영양제를 등록해보세요.',
+              l10n.supplementEmptyDescription,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,

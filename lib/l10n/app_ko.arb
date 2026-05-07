@@ -1,0 +1,129 @@
+{
+  "@@locale": "ko",
+  "appTitle": "Supplement Routine",
+  "navToday": "오늘",
+  "navSupplements": "영양제",
+  "navHistory": "기록",
+  "navSettings": "설정",
+  "todayAppBarTitle": "오늘의 복용",
+  "todayDate": "{year}년 {month}월 {day}일 {weekday}요일",
+  "@todayDate": {
+    "placeholders": {
+      "year": { "type": "int" },
+      "month": { "type": "int" },
+      "day": { "type": "int" },
+      "weekday": { "type": "String" }
+    }
+  },
+  "weekdayMonday": "월",
+  "weekdayTuesday": "화",
+  "weekdayWednesday": "수",
+  "weekdayThursday": "목",
+  "weekdayFriday": "금",
+  "weekdaySaturday": "토",
+  "weekdaySunday": "일",
+  "todayMemoQuote": "내 메모 · {supplementName}: {memo}",
+  "@todayMemoQuote": {
+    "placeholders": {
+      "supplementName": { "type": "String" },
+      "memo": { "type": "String" }
+    }
+  },
+  "habitQuoteCheckAfterTaking": "복용 후 바로 체크하면 오늘 기록이 더 정확해집니다.",
+  "habitQuoteFixedRoutine": "복용 시간을 고정하면 루틴을 확인하기 쉽습니다.",
+  "habitQuoteReviewToday": "오늘 복용할 항목을 확인하고 완료 여부를 기록해보세요.",
+  "todayRoutineTitle": "오늘의 루틴",
+  "todayProgressCount": "{done} / {total} 완료",
+  "@todayProgressCount": {
+    "placeholders": {
+      "done": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "todayListTitle": "복용 목록",
+  "todayEmptyTitle": "등록된 복용 일정이 없습니다",
+  "todayEmptyDescription": "오른쪽 아래 + 버튼으로 영양제를 등록해보세요.",
+  "supplementListTitle": "영양제",
+  "deleteSupplementTitle": "영양제 삭제",
+  "deleteSupplementMessage": "{supplementName}을(를) 삭제하시겠습니까?",
+  "@deleteSupplementMessage": {
+    "placeholders": {
+      "supplementName": { "type": "String" }
+    }
+  },
+  "cancel": "취소",
+  "delete": "삭제",
+  "edit": "수정",
+  "supplementDailyCount": "{methodLabel} · 하루 {dailyCount}회",
+  "@supplementDailyCount": {
+    "placeholders": {
+      "methodLabel": { "type": "String" },
+      "dailyCount": { "type": "int" }
+    }
+  },
+  "supplementDosage": "1회 {dosage} {unit}",
+  "@supplementDosage": {
+    "placeholders": {
+      "dosage": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+  "supplementEmptyTitle": "등록된 영양제가 없습니다",
+  "supplementEmptyDescription": "오른쪽 아래 + 버튼으로 영양제를 등록해보세요.",
+  "historyTitle": "기록",
+  "historyTodayDate": "오늘 · {month}월 {day}일 {weekday}요일",
+  "@historyTodayDate": {
+    "placeholders": {
+      "month": { "type": "int" },
+      "day": { "type": "int" },
+      "weekday": { "type": "String" }
+    }
+  },
+  "historyCompletion": "완료율 {percent}% ({done}/{total})",
+  "@historyCompletion": {
+    "placeholders": {
+      "percent": { "type": "int" },
+      "done": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "historyEmptyToday": "오늘 등록된 복용 일정이 없습니다.",
+  "settingsTitle": "설정",
+  "settingsDefaultSection": "기본 설정",
+  "settingsMealTimeTitle": "식사 시간 설정",
+  "settingsMealTimeSummary": "아침 {breakfast} · 점심 {lunch} · 저녁 {dinner}",
+  "@settingsMealTimeSummary": {
+    "placeholders": {
+      "breakfast": { "type": "String" },
+      "lunch": { "type": "String" },
+      "dinner": { "type": "String" }
+    }
+  },
+  "settingsNotificationTitle": "알림 설정",
+  "settingsNotificationOn": "새 영양제 등록 시 알림을 기본으로 켭니다",
+  "settingsNotificationOff": "새 영양제 등록 시 알림을 기본으로 끕니다",
+  "settingsDataSection": "데이터 관리",
+  "settingsResetTitle": "데이터 초기화",
+  "settingsResetMessage": "모든 영양제 정보와 복용 기록이 삭제됩니다. 정말 초기화하시겠습니까?",
+  "settingsResetConfirm": "초기화",
+  "settingsResetDone": "데이터가 초기화되었습니다.",
+  "settingsInfoSection": "정보",
+  "settingsUsageGuideTitle": "앱 사용 가이드",
+  "settingsDisclaimerTitle": "면책 고지",
+  "settingsVersionTitle": "앱 버전",
+  "settingsMealTimeDescription": "오늘 일정 계산에 사용할 기본 식사 시간입니다",
+  "mealBreakfast": "아침",
+  "mealLunch": "점심",
+  "mealDinner": "저녁",
+  "confirm": "확인",
+  "usageGuideStepRegisterTitle": "1. 영양제를 등록하세요",
+  "usageGuideStepRegisterDescription": "이름, 복용 방식, 복용 조건, 알림 여부, 메모를 직접 입력합니다.",
+  "usageGuideStepTodayTitle": "2. 오늘 화면에서 확인하세요",
+  "usageGuideStepTodayDescription": "입력한 규칙을 기준으로 오늘의 복용 일정과 진행률을 확인합니다.",
+  "usageGuideStepCheckTitle": "3. 복용 후 체크하세요",
+  "usageGuideStepCheckDescription": "복용을 완료하면 오늘 목록에서 해당 일정을 체크합니다.",
+  "usageGuideStepHistoryTitle": "4. 기록 화면에서 돌아보세요",
+  "usageGuideStepHistoryDescription": "오늘 완료 개수와 완료율을 확인해 복용 기록을 관리합니다.",
+  "usageGuideDisclaimer": "Supplement Routine은 영양제를 추천하거나 의료 조언을 제공하지 않습니다.",
+  "disclaimerBody": "본 앱은 사용자가 입력한 정보를 기반으로 복용 일정을 관리해주는 도구일 뿐, 의료적 조언이나 진단을 제공하지 않습니다.\n\n영양제 복용에 관한 결정은 전문의와 상담하시기 바랍니다. 앱에서 제공하는 정보의 오류나 누락으로 인한 책임은 사용자에게 있습니다."
+}

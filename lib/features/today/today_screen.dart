@@ -1,23 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supplement_routine/features/today/today_provider.dart';
-import 'package:supplement_routine/core/constants/habit_quotes.dart';
 import 'package:supplement_routine/features/supplement/supplement_add_screen.dart';
+import 'package:supplement_routine/features/today/today_provider.dart';
+import 'package:supplement_routine/l10n/generated/app_localizations.dart';
 
 class TodayScreen extends ConsumerWidget {
   const TodayScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final todayList = ref.watch(todayListProvider);
 
     final doneCount = todayList.where((item) => item.record.isDone).length;
     final totalCount = todayList.length;
 
     final now = DateTime.now();
-    final weekDays = ['월', '화', '수', '목', '금', '토', '일'];
-    final dateString =
-        '${now.year}년 ${now.month}월 ${now.day}일 ${weekDays[now.weekday - 1]}요일';
+    final dateString = l10n.todayDate(
+      now.year,
+      now.month,
+      now.day,
+      _weekdayLabel(l10n, now.weekday),
+    );
 
     final memoItems = todayList.where(
       (item) =>
@@ -30,17 +34,24 @@ class TodayScreen extends ConsumerWidget {
 
     if (memoItems.isNotEmpty) {
       final firstMemo = memoItems.first;
-      quoteText =
-          '내 메모 · ${firstMemo.supplement.name}: ${firstMemo.supplement.memo}';
+      quoteText = l10n.todayMemoQuote(
+        firstMemo.supplement.name,
+        firstMemo.supplement.memo!,
+      );
       quoteIcon = Icons.edit_note;
     } else {
-      final quoteIndex = now.day % HabitQuotes.quotes.length;
-      quoteText = HabitQuotes.quotes[quoteIndex];
+      final quotes = [
+        l10n.habitQuoteCheckAfterTaking,
+        l10n.habitQuoteFixedRoutine,
+        l10n.habitQuoteReviewToday,
+      ];
+      final quoteIndex = now.day % quotes.length;
+      quoteText = quotes[quoteIndex];
       quoteIcon = Icons.auto_awesome;
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('오늘의 복용')),
+      appBar: AppBar(title: Text(l10n.todayAppBarTitle)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -53,7 +64,7 @@ class TodayScreen extends ConsumerWidget {
             _TodayProgressCard(done: doneCount, total: totalCount),
             const SizedBox(height: 32),
             Text(
-              '복용 목록',
+              l10n.todayListTitle,
               style: Theme.of(
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
@@ -92,6 +103,19 @@ class TodayScreen extends ConsumerWidget {
         child: const Icon(Icons.add),
       ),
     );
+  }
+
+  String _weekdayLabel(AppLocalizations l10n, int weekday) {
+    return switch (weekday) {
+      DateTime.monday => l10n.weekdayMonday,
+      DateTime.tuesday => l10n.weekdayTuesday,
+      DateTime.wednesday => l10n.weekdayWednesday,
+      DateTime.thursday => l10n.weekdayThursday,
+      DateTime.friday => l10n.weekdayFriday,
+      DateTime.saturday => l10n.weekdaySaturday,
+      DateTime.sunday => l10n.weekdaySunday,
+      _ => '',
+    };
   }
 }
 
@@ -138,6 +162,7 @@ class _TodayProgressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final double percent = total > 0 ? done / total : 0;
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -153,13 +178,13 @@ class _TodayProgressCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '오늘의 루틴',
+                  l10n.todayRoutineTitle,
                   style: Theme.of(
                     context,
                   ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  '$done / $total 완료',
+                  l10n.todayProgressCount(done, total),
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
                     color: colorScheme.primary,
                     fontWeight: FontWeight.bold,
@@ -285,6 +310,7 @@ class _TodayEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final colorScheme = Theme.of(context).colorScheme;
 
     return Card(
@@ -301,14 +327,14 @@ class _TodayEmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              '등록된 복용 일정이 없습니다',
+              l10n.todayEmptyTitle,
               style: Theme.of(
                 context,
               ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 6),
             Text(
-              '오른쪽 아래 + 버튼으로 영양제를 등록해보세요.',
+              l10n.todayEmptyDescription,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
