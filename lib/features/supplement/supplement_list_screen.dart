@@ -13,25 +13,15 @@ class SupplementListScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('영양제')),
-      body: supplements.isEmpty
-          ? const _SupplementEmptyState()
-          : ListView.separated(
-              padding: const EdgeInsets.all(16),
-              itemCount: supplements.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 12),
-              itemBuilder: (context, index) {
-                final supplement = supplements[index];
-                return _SupplementListItem(
-                  supplement: supplement,
-                  onEdit: () {
-                    _openEditScreen(context, supplement);
-                  },
-                  onDelete: () {
-                    _showDeleteDialog(context, ref, supplement);
-                  },
-                );
-              },
-            ),
+      body: _SupplementListBody(
+        supplements: supplements,
+        onEdit: (supplement) {
+          _openEditScreen(context, supplement);
+        },
+        onDelete: (supplement) {
+          _showDeleteDialog(context, ref, supplement);
+        },
+      ),
       floatingActionButton: FloatingActionButton(
         heroTag: 'supplement_list_add',
         onPressed: () {
@@ -87,6 +77,44 @@ class SupplementListScreen extends ConsumerWidget {
   }
 }
 
+class _SupplementListBody extends StatelessWidget {
+  const _SupplementListBody({
+    required this.supplements,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  final List<Supplement> supplements;
+  final ValueChanged<Supplement> onEdit;
+  final ValueChanged<Supplement> onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    if (supplements.isEmpty) {
+      return const _SupplementEmptyState();
+    }
+
+    return ListView.separated(
+      padding: const EdgeInsets.all(16),
+      itemCount: supplements.length,
+      separatorBuilder: (context, index) => const SizedBox(height: 12),
+      itemBuilder: (context, index) {
+        final supplement = supplements[index];
+
+        return _SupplementListItem(
+          supplement: supplement,
+          onEdit: () {
+            onEdit(supplement);
+          },
+          onDelete: () {
+            onDelete(supplement);
+          },
+        );
+      },
+    );
+  }
+}
+
 class _SupplementListItem extends StatelessWidget {
   const _SupplementListItem({
     required this.supplement,
@@ -122,28 +150,10 @@ class _SupplementListItem extends StatelessWidget {
                     ),
                   ),
                 ),
-                Icon(
-                  supplement.isNotificationEnabled
-                      ? Icons.notifications_active_outlined
-                      : Icons.notifications_off_outlined,
-                  size: 20,
-                  color: supplement.isNotificationEnabled
-                      ? colorScheme.primary
-                      : colorScheme.outline,
-                ),
-                const SizedBox(width: 4),
-                IconButton(
-                  tooltip: '수정',
-                  onPressed: onEdit,
-                  icon: const Icon(Icons.edit_outlined),
-                  color: colorScheme.onSurfaceVariant,
-                ),
-                const SizedBox(width: 4),
-                IconButton(
-                  tooltip: '삭제',
-                  onPressed: onDelete,
-                  icon: const Icon(Icons.delete_outline),
-                  color: colorScheme.error,
+                _SupplementItemActions(
+                  isNotificationEnabled: supplement.isNotificationEnabled,
+                  onEdit: onEdit,
+                  onDelete: onDelete,
                 ),
               ],
             ),
@@ -182,6 +192,52 @@ class _SupplementListItem extends StatelessWidget {
     }
 
     return value.toString();
+  }
+}
+
+class _SupplementItemActions extends StatelessWidget {
+  const _SupplementItemActions({
+    required this.isNotificationEnabled,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  final bool isNotificationEnabled;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          isNotificationEnabled
+              ? Icons.notifications_active_outlined
+              : Icons.notifications_off_outlined,
+          size: 20,
+          color: isNotificationEnabled
+              ? colorScheme.primary
+              : colorScheme.outline,
+        ),
+        const SizedBox(width: 4),
+        IconButton(
+          tooltip: '수정',
+          onPressed: onEdit,
+          icon: const Icon(Icons.edit_outlined),
+          color: colorScheme.onSurfaceVariant,
+        ),
+        const SizedBox(width: 4),
+        IconButton(
+          tooltip: '삭제',
+          onPressed: onDelete,
+          icon: const Icon(Icons.delete_outline),
+          color: colorScheme.error,
+        ),
+      ],
+    );
   }
 }
 
