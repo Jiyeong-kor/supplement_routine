@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="widget_padding">16dp</dimen>
+    <dimen name="widget_corner_radius">24dp</dimen>
+    <dimen name="widget_progress_corner_radius">8dp</dimen>
+    <dimen name="widget_progress_height">8dp</dimen>
+    <dimen name="widget_title_text_size">13sp</dimen>
+    <dimen name="widget_percent_text_size">28sp</dimen>
+    <dimen name="widget_body_text_size">12sp</dimen>
+    <dimen name="widget_title_margin_top">6dp</dimen>
+    <dimen name="widget_section_margin_top">8dp</dimen>
+    <dimen name="widget_next_margin_top">2dp</dimen>
+    <dimen name="widget_min_width">180dp</dimen>
+    <dimen name="widget_min_height">110dp</dimen>
+</resources>
