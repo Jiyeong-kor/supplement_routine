@@ -100,12 +100,12 @@ class _SupplementListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey[200]!),
-      ),
+      margin: EdgeInsets.zero,
+      color: colorScheme.surfaceContainerLow,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -116,9 +116,9 @@ class _SupplementListItem extends StatelessWidget {
                 Expanded(
                   child: Text(
                     supplement.name,
-                    style: const TextStyle(
-                      fontSize: 16,
+                    style: textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                 ),
@@ -127,39 +127,47 @@ class _SupplementListItem extends StatelessWidget {
                       ? Icons.notifications_active_outlined
                       : Icons.notifications_off_outlined,
                   size: 20,
-                  color: Colors.grey[600],
+                  color: supplement.isNotificationEnabled
+                      ? colorScheme.primary
+                      : colorScheme.outline,
                 ),
                 const SizedBox(width: 4),
                 IconButton(
                   tooltip: '수정',
                   onPressed: onEdit,
                   icon: const Icon(Icons.edit_outlined),
-                  color: Colors.grey[700],
+                  color: colorScheme.onSurfaceVariant,
                 ),
                 const SizedBox(width: 4),
                 IconButton(
                   tooltip: '삭제',
                   onPressed: onDelete,
                   icon: const Icon(Icons.delete_outline),
-                  color: Colors.red,
+                  color: colorScheme.error,
                 ),
               ],
             ),
             const SizedBox(height: 6),
             Text(
               '${supplement.method.label} · 하루 ${supplement.dailyCount}회',
-              style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: 4),
             Text(
               '1회 ${_formatDosage(supplement.dosageValue)} ${supplement.dosageUnit}',
-              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
             if (supplement.memo != null) ...[
               const SizedBox(height: 8),
               Text(
                 supplement.memo!,
-                style: const TextStyle(fontSize: 13, color: Colors.blueGrey),
+                style: textTheme.bodySmall?.copyWith(
+                  color: colorScheme.tertiary,
+                ),
               ),
             ],
           ],
@@ -182,23 +190,33 @@ class _SupplementEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.medication_outlined, size: 40, color: Colors.grey[500]),
+            Icon(
+              Icons.inventory_2_outlined,
+              size: 40,
+              color: colorScheme.outline,
+            ),
             const SizedBox(height: 12),
-            const Text(
+            Text(
               '등록된 영양제가 없습니다',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 6),
             Text(
               '오른쪽 아래 + 버튼으로 영양제를 등록해보세요.',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),
