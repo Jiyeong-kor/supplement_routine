@@ -6,6 +6,7 @@ import 'package:supplement_routine/core/models/intake_condition.dart';
 import 'package:supplement_routine/core/models/intake_method.dart';
 import 'package:supplement_routine/core/models/meal_type.dart';
 import 'package:supplement_routine/core/models/supplement.dart';
+import 'package:supplement_routine/core/services/scheduling_service.dart';
 import 'package:supplement_routine/features/history/history_summary_provider.dart';
 import 'package:supplement_routine/features/settings/settings_provider.dart';
 import 'package:supplement_routine/features/supplement/supplement_provider.dart';
@@ -326,5 +327,36 @@ void main() {
     expect(summary.doneCount, 1);
     expect(summary.totalCount, 1);
     expect(summary.completionRate, 1);
+  });
+
+  test('복용 기록 ID는 연월일을 포함해 날짜별로 구분된다', () {
+    const supplement = Supplement(
+      id: 'test_supplement',
+      name: '비타민 D',
+      dailyCount: 1,
+      method: IntakeMethod.mealBased,
+      dosageUnit: '개',
+      dosageValue: 1,
+      selectedSlots: [
+        IntakeSlot(
+          mealType: MealType.breakfast,
+          condition: IntakeCondition.afterMeal,
+        ),
+      ],
+      isNotificationEnabled: true,
+    );
+
+    final aprilRecord = SchedulingService.createDailyIntakeRecords(
+      supplements: [supplement],
+      date: DateTime(2026, 4, 7),
+    ).first.record;
+    final mayRecord = SchedulingService.createDailyIntakeRecords(
+      supplements: [supplement],
+      date: DateTime(2026, 5, 7),
+    ).first.record;
+
+    expect(aprilRecord.id, 'r_test_supplement_20260407_0');
+    expect(mayRecord.id, 'r_test_supplement_20260507_0');
+    expect(aprilRecord.id, isNot(mayRecord.id));
   });
 }

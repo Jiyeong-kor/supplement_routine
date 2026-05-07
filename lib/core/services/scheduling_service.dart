@@ -118,7 +118,7 @@ class SchedulingService {
             supplement: supplement,
             label: intake.label,
             record: IntakeRecord(
-              id: 'r_${supplement.id}_${date.day}_$i',
+              id: 'r_${supplement.id}_${_dateKey(date)}_$i',
               supplementId: supplement.id,
               date: date,
               scheduledTime: intake.time,
@@ -138,6 +138,14 @@ class SchedulingService {
     });
 
     return records;
+  }
+
+  static String _dateKey(DateTime date) {
+    final year = date.year.toString().padLeft(4, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final day = date.day.toString().padLeft(2, '0');
+
+    return '$year$month$day';
   }
 
   static TimeOfDay _midpoint(TimeOfDay start, TimeOfDay end) {
