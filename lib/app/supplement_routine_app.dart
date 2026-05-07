@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import 'package:supplement_routine/app/app_theme.dart';
+
 import '../features/main_navigation_screen.dart';
 
 class SupplementRoutineApp extends StatelessWidget {
@@ -9,10 +12,9 @@ class SupplementRoutineApp extends StatelessWidget {
     return MaterialApp(
       title: '영양제 루틴',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorSchemeSeed: Colors.blue,
-      ),
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
       home: const MainNavigationScreen(),
     );
   }
