@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supplement_routine/app/app_radius.dart';
+import 'package:supplement_routine/app/app_spacing.dart';
 import 'package:supplement_routine/core/models/supplement.dart';
 import 'package:supplement_routine/core/models/intake_method.dart';
 import 'package:supplement_routine/core/models/intake_condition.dart';
@@ -192,17 +194,17 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
           _isEditMode ? '영양제 수정' : '영양제 등록',
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: textTheme.titleLarge,
         ),
-        centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -240,9 +242,8 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
                         initialValue: _unit,
                         decoration: InputDecoration(
                           filled: true,
-                          fillColor: Colors.grey[100],
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: AppRadius.mdBorder,
                             borderSide: BorderSide.none,
                           ),
                         ),
@@ -294,11 +295,13 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
   }
 
   Widget _buildTopMethodSelector() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(12),
+        color: colorScheme.surfaceContainerHigh,
+        borderRadius: AppRadius.mdBorder,
       ),
       child: Row(
         children: [
@@ -322,20 +325,25 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
     bool isSelected,
     VoidCallback onTap,
   ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: isSelected ? Colors.blue : Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
+            color: isSelected ? colorScheme.primary : Colors.transparent,
+            borderRadius: AppRadius.mdBorder,
           ),
           child: Text(
             title,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: isSelected ? Colors.white : Colors.grey[600],
+            style: textTheme.labelLarge?.copyWith(
+              color: isSelected
+                  ? colorScheme.onPrimary
+                  : colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -345,6 +353,8 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
   }
 
   Widget _buildDetailSection() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     if (_isRoutineBased) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -379,8 +389,8 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
           Container(
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(10),
+              color: colorScheme.surfaceContainerHigh,
+              borderRadius: AppRadius.mdBorder,
             ),
             child: Row(
               children: [
@@ -409,18 +419,21 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
     bool isSelected,
     VoidCallback onTap,
   ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
-            color: isSelected ? Colors.white : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
+            color: isSelected ? colorScheme.surface : Colors.transparent,
+            borderRadius: AppRadius.smBorder,
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
+                      color: colorScheme.shadow.withValues(alpha: 0.05),
                       blurRadius: 4,
                     ),
                   ]
@@ -429,9 +442,10 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
           child: Text(
             title,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: isSelected ? Colors.black : Colors.grey[500],
-              fontSize: 13,
+            style: textTheme.labelMedium?.copyWith(
+              color: isSelected
+                  ? colorScheme.onSurface
+                  : colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -464,7 +478,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
               title: Text('복용 시각 ${index + 1}'),
               trailing: Text(
                 _fixedTimes[index].format(context),
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.labelLarge,
               ),
               onTap: () async {
                 final picked = await showTimePicker(
@@ -475,10 +489,8 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
                   setState(() => _fixedTimes[index] = picked);
                 }
               },
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              tileColor: Colors.blue[50],
+              shape: RoundedRectangleBorder(borderRadius: AppRadius.mdBorder),
+              tileColor: Theme.of(context).colorScheme.secondaryContainer,
             ),
           ),
         ),
@@ -487,12 +499,14 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
   }
 
   Widget _buildIntervalUI() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
+        color: colorScheme.surfaceContainerLow,
+        borderRadius: AppRadius.mdBorder,
+        border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: Column(
         children: [
@@ -503,10 +517,13 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
           ),
           const Divider(height: 24),
           ListTile(
-            title: const Text('첫 복용 시작 시각', style: TextStyle(fontSize: 15)),
+            title: Text(
+              '첫 복용 시작 시각',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
             trailing: Text(
               _startTime.format(context),
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.labelLarge,
             ),
             onTap: () async {
               final picked = await showTimePicker(
@@ -528,10 +545,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
             max: 24,
           ),
           const SizedBox(height: 12),
-          const Text(
-            '※ 오늘 자정 전까지만 일정이 생성됩니다.',
-            style: TextStyle(fontSize: 12, color: Colors.grey),
-          ),
+          const Text('※ 오늘 자정 전까지만 일정이 생성됩니다.'),
         ],
       ),
     );
@@ -544,33 +558,39 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
     int min = 1,
     int max = 10,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           title,
-          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+          style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
         ),
         Row(
           children: [
             IconButton(
               onPressed: value > min ? () => onChanged(value - 1) : null,
-              icon: const Icon(Icons.remove_circle_outline, color: Colors.blue),
+              icon: Icon(
+                Icons.remove_circle_outline,
+                color: value > min ? colorScheme.primary : colorScheme.outline,
+              ),
             ),
             Container(
               constraints: const BoxConstraints(minWidth: 30),
               child: Text(
                 '$value',
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: textTheme.titleMedium,
               ),
             ),
             IconButton(
               onPressed: value < max ? () => onChanged(value + 1) : null,
-              icon: const Icon(Icons.add_circle_outline, color: Colors.blue),
+              icon: Icon(
+                Icons.add_circle_outline,
+                color: value < max ? colorScheme.primary : colorScheme.outline,
+              ),
             ),
           ],
         ),
@@ -586,14 +606,15 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(
         title,
-        style: const TextStyle(
-          fontSize: 14,
+        style: Theme.of(context).textTheme.labelLarge?.copyWith(
           fontWeight: FontWeight.bold,
-          color: Colors.blueGrey,
+          color: colorScheme.primary,
         ),
       ),
     );
@@ -622,15 +643,7 @@ class _SupplementTextField extends StatelessWidget {
       keyboardType: keyboardType,
       textAlign: textAlign,
       maxLines: maxLines,
-      decoration: InputDecoration(
-        hintText: hintText,
-        filled: true,
-        fillColor: Colors.grey[100],
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-      ),
+      decoration: InputDecoration(hintText: hintText, filled: true),
     );
   }
 }
@@ -645,22 +658,7 @@ class _SaveSupplementButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 56,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          elevation: 0,
-        ),
-        child: Text(
-          label,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-      ),
+      child: FilledButton(onPressed: onPressed, child: Text(label)),
     );
   }
 }

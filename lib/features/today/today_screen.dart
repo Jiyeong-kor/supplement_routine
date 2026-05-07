@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supplement_routine/app/app_radius.dart';
 import 'package:supplement_routine/features/supplement/supplement_add_screen.dart';
 import 'package:supplement_routine/features/today/today_provider.dart';
 import 'package:supplement_routine/l10n/generated/app_localizations.dart';
@@ -194,7 +195,7 @@ class _TodayProgressCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             ClipRRect(
-              borderRadius: BorderRadius.circular(999),
+              borderRadius: AppRadius.pillBorder,
               child: LinearProgressIndicator(
                 value: percent,
                 minHeight: 10,
@@ -243,7 +244,7 @@ class _TodaySupplementItem extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       color: isDone ? colorScheme.surfaceContainerHighest : null,
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppRadius.mdBorder,
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(16),
