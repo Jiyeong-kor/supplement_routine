@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supplement_routine/app/app_radius.dart';
+import 'package:supplement_routine/app/app_spacing.dart';
 import 'package:supplement_routine/features/supplement/supplement_add_screen.dart';
 import 'package:supplement_routine/features/today/today_provider.dart';
 import 'package:supplement_routine/l10n/generated/app_localizations.dart';
@@ -35,23 +36,23 @@ class TodayScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: Text(l10n.todayAppBarTitle)),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: AppSpacing.screenPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(dateString, style: Theme.of(context).textTheme.bodyMedium),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
             _TodayQuoteCard(icon: Icons.auto_awesome, text: quoteText),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.xxl),
             _TodayProgressCard(done: doneCount, total: totalCount),
-            const SizedBox(height: 32),
+            const SizedBox(height: AppSpacing.xxxl),
             Text(
               l10n.todayListTitle,
               style: Theme.of(
                 context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             if (todayList.isEmpty)
               const _TodayEmptyState()
             else
@@ -115,11 +116,11 @@ class _TodayQuoteCard extends StatelessWidget {
       margin: EdgeInsets.zero,
       color: colorScheme.secondaryContainer,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.cardPadding,
         child: Row(
           children: [
             Icon(icon, color: colorScheme.onSecondaryContainer),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Text(
                 text,
@@ -152,7 +153,7 @@ class _TodayProgressCard extends StatelessWidget {
       margin: EdgeInsets.zero,
       color: colorScheme.surfaceContainerLow,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.cardPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -163,18 +164,18 @@ class _TodayProgressCard extends StatelessWidget {
                   l10n.todayRoutineTitle,
                   style: Theme.of(
                     context,
-                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
                 ),
                 Text(
                   l10n.todayProgressCount(done, total),
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
                     color: colorScheme.primary,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             ClipRRect(
               borderRadius: AppRadius.pillBorder,
               child: LinearProgressIndicator(
@@ -213,7 +214,6 @@ class _TodaySupplementItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 1.5 개 -> 1.5개, 1.0 개 -> 1개 처리
     final dosageStr = dosageValue == dosageValue.toInt()
         ? dosageValue.toInt().toString()
         : dosageValue.toString();
@@ -222,13 +222,13 @@ class _TodaySupplementItem extends StatelessWidget {
     final memoText = memo;
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
       color: isDone ? colorScheme.surfaceContainerHighest : null,
       child: InkWell(
         borderRadius: AppRadius.mdBorder,
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: AppSpacing.cardPadding,
           child: Row(
             children: [
               SizedBox(
@@ -236,12 +236,12 @@ class _TodaySupplementItem extends StatelessWidget {
                 child: Text(
                   time,
                   style: textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                     color: colorScheme.primary,
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -249,7 +249,7 @@ class _TodaySupplementItem extends StatelessWidget {
                     Text(
                       name,
                       style: textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w700,
                         color: isDone
                             ? colorScheme.onSurfaceVariant
                             : colorScheme.onSurface,
@@ -263,7 +263,7 @@ class _TodaySupplementItem extends StatelessWidget {
                     ),
                     if (memoText != null)
                       Padding(
-                        padding: const EdgeInsets.only(top: 4),
+                        padding: const EdgeInsets.only(top: AppSpacing.xxs),
                         child: Text(
                           memoText,
                           style: textTheme.bodySmall?.copyWith(
@@ -299,7 +299,10 @@ class _TodayEmptyState extends StatelessWidget {
       margin: EdgeInsets.zero,
       color: colorScheme.surfaceContainerLow,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 28),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.xxxl,
+        ),
         child: Column(
           children: [
             Icon(
@@ -307,14 +310,14 @@ class _TodayEmptyState extends StatelessWidget {
               size: 36,
               color: colorScheme.outline,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             Text(
               l10n.todayEmptyTitle,
               style: Theme.of(
                 context,
-              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: AppSpacing.xs),
             Text(
               l10n.todayEmptyDescription,
               textAlign: TextAlign.center,
