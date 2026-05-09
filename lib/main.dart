@@ -5,6 +5,8 @@ import 'app/supplement_routine_app.dart';
 import 'core/services/intake_notification_service.dart';
 import 'features/history/data/local_intake_record_repository.dart';
 import 'features/history/intake_record_provider.dart';
+import 'features/settings/data/local_settings_repository.dart';
+import 'features/settings/settings_provider.dart';
 import 'features/supplement/data/local_supplement_repository.dart';
 import 'features/supplement/supplement_provider.dart';
 
@@ -16,6 +18,8 @@ Future<void> main() async {
       allowList: {
         LocalSupplementRepository.storageKey,
         LocalIntakeRecordRepository.storageKey,
+        LocalSettingsRepository.mealTimeSettingsKey,
+        LocalSettingsRepository.notificationEnabledKey,
       },
     ),
   );
@@ -28,6 +32,9 @@ Future<void> main() async {
         ),
         intakeRecordRepositoryProvider.overrideWithValue(
           LocalIntakeRecordRepository(preferences),
+        ),
+        settingsRepositoryProvider.overrideWithValue(
+          LocalSettingsRepository(preferences),
         ),
       ],
       child: const SupplementRoutineApp(),
