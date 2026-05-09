@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supplement_routine/app/app_spacing.dart';
 import 'package:supplement_routine/core/models/supplement.dart';
 import 'package:supplement_routine/features/supplement/presentation/supplement_display_text.dart';
 import 'package:supplement_routine/features/supplement/supplement_add_screen.dart';
@@ -110,9 +111,10 @@ class _SupplementListBody extends StatelessWidget {
     }
 
     return ListView.separated(
-      padding: const EdgeInsets.all(16),
+      padding: AppSpacing.screenPadding,
       itemCount: supplements.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 12),
+      separatorBuilder: (context, index) =>
+          const SizedBox(height: AppSpacing.md),
       itemBuilder: (context, index) {
         final supplement = supplements[index];
 
@@ -156,7 +158,7 @@ class _SupplementListItem extends StatelessWidget {
       margin: EdgeInsets.zero,
       color: colorScheme.surfaceContainerLow,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: AppSpacing.cardPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -166,7 +168,7 @@ class _SupplementListItem extends StatelessWidget {
                   child: Text(
                     supplement.name,
                     style: textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w700,
                       color: colorScheme.onSurface,
                     ),
                   ),
@@ -179,7 +181,7 @@ class _SupplementListItem extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: AppSpacing.xs),
             Text(
               l10n.supplementDailyCount(
                 SupplementDisplayText.methodLabel(l10n, supplement.method),
@@ -189,7 +191,7 @@ class _SupplementListItem extends StatelessWidget {
                 color: colorScheme.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.xxs),
             Text(
               l10n.supplementDosage(
                 _formatDosage(supplement.dosageValue),
@@ -200,7 +202,7 @@ class _SupplementListItem extends StatelessWidget {
               ),
             ),
             if (supplement.memo != null) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.sm),
               Text(
                 supplement.memo!,
                 style: textTheme.bodySmall?.copyWith(
@@ -259,14 +261,14 @@ class _SupplementItemActions extends StatelessWidget {
                 : colorScheme.outline,
           ),
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: AppSpacing.xxs),
         IconButton(
           tooltip: l10n.edit,
           onPressed: onEdit,
           icon: const Icon(Icons.edit_outlined),
           color: colorScheme.onSurfaceVariant,
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: AppSpacing.xxs),
         IconButton(
           tooltip: l10n.delete,
           onPressed: onDelete,
@@ -288,7 +290,7 @@ class _SupplementEmptyState extends StatelessWidget {
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(AppSpacing.xxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -297,14 +299,14 @@ class _SupplementEmptyState extends StatelessWidget {
               size: 40,
               color: colorScheme.outline,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             Text(
               l10n.supplementEmptyTitle,
               style: Theme.of(
                 context,
-              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: AppSpacing.xs),
             Text(
               l10n.supplementEmptyDescription,
               textAlign: TextAlign.center,

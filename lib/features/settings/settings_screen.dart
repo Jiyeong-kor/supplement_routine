@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supplement_routine/app/app_spacing.dart';
 import 'package:supplement_routine/app/app_config.dart';
 import 'package:supplement_routine/core/utils/time_utils.dart';
 import 'package:supplement_routine/features/settings/settings_provider.dart';
@@ -139,7 +140,7 @@ class SettingsScreen extends ConsumerWidget {
                   context,
                 ).usageGuideStepHistoryDescription,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.sm),
               Text(AppLocalizations.of(context).usageGuideDisclaimer),
             ],
           ),
@@ -212,11 +213,11 @@ class _SettingsSectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      padding: AppSpacing.sectionTitlePadding,
       child: Text(
         title,
         style: Theme.of(context).textTheme.labelLarge?.copyWith(
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w700,
           color: Theme.of(context).colorScheme.primary,
         ),
       ),
@@ -238,14 +239,19 @@ class _MealTimeSheetContent extends ConsumerWidget {
 
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          0,
+          AppSpacing.lg,
+          AppSpacing.lg,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               title: Text(
                 l10n.settingsMealTimeTitle,
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(fontWeight: FontWeight.w700),
               ),
               subtitle: Text(
                 l10n.settingsMealTimeDescription,
@@ -315,7 +321,7 @@ class _GuideItem extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -323,9 +329,9 @@ class _GuideItem extends StatelessWidget {
             title,
             style: Theme.of(
               context,
-            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xxs),
           Text(
             description,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -359,7 +365,7 @@ class _MealTimeTile extends StatelessWidget {
         time.to24hString(),
         style: TextStyle(
           color: colorScheme.primary,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w700,
         ),
       ),
       onTap: onTap,
