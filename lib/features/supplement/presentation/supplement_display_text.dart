@@ -1,6 +1,7 @@
 import 'package:supplement_routine/core/models/intake_condition.dart';
 import 'package:supplement_routine/core/models/intake_method.dart';
 import 'package:supplement_routine/core/models/meal_type.dart';
+import 'package:supplement_routine/core/models/schedule_label.dart';
 import 'package:supplement_routine/core/models/supplement.dart';
 import 'package:supplement_routine/l10n/generated/app_localizations.dart';
 
@@ -59,5 +60,13 @@ class SupplementDisplayText {
       mealLabel(l10n, mealType),
       conditionLabel(l10n, slot.condition),
     );
+  }
+
+  static String scheduleLabel(AppLocalizations l10n, ScheduleLabel label) {
+    return switch (label.type) {
+      ScheduleLabelType.fixedTime => l10n.intakeMethodFixedTime,
+      ScheduleLabelType.interval => l10n.intakeMethodInterval,
+      ScheduleLabelType.routineSlot => slotLabel(l10n, label.slot!),
+    };
   }
 }

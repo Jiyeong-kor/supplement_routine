@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supplement_routine/core/models/intake_record.dart';
 import 'package:supplement_routine/core/models/intake_method.dart';
+import 'package:supplement_routine/core/models/schedule_label.dart';
 import 'package:supplement_routine/core/models/supplement.dart';
 import 'package:supplement_routine/core/services/home_widget_service.dart';
 import 'package:supplement_routine/features/today/today_provider.dart';
@@ -30,7 +31,7 @@ void main() {
         scheduledTime: scheduledTime,
         isDone: isDone,
       ),
-      label: '정해진 시간',
+      label: const ScheduleLabel.fixedTime(),
     );
   }
 

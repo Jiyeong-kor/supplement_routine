@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supplement_routine/core/models/intake_record.dart';
 import 'package:supplement_routine/core/models/meal_time_settings.dart';
+import 'package:supplement_routine/core/models/schedule_label.dart';
 import 'package:supplement_routine/core/models/supplement.dart';
 import 'package:supplement_routine/core/models/intake_method.dart';
 import 'package:supplement_routine/core/models/intake_condition.dart';
@@ -9,7 +10,7 @@ import 'package:supplement_routine/core/utils/time_utils.dart';
 
 class ScheduledIntake {
   final TimeOfDay time;
-  final String label;
+  final ScheduleLabel label;
 
   ScheduledIntake(this.time, this.label);
 }
@@ -17,7 +18,7 @@ class ScheduledIntake {
 class ScheduledIntakeRecord {
   final Supplement supplement;
   final IntakeRecord record;
-  final String label;
+  final ScheduleLabel label;
 
   ScheduledIntakeRecord({
     required this.supplement,
@@ -37,8 +38,9 @@ class SchedulingService {
     if (supplement.method == IntakeMethod.fixedTime) {
       final times =
           supplement.fixedTimes ?? [const TimeOfDay(hour: 9, minute: 0)];
-      // 정해진 시간은 별도 라벨 없이 '복용 시간' 정도로만 표시하거나 생략 가능
-      return times.map((t) => ScheduledIntake(t, '정해진 시간')).toList();
+      return times
+          .map((time) => ScheduledIntake(time, const ScheduleLabel.fixedTime()))
+          .toList();
     }
 
     if (supplement.method == IntakeMethod.interval) {
@@ -47,7 +49,9 @@ class SchedulingService {
           supplement.startTime ?? const TimeOfDay(hour: 8, minute: 0);
       final interval = supplement.intervalHours ?? 8;
       for (int i = 0; i < supplement.dailyCount; i++) {
-        result.add(ScheduledIntake(currentTime, '일정 간격'));
+        result.add(
+          ScheduledIntake(currentTime, const ScheduleLabel.interval()),
+        );
         final nextMinutes =
             currentTime.hour * 60 + currentTime.minute + (interval * 60);
         if (nextMinutes >= 24 * 60) break;
@@ -56,7 +60,6 @@ class SchedulingService {
       return result;
     }
 
-    // 루틴 기반 (가장 상세한 라벨 제공)
     if (supplement.selectedSlots == null || supplement.selectedSlots!.isEmpty) {
       return [];
     }
@@ -94,7 +97,7 @@ class SchedulingService {
         }
       }
 
-      return ScheduledIntake(scheduledTime, slot.label);
+      return ScheduledIntake(scheduledTime, ScheduleLabel.routineSlot(slot));
     }).toList();
   }
 

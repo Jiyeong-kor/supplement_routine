@@ -25,22 +25,6 @@ class IntakeSlot {
     return {'mealType': mealType?.name, 'condition': condition.name};
   }
 
-  String get label {
-    if (condition == IntakeCondition.beforeSleep) return '취침 전';
-    if (condition == IntakeCondition.fasting) return '기상 직후(공복)';
-
-    if (condition == IntakeCondition.betweenMeals) {
-      if (mealType == MealType.breakfast) return '아침-점심 사이';
-      if (mealType == MealType.lunch) return '점심-저녁 사이';
-      return '식간(식사 사이)';
-    }
-
-    final mealLabel = mealType == MealType.breakfast
-        ? '아침'
-        : (mealType == MealType.lunch ? '점심' : '저녁');
-    return '$mealLabel ${condition == IntakeCondition.beforeMeal ? "식전" : "식후"}';
-  }
-
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||

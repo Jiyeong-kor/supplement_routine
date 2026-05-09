@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supplement_routine/core/models/supplement.dart';
 import 'package:supplement_routine/core/models/intake_record.dart';
+import 'package:supplement_routine/core/models/schedule_label.dart';
+import 'package:supplement_routine/core/models/supplement.dart';
 import 'package:supplement_routine/core/services/scheduling_service.dart';
 import 'package:supplement_routine/features/history/intake_record_provider.dart';
 import 'package:supplement_routine/features/settings/settings_provider.dart';
@@ -9,7 +10,7 @@ import 'package:supplement_routine/features/supplement/supplement_provider.dart'
 class TodayDisplayItem {
   final Supplement supplement;
   final IntakeRecord record;
-  final String label;
+  final ScheduleLabel label;
 
   TodayDisplayItem({
     required this.supplement,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supplement_routine/app/app_radius.dart';
 import 'package:supplement_routine/app/app_spacing.dart';
+import 'package:supplement_routine/features/supplement/presentation/supplement_display_text.dart';
 import 'package:supplement_routine/features/supplement/supplement_add_screen.dart';
 import 'package:supplement_routine/features/today/today_provider.dart';
 import 'package:supplement_routine/l10n/generated/app_localizations.dart';
@@ -60,7 +61,7 @@ class TodayScreen extends ConsumerWidget {
                 (item) => _TodaySupplementItem(
                   time: item.record.scheduledTime.format(context),
                   name: item.supplement.name,
-                  label: item.label,
+                  label: SupplementDisplayText.scheduleLabel(l10n, item.label),
                   dosageUnit: item.supplement.dosageUnit,
                   dosageValue: item.supplement.dosageValue,
                   isDone: item.record.isDone,
