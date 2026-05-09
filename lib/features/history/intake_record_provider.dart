@@ -1,11 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supplement_routine/core/models/intake_record.dart';
-import 'package:supplement_routine/features/history/data/mock_intake_records.dart';
+import 'package:supplement_routine/features/history/data/intake_record_repository.dart';
+import 'package:supplement_routine/features/history/data/mock_intake_record_repository.dart';
+
+final intakeRecordRepositoryProvider = Provider<IntakeRecordRepository>((ref) {
+  return MockIntakeRecordRepository();
+});
 
 class IntakeRecordNotifier extends Notifier<Map<String, IntakeRecord>> {
   @override
   Map<String, IntakeRecord> build() {
-    return createMockIntakeRecords();
+    return ref.read(intakeRecordRepositoryProvider).getRecords();
   }
 
   IntakeRecord getOrCreate(IntakeRecord record) {
@@ -26,18 +31,19 @@ class IntakeRecordNotifier extends Notifier<Map<String, IntakeRecord>> {
         ? currentRecord.markUndone()
         : currentRecord.markDone();
 
-    state = {...state, record.id: updatedRecord};
+    state = ref
+        .read(intakeRecordRepositoryProvider)
+        .upsertRecord(updatedRecord);
   }
 
   void clearRecordsForSupplement(String supplementId) {
-    state = {
-      for (final entry in state.entries)
-        if (entry.value.supplementId != supplementId) entry.key: entry.value,
-    };
+    state = ref
+        .read(intakeRecordRepositoryProvider)
+        .clearRecordsForSupplement(supplementId);
   }
 
   void clearAll() {
-    state = {};
+    state = ref.read(intakeRecordRepositoryProvider).clearAll();
   }
 }
 
