@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:supplement_routine/core/services/intake_notification_copy.dart';
 import 'package:supplement_routine/features/today/today_provider.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
@@ -13,13 +14,13 @@ class IntakeNotificationService {
       FlutterLocalNotificationsPlugin();
 
   static var _isInitialized = false;
+  static var _copy = IntakeNotificationCopy.ko();
 
   static const _channelId = 'intake_reminders';
-  static const _channelName = '복용 일정 알림';
-  static const _channelDescription = '사용자가 입력한 복용 일정에 맞춰 체크 알림을 보냅니다.';
-  static const _notificationTitle = '복용 일정 확인';
 
-  static Future<void> initialize() async {
+  static Future<void> initialize({IntakeNotificationCopy? copy}) async {
+    configureCopy(copy ?? IntakeNotificationCopy.ko());
+
     if (kIsWeb) {
       return;
     }
@@ -46,6 +47,10 @@ class IntakeNotificationService {
     }
   }
 
+  static void configureCopy(IntakeNotificationCopy copy) {
+    _copy = copy;
+  }
+
   static Future<void> syncTodayReminders(List<TodayDisplayItem> items) async {
     if (kIsWeb) {
       return;
@@ -65,7 +70,7 @@ class IntakeNotificationService {
       for (final item in notificationItems) {
         await _notifications.zonedSchedule(
           id: _notificationId(item.record.id),
-          title: _notificationTitle,
+          title: _copy.notificationTitle,
           body: reminderBody(item.supplement.name),
           scheduledDate: _nextSchedule(item),
           notificationDetails: _notificationDetails,
@@ -91,15 +96,15 @@ class IntakeNotificationService {
   }
 
   static String reminderBody(String supplementName) {
-    return '$supplementName 복용할 시간이에요.';
+    return _copy.reminderBody(supplementName);
   }
 
   static NotificationDetails get _notificationDetails {
-    return const NotificationDetails(
+    return NotificationDetails(
       android: AndroidNotificationDetails(
         _channelId,
-        _channelName,
-        channelDescription: _channelDescription,
+        _copy.channelName,
+        channelDescription: _copy.channelDescription,
         importance: Importance.high,
         priority: Priority.high,
       ),
