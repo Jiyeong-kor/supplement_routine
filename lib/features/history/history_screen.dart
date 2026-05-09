@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supplement_routine/app/app_radius.dart';
+import 'package:supplement_routine/app/app_spacing.dart';
 import 'package:supplement_routine/features/history/history_summary_provider.dart';
 import 'package:supplement_routine/features/history/history_view_model.dart';
 import 'package:supplement_routine/l10n/generated/app_localizations.dart';
@@ -15,24 +17,24 @@ class HistoryScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: Text(l10n.historyTitle)),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.screenPadding,
         children: [
           _HistoryOverviewCard(summary: state.todaySummary),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.xxl),
           Text(
             l10n.historyRecentTitle,
             style: Theme.of(
               context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xxs),
           Text(
             l10n.historyRecentDescription,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           if (state.isEmpty)
             const _HistoryEmptyState()
           else
@@ -87,7 +89,7 @@ class _HistoryOverviewCard extends StatelessWidget {
       margin: EdgeInsets.zero,
       color: colorScheme.primaryContainer,
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -95,18 +97,18 @@ class _HistoryOverviewCard extends StatelessWidget {
               l10n.historyTodayOverviewTitle,
               style: textTheme.titleSmall?.copyWith(
                 color: colorScheme.onPrimaryContainer,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               l10n.historyPercent(percent),
               style: textTheme.displaySmall?.copyWith(
                 color: colorScheme.onPrimaryContainer,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               summary.isEmpty
                   ? l10n.historyEmptyToday
@@ -119,11 +121,11 @@ class _HistoryOverviewCard extends StatelessWidget {
                 color: colorScheme.onPrimaryContainer,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
             LinearProgressIndicator(
               value: summary.completionRate,
               minHeight: 10,
-              borderRadius: BorderRadius.circular(999),
+              borderRadius: AppRadius.pillBorder,
               backgroundColor: colorScheme.primary.withValues(alpha: 0.18),
             ),
           ],
@@ -156,7 +158,7 @@ class _HistoryItem extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       color: colorScheme.surfaceContainerLow,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.cardPadding,
         child: Row(
           children: [
             SizedBox(
@@ -172,13 +174,13 @@ class _HistoryItem extends StatelessWidget {
                     '${(completion * 100).round()}',
                     style: textTheme.labelLarge?.copyWith(
                       color: colorScheme.onPrimary,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
               ),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -186,11 +188,11 @@ class _HistoryItem extends StatelessWidget {
                   Text(
                     dateText,
                     style: textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w700,
                       color: colorScheme.onSurface,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.xxs),
                   Text(
                     l10n.historyCompletion(
                       (completion * 100).toInt(),
@@ -201,11 +203,11 @@ class _HistoryItem extends StatelessWidget {
                       color: colorScheme.onSurfaceVariant,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: AppSpacing.sm),
                   LinearProgressIndicator(
                     value: completion,
                     minHeight: 6,
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: AppRadius.pillBorder,
                     backgroundColor: colorScheme.surfaceContainerHighest,
                   ),
                 ],
@@ -240,7 +242,10 @@ class _HistoryEmptyState extends StatelessWidget {
       margin: EdgeInsets.zero,
       color: colorScheme.surfaceContainerLow,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.xxl,
+        ),
         child: Column(
           children: [
             Icon(
@@ -248,7 +253,7 @@ class _HistoryEmptyState extends StatelessWidget {
               size: 36,
               color: colorScheme.outline,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             Text(
               l10n.historyEmptyToday,
               textAlign: TextAlign.center,
