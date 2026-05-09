@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supplement_routine/core/models/supplement.dart';
+import 'package:supplement_routine/features/supplement/presentation/supplement_display_text.dart';
 import 'package:supplement_routine/features/supplement/supplement_add_screen.dart';
 import 'package:supplement_routine/features/supplement/supplement_provider.dart';
 import 'package:supplement_routine/l10n/generated/app_localizations.dart';
@@ -181,7 +182,7 @@ class _SupplementListItem extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               l10n.supplementDailyCount(
-                supplement.method.label,
+                SupplementDisplayText.methodLabel(l10n, supplement.method),
                 supplement.dailyCount,
               ),
               style: textTheme.bodySmall?.copyWith(

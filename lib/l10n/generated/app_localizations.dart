@@ -286,6 +286,96 @@ abstract class AppLocalizations {
   /// **'1회 {dosage} {unit}'**
   String supplementDosage(String dosage, String unit);
 
+  /// No description provided for @intakeMethodFixedTime.
+  ///
+  /// In ko, this message translates to:
+  /// **'정해진 시간'**
+  String get intakeMethodFixedTime;
+
+  /// No description provided for @intakeMethodMealBased.
+  ///
+  /// In ko, this message translates to:
+  /// **'식사 기준'**
+  String get intakeMethodMealBased;
+
+  /// No description provided for @intakeMethodInterval.
+  ///
+  /// In ko, this message translates to:
+  /// **'일정 간격'**
+  String get intakeMethodInterval;
+
+  /// No description provided for @intakeSlotBeforeSleep.
+  ///
+  /// In ko, this message translates to:
+  /// **'취침 전'**
+  String get intakeSlotBeforeSleep;
+
+  /// No description provided for @intakeSlotFasting.
+  ///
+  /// In ko, this message translates to:
+  /// **'기상 직후(공복)'**
+  String get intakeSlotFasting;
+
+  /// No description provided for @intakeSlotBetweenBreakfastLunch.
+  ///
+  /// In ko, this message translates to:
+  /// **'아침-점심 사이'**
+  String get intakeSlotBetweenBreakfastLunch;
+
+  /// No description provided for @intakeSlotBetweenLunchDinner.
+  ///
+  /// In ko, this message translates to:
+  /// **'점심-저녁 사이'**
+  String get intakeSlotBetweenLunchDinner;
+
+  /// No description provided for @intakeSlotBetweenMeals.
+  ///
+  /// In ko, this message translates to:
+  /// **'식간(식사 사이)'**
+  String get intakeSlotBetweenMeals;
+
+  /// No description provided for @intakeSlotMealCondition.
+  ///
+  /// In ko, this message translates to:
+  /// **'{mealLabel} {conditionLabel}'**
+  String intakeSlotMealCondition(String mealLabel, String conditionLabel);
+
+  /// No description provided for @intakeConditionBeforeMeal.
+  ///
+  /// In ko, this message translates to:
+  /// **'식전'**
+  String get intakeConditionBeforeMeal;
+
+  /// No description provided for @intakeConditionAfterMeal.
+  ///
+  /// In ko, this message translates to:
+  /// **'식후'**
+  String get intakeConditionAfterMeal;
+
+  /// No description provided for @intakeConditionBetweenMeals.
+  ///
+  /// In ko, this message translates to:
+  /// **'식간'**
+  String get intakeConditionBetweenMeals;
+
+  /// No description provided for @intakeConditionFasting.
+  ///
+  /// In ko, this message translates to:
+  /// **'공복'**
+  String get intakeConditionFasting;
+
+  /// No description provided for @intakeConditionBeforeSleep.
+  ///
+  /// In ko, this message translates to:
+  /// **'취침 전'**
+  String get intakeConditionBeforeSleep;
+
+  /// No description provided for @intakeConditionNone.
+  ///
+  /// In ko, this message translates to:
+  /// **'상관없음'**
+  String get intakeConditionNone;
+
   /// No description provided for @supplementEmptyTitle.
   ///
   /// In ko, this message translates to:

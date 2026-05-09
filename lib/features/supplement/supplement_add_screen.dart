@@ -7,6 +7,7 @@ import 'package:supplement_routine/core/models/intake_method.dart';
 import 'package:supplement_routine/features/settings/settings_provider.dart';
 import 'package:supplement_routine/features/supplement/application/supplement_form_mapper.dart';
 import 'package:supplement_routine/features/supplement/application/supplement_form_policy.dart';
+import 'package:supplement_routine/features/supplement/presentation/supplement_display_text.dart';
 import 'package:supplement_routine/features/supplement/supplement_provider.dart';
 import 'package:supplement_routine/l10n/generated/app_localizations.dart';
 
@@ -344,7 +345,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
             children: SupplementFormPolicy.routineSlots.map((slot) {
               final isSelected = _selectedSlots.contains(slot);
               return FilterChip(
-                label: Text(slot.label),
+                label: Text(SupplementDisplayText.slotLabel(l10n, slot)),
                 selected: isSelected,
                 onSelected: (v) {
                   setState(() {

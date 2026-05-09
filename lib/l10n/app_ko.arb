@@ -63,6 +63,27 @@
       "unit": { "type": "String" }
     }
   },
+  "intakeMethodFixedTime": "정해진 시간",
+  "intakeMethodMealBased": "식사 기준",
+  "intakeMethodInterval": "일정 간격",
+  "intakeSlotBeforeSleep": "취침 전",
+  "intakeSlotFasting": "기상 직후(공복)",
+  "intakeSlotBetweenBreakfastLunch": "아침-점심 사이",
+  "intakeSlotBetweenLunchDinner": "점심-저녁 사이",
+  "intakeSlotBetweenMeals": "식간(식사 사이)",
+  "intakeSlotMealCondition": "{mealLabel} {conditionLabel}",
+  "@intakeSlotMealCondition": {
+    "placeholders": {
+      "mealLabel": { "type": "String" },
+      "conditionLabel": { "type": "String" }
+    }
+  },
+  "intakeConditionBeforeMeal": "식전",
+  "intakeConditionAfterMeal": "식후",
+  "intakeConditionBetweenMeals": "식간",
+  "intakeConditionFasting": "공복",
+  "intakeConditionBeforeSleep": "취침 전",
+  "intakeConditionNone": "상관없음",
   "supplementEmptyTitle": "등록된 영양제가 없습니다",
   "supplementEmptyDescription": "오른쪽 아래 + 버튼으로 영양제를 등록해보세요.",
   "supplementAddTitle": "영양제 등록",

@@ -115,6 +115,53 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get intakeMethodFixedTime => '정해진 시간';
+
+  @override
+  String get intakeMethodMealBased => '식사 기준';
+
+  @override
+  String get intakeMethodInterval => '일정 간격';
+
+  @override
+  String get intakeSlotBeforeSleep => '취침 전';
+
+  @override
+  String get intakeSlotFasting => '기상 직후(공복)';
+
+  @override
+  String get intakeSlotBetweenBreakfastLunch => '아침-점심 사이';
+
+  @override
+  String get intakeSlotBetweenLunchDinner => '점심-저녁 사이';
+
+  @override
+  String get intakeSlotBetweenMeals => '식간(식사 사이)';
+
+  @override
+  String intakeSlotMealCondition(String mealLabel, String conditionLabel) {
+    return '$mealLabel $conditionLabel';
+  }
+
+  @override
+  String get intakeConditionBeforeMeal => '식전';
+
+  @override
+  String get intakeConditionAfterMeal => '식후';
+
+  @override
+  String get intakeConditionBetweenMeals => '식간';
+
+  @override
+  String get intakeConditionFasting => '공복';
+
+  @override
+  String get intakeConditionBeforeSleep => '취침 전';
+
+  @override
+  String get intakeConditionNone => '상관없음';
+
+  @override
   String get supplementEmptyTitle => '등록된 영양제가 없습니다';
 
   @override
