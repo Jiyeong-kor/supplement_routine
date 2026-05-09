@@ -229,7 +229,7 @@ The project currently has an MVP scope with a release-oriented structure.
 - localize notification channel/body strings
 - continue replacing hardcoded UI tokens in the supplement form
 - improve monthly calendar UX on the history screen
-- prepare app icon and store graphics
+- prepare store graphics
 - add screenshots/GIFs
 
 ## License
