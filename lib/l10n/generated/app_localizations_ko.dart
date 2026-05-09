@@ -265,6 +265,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get historyRecentDescription => '입력한 복용 규칙을 기준으로 날짜별 완료 여부를 확인합니다.';
 
   @override
+  String get historyMonthTitle => '이번 달 기록';
+
+  @override
+  String get historyMonthDescription => '완료율이 높을수록 진한 색으로 표시됩니다.';
+
+  @override
   String historyDate(int month, int day, String weekday) {
     return '$month월 $day일 $weekday요일';
   }

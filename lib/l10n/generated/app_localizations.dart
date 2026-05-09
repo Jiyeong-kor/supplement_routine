@@ -574,6 +574,18 @@ abstract class AppLocalizations {
   /// **'입력한 복용 규칙을 기준으로 날짜별 완료 여부를 확인합니다.'**
   String get historyRecentDescription;
 
+  /// No description provided for @historyMonthTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'이번 달 기록'**
+  String get historyMonthTitle;
+
+  /// No description provided for @historyMonthDescription.
+  ///
+  /// In ko, this message translates to:
+  /// **'완료율이 높을수록 진한 색으로 표시됩니다.'**
+  String get historyMonthDescription;
+
   /// No description provided for @historyDate.
   ///
   /// In ko, this message translates to:
