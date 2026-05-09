@@ -3,17 +3,20 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supplement_routine/core/models/supplement.dart';
-import 'package:supplement_routine/features/supplement/data/mock_supplements.dart';
 import 'package:supplement_routine/features/supplement/data/supplement_repository.dart';
 
 class LocalSupplementRepository implements SupplementRepository {
-  LocalSupplementRepository(this._preferences) {
+  LocalSupplementRepository(
+    this._preferences, {
+    List<Supplement> seedSupplements = const [],
+  }) : _seedSupplements = seedSupplements {
     _supplements = _loadSupplements();
   }
 
   static const storageKey = 'supplements';
 
   final SharedPreferencesWithCache _preferences;
+  final List<Supplement> _seedSupplements;
   late List<Supplement> _supplements;
 
   @override
@@ -62,7 +65,7 @@ class LocalSupplementRepository implements SupplementRepository {
     final rawJson = _preferences.getString(storageKey);
 
     if (rawJson == null) {
-      return [...mockSupplements];
+      return [..._seedSupplements];
     }
 
     final values = jsonDecode(rawJson) as List;

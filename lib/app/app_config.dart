@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 enum AppFlavor { dev, prod }
 
 class AppConfig {
@@ -19,6 +21,11 @@ class AppConfig {
   static const appVersion = String.fromEnvironment(
     'APP_VERSION',
     defaultValue: '1.0.0',
+  );
+
+  static const isMockDataEnabled = bool.fromEnvironment(
+    'MOCK_DATA',
+    defaultValue: !kReleaseMode,
   );
 
   static AppFlavor get flavor {

@@ -4,16 +4,19 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supplement_routine/core/models/intake_record.dart';
 import 'package:supplement_routine/features/history/data/intake_record_repository.dart';
-import 'package:supplement_routine/features/history/data/mock_intake_records.dart';
 
 class LocalIntakeRecordRepository implements IntakeRecordRepository {
-  LocalIntakeRecordRepository(this._preferences) {
+  LocalIntakeRecordRepository(
+    this._preferences, {
+    Map<String, IntakeRecord> seedRecords = const {},
+  }) : _seedRecords = seedRecords {
     _records = _loadRecords();
   }
 
   static const storageKey = 'intake_records';
 
   final SharedPreferencesWithCache _preferences;
+  final Map<String, IntakeRecord> _seedRecords;
   late Map<String, IntakeRecord> _records;
 
   @override
@@ -49,7 +52,7 @@ class LocalIntakeRecordRepository implements IntakeRecordRepository {
     final rawJson = _preferences.getString(storageKey);
 
     if (rawJson == null) {
-      return createMockIntakeRecords();
+      return {..._seedRecords};
     }
 
     final values = jsonDecode(rawJson) as List;

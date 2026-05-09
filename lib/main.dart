@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'app/app_config.dart';
 import 'app/supplement_routine_app.dart';
 import 'core/services/intake_notification_service.dart';
 import 'features/history/data/local_intake_record_repository.dart';
+import 'features/history/data/mock_intake_records.dart';
 import 'features/history/intake_record_provider.dart';
 import 'features/settings/data/local_settings_repository.dart';
 import 'features/settings/settings_provider.dart';
 import 'features/supplement/data/local_supplement_repository.dart';
+import 'features/supplement/data/mock_supplements.dart';
 import 'features/supplement/supplement_provider.dart';
 
 Future<void> main() async {
@@ -28,10 +31,20 @@ Future<void> main() async {
     ProviderScope(
       overrides: [
         supplementRepositoryProvider.overrideWithValue(
-          LocalSupplementRepository(preferences),
+          LocalSupplementRepository(
+            preferences,
+            seedSupplements: AppConfig.isMockDataEnabled
+                ? mockSupplements
+                : const [],
+          ),
         ),
         intakeRecordRepositoryProvider.overrideWithValue(
-          LocalIntakeRecordRepository(preferences),
+          LocalIntakeRecordRepository(
+            preferences,
+            seedRecords: AppConfig.isMockDataEnabled
+                ? createMockIntakeRecords()
+                : const {},
+          ),
         ),
         settingsRepositoryProvider.overrideWithValue(
           LocalSettingsRepository(preferences),
