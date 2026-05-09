@@ -195,6 +195,7 @@ See also:
 
 - [Korean Design System](docs/design_system_ko.md)
 - [Design System](docs/design_system.md)
+- [Android Release Signing](docs/release_signing.md)
 
 ## Test Coverage
 
@@ -228,7 +229,6 @@ The project currently has an MVP scope with a release-oriented structure.
 - localize notification channel/body strings
 - continue replacing hardcoded UI tokens in the supplement form
 - improve monthly calendar UX on the history screen
-- document Android release signing
 - prepare app icon and store graphics
 - add screenshots/GIFs
 
