@@ -30,10 +30,8 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
 
   String _unit = SupplementFormPolicy.defaultUnit;
 
-  // 큰 분류: 루틴 기준(true) vs 직접 시간 지정(false)
   bool _isRoutineBased = true;
 
-  // 직접 시간 지정 내부 분류: 특정 시각(true) vs 일정 간격(false)
   bool _isSpecificTime = true;
 
   final Set<IntakeSlot> _selectedSlots = {};
@@ -188,7 +186,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
               controller: _nameController,
               hintText: l10n.supplementNameHint,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.xxl),
 
             Row(
               children: [
@@ -207,7 +205,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -234,15 +232,15 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.xxl),
 
             _SectionTitle(l10n.supplementMethodSection),
             _buildTopMethodSelector(),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.xxl),
 
             _buildDetailSection(),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.xxl),
             _SectionTitle(l10n.supplementOtherSettingsSection),
             SwitchListTile(
               title: Text(l10n.supplementNotificationSwitch),
@@ -250,14 +248,14 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
               contentPadding: EdgeInsets.zero,
               onChanged: (v) => setState(() => _isNotificationEnabled = v),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             _SectionTitle(l10n.supplementMemoSection),
             _SupplementTextField(
               controller: _memoController,
               maxLines: 2,
               hintText: l10n.supplementMemoHint,
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: AppSpacing.xxxl),
 
             _SaveSupplementButton(
               label: _isEditMode
@@ -310,7 +308,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
           decoration: BoxDecoration(
             color: isSelected ? colorScheme.primary : Colors.transparent,
             borderRadius: AppRadius.mdBorder,
@@ -322,7 +320,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
               color: isSelected
                   ? colorScheme.onPrimary
                   : colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),
@@ -340,8 +338,8 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
         children: [
           _SectionTitle(l10n.supplementTimingSection),
           Wrap(
-            spacing: 8,
-            runSpacing: 8,
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
             children: SupplementFormPolicy.routineSlots.map((slot) {
               final isSelected = _selectedSlots.contains(slot);
               return FilterChip(
@@ -364,9 +362,8 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
     } else {
       return Column(
         children: [
-          // 시간 지정 내의 서브 탭
           Container(
-            padding: const EdgeInsets.all(4),
+            padding: const EdgeInsets.all(AppSpacing.xxs),
             decoration: BoxDecoration(
               color: colorScheme.surfaceContainerHigh,
               borderRadius: AppRadius.mdBorder,
@@ -386,7 +383,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.xl),
           _isSpecificTime ? _buildFixedTimeUI() : _buildIntervalUI(),
         ],
       );
@@ -405,7 +402,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
           decoration: BoxDecoration(
             color: isSelected ? colorScheme.surface : Colors.transparent,
             borderRadius: AppRadius.smBorder,
@@ -413,7 +410,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
                 ? [
                     BoxShadow(
                       color: colorScheme.shadow.withValues(alpha: 0.05),
-                      blurRadius: 4,
+                      blurRadius: AppSpacing.xxs,
                     ),
                   ]
                 : [],
@@ -450,11 +447,11 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
             }
           }),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.md),
         ...List.generate(
           _fixedCount,
           (index) => Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
+            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
             child: ListTile(
               title: Text(l10n.supplementScheduledTimeLabel(index + 1)),
               trailing: Text(
@@ -484,7 +481,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: AppSpacing.cardPadding,
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
         borderRadius: AppRadius.mdBorder,
@@ -497,7 +494,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
             _intervalCount,
             (v) => setState(() => _intervalCount = v),
           ),
-          const Divider(height: 24),
+          const Divider(height: AppSpacing.xxl),
           ListTile(
             title: Text(
               l10n.supplementStartTimeLabel,
@@ -518,7 +515,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
             },
             contentPadding: EdgeInsets.zero,
           ),
-          const Divider(height: 24),
+          const Divider(height: AppSpacing.xxl),
           _buildCounterRow(
             l10n.supplementIntervalHoursLabel,
             _intervalHours,
@@ -526,7 +523,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
             min: SupplementFormPolicy.minIntervalHours,
             max: SupplementFormPolicy.maxIntervalHours,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           Text(l10n.supplementIntervalNotice),
         ],
       ),
@@ -591,11 +588,11 @@ class _SectionTitle extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: Text(
         title,
         style: Theme.of(context).textTheme.labelLarge?.copyWith(
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w700,
           color: colorScheme.primary,
         ),
       ),
