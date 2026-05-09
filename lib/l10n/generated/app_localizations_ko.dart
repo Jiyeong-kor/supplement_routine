@@ -99,6 +99,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get edit => '수정';
 
   @override
+  String get notificationsEnabled => '알림 켬';
+
+  @override
+  String get notificationsDisabled => '알림 끔';
+
+  @override
   String supplementDailyCount(String methodLabel, int dailyCount) {
     return '$methodLabel · 하루 $dailyCount회';
   }

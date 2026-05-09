@@ -211,6 +211,20 @@ void main() {
     expect(find.byIcon(Icons.notifications_off_outlined), findsWidgets);
   });
 
+  testWidgets('영양제 목록에서 알림 여부를 변경한다', (WidgetTester tester) async {
+    await tester.pumpWidget(const ProviderScope(child: SupplementRoutineApp()));
+
+    await tester.tap(find.text('영양제'));
+    await tester.pumpAndSettle();
+
+    expect(find.byTooltip('알림 켬'), findsWidgets);
+
+    await tester.tap(find.byTooltip('알림 켬').first);
+    await tester.pumpAndSettle();
+
+    expect(find.byTooltip('알림 끔'), findsWidgets);
+  });
+
   testWidgets('설정 화면에서 앱 사용 가이드를 확인한다', (WidgetTester tester) async {
     await tester.pumpWidget(const ProviderScope(child: SupplementRoutineApp()));
 

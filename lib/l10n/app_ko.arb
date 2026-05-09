@@ -47,6 +47,8 @@
   "cancel": "취소",
   "delete": "삭제",
   "edit": "수정",
+  "notificationsEnabled": "알림 켬",
+  "notificationsDisabled": "알림 끔",
   "supplementDailyCount": "{methodLabel} · 하루 {dailyCount}회",
   "@supplementDailyCount": {
     "placeholders": {

@@ -23,6 +23,11 @@ class SupplementListScreen extends ConsumerWidget {
         onDelete: (supplement) {
           _showDeleteDialog(context, ref, supplement);
         },
+        onToggleNotification: (supplement) {
+          ref
+              .read(supplementListProvider.notifier)
+              .toggleNotification(supplement.id);
+        },
       ),
       floatingActionButton: FloatingActionButton(
         heroTag: 'supplement_list_add',
@@ -89,11 +94,13 @@ class _SupplementListBody extends StatelessWidget {
     required this.supplements,
     required this.onEdit,
     required this.onDelete,
+    required this.onToggleNotification,
   });
 
   final List<Supplement> supplements;
   final ValueChanged<Supplement> onEdit;
   final ValueChanged<Supplement> onDelete;
+  final ValueChanged<Supplement> onToggleNotification;
 
   @override
   Widget build(BuildContext context) {
@@ -116,6 +123,9 @@ class _SupplementListBody extends StatelessWidget {
           onDelete: () {
             onDelete(supplement);
           },
+          onToggleNotification: () {
+            onToggleNotification(supplement);
+          },
         );
       },
     );
@@ -127,11 +137,13 @@ class _SupplementListItem extends StatelessWidget {
     required this.supplement,
     required this.onEdit,
     required this.onDelete,
+    required this.onToggleNotification,
   });
 
   final Supplement supplement;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
+  final VoidCallback onToggleNotification;
 
   @override
   Widget build(BuildContext context) {
@@ -162,6 +174,7 @@ class _SupplementListItem extends StatelessWidget {
                   isNotificationEnabled: supplement.isNotificationEnabled,
                   onEdit: onEdit,
                   onDelete: onDelete,
+                  onToggleNotification: onToggleNotification,
                 ),
               ],
             ),
@@ -214,11 +227,13 @@ class _SupplementItemActions extends StatelessWidget {
     required this.isNotificationEnabled,
     required this.onEdit,
     required this.onDelete,
+    required this.onToggleNotification,
   });
 
   final bool isNotificationEnabled;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
+  final VoidCallback onToggleNotification;
 
   @override
   Widget build(BuildContext context) {
@@ -228,14 +243,20 @@ class _SupplementItemActions extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          isNotificationEnabled
-              ? Icons.notifications_active_outlined
-              : Icons.notifications_off_outlined,
-          size: 20,
-          color: isNotificationEnabled
-              ? colorScheme.primary
-              : colorScheme.outline,
+        IconButton(
+          tooltip: isNotificationEnabled
+              ? l10n.notificationsEnabled
+              : l10n.notificationsDisabled,
+          onPressed: onToggleNotification,
+          icon: Icon(
+            isNotificationEnabled
+                ? Icons.notifications_active_outlined
+                : Icons.notifications_off_outlined,
+            size: 20,
+            color: isNotificationEnabled
+                ? colorScheme.primary
+                : colorScheme.outline,
+          ),
         ),
         const SizedBox(width: 4),
         IconButton(

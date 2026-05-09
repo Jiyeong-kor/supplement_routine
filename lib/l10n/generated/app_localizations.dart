@@ -262,6 +262,18 @@ abstract class AppLocalizations {
   /// **'수정'**
   String get edit;
 
+  /// No description provided for @notificationsEnabled.
+  ///
+  /// In ko, this message translates to:
+  /// **'알림 켬'**
+  String get notificationsEnabled;
+
+  /// No description provided for @notificationsDisabled.
+  ///
+  /// In ko, this message translates to:
+  /// **'알림 끔'**
+  String get notificationsDisabled;
+
   /// No description provided for @supplementDailyCount.
   ///
   /// In ko, this message translates to:

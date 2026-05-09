@@ -24,6 +24,14 @@ class SupplementListNotifier extends Notifier<List<Supplement>> {
         .updateSupplement(updatedSupplement);
   }
 
+  void toggleNotification(String supplementId) {
+    final supplement = state.firstWhere((s) => s.id == supplementId);
+    final updated = supplement.copyWith(
+      isNotificationEnabled: !supplement.isNotificationEnabled,
+    );
+    updateSupplement(updated);
+  }
+
   void removeSupplement(String supplementId) {
     state = ref
         .read(supplementRepositoryProvider)
