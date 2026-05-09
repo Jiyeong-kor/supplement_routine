@@ -227,7 +227,6 @@ Supplement Routine은 Android 우선 앱으로 Material Design 3를 따릅니다
 
 - 알림 채널/본문 문구의 localization 정리
 - 영양제 등록 화면의 디자인 토큰 추가 정리
-- 기록 화면의 월간 캘린더 UX 개선
 - 스토어 등록용 그래픽 정리
 - 스크린샷/GIF 추가
 
