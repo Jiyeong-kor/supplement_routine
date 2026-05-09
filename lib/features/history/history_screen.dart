@@ -21,18 +21,16 @@ class HistoryScreen extends ConsumerWidget {
         children: [
           _HistoryOverviewCard(summary: state.todaySummary),
           const SizedBox(height: AppSpacing.xxl),
-          Text(
-            l10n.historyRecentTitle,
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          _HistorySectionHeader(
+            title: l10n.historyMonthTitle,
+            description: l10n.historyMonthDescription,
           ),
-          const SizedBox(height: AppSpacing.xxs),
-          Text(
-            l10n.historyRecentDescription,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
+          const SizedBox(height: AppSpacing.md),
+          _MonthHistoryCard(summaries: state.monthSummaries),
+          const SizedBox(height: AppSpacing.xxl),
+          _HistorySectionHeader(
+            title: l10n.historyRecentTitle,
+            description: l10n.historyRecentDescription,
           ),
           const SizedBox(height: AppSpacing.md),
           if (state.isEmpty)
@@ -70,6 +68,193 @@ class HistoryScreen extends ConsumerWidget {
       DateTime.sunday => l10n.weekdaySunday,
       _ => '',
     };
+  }
+}
+
+class _HistorySectionHeader extends StatelessWidget {
+  const _HistorySectionHeader({required this.title, required this.description});
+
+  final String title;
+  final String description;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+        ),
+        const SizedBox(height: AppSpacing.xxs),
+        Text(
+          description,
+          style: textTheme.bodySmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _MonthHistoryCard extends StatelessWidget {
+  const _MonthHistoryCard({required this.summaries});
+
+  final List<DailyHistorySummary> summaries;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
+    final firstWeekdayOffset = summaries.isEmpty
+        ? 0
+        : summaries.first.date.weekday % DateTime.daysPerWeek;
+    final tiles = <DailyHistorySummary?>[
+      ...List<DailyHistorySummary?>.filled(firstWeekdayOffset, null),
+      ...summaries,
+    ];
+
+    return Card.outlined(
+      margin: EdgeInsets.zero,
+      color: colorScheme.surfaceContainerLow,
+      child: Padding(
+        padding: AppSpacing.cardPadding,
+        child: Column(
+          children: [
+            _WeekdayHeader(
+              labels: [
+                l10n.weekdaySunday,
+                l10n.weekdayMonday,
+                l10n.weekdayTuesday,
+                l10n.weekdayWednesday,
+                l10n.weekdayThursday,
+                l10n.weekdayFriday,
+                l10n.weekdaySaturday,
+              ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            GridView.builder(
+              itemCount: tiles.length,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: DateTime.daysPerWeek,
+                mainAxisSpacing: AppSpacing.xs,
+                crossAxisSpacing: AppSpacing.xs,
+              ),
+              itemBuilder: (context, index) {
+                final summary = tiles[index];
+
+                if (summary == null) {
+                  return const SizedBox.shrink();
+                }
+
+                return _MonthDayTile(summary: summary);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _WeekdayHeader extends StatelessWidget {
+  const _WeekdayHeader({required this.labels});
+
+  final List<String> labels;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Row(
+      children: labels
+          .map(
+            (label) => Expanded(
+              child: Text(
+                label,
+                textAlign: TextAlign.center,
+                style: textTheme.labelSmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          )
+          .toList(),
+    );
+  }
+}
+
+class _MonthDayTile extends StatelessWidget {
+  const _MonthDayTile({required this.summary});
+
+  final DailyHistorySummary summary;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final completion = summary.completionRate;
+    final isToday = _isSameDate(summary.date, DateTime.now());
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: _backgroundColor(colorScheme, completion, summary.isEmpty),
+        borderRadius: AppRadius.smBorder,
+        border: isToday ? Border.all(color: colorScheme.primary) : null,
+      ),
+      child: Center(
+        child: Text(
+          '${summary.date.day}',
+          style: textTheme.labelMedium?.copyWith(
+            color: _foregroundColor(colorScheme, completion, summary.isEmpty),
+            fontWeight: isToday ? FontWeight.w700 : FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
+  bool _isSameDate(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+
+  Color _backgroundColor(
+    ColorScheme colorScheme,
+    double completion,
+    bool isEmpty,
+  ) {
+    if (isEmpty) {
+      return colorScheme.surfaceContainerHighest;
+    }
+    if (completion >= 0.8) {
+      return colorScheme.primary;
+    }
+    if (completion >= 0.4) {
+      return colorScheme.tertiaryContainer;
+    }
+    return colorScheme.outlineVariant;
+  }
+
+  Color _foregroundColor(
+    ColorScheme colorScheme,
+    double completion,
+    bool isEmpty,
+  ) {
+    if (completion >= 0.8) {
+      return colorScheme.onPrimary;
+    }
+    if (isEmpty) {
+      return colorScheme.onSurfaceVariant;
+    }
+    return colorScheme.onSurface;
   }
 }
 

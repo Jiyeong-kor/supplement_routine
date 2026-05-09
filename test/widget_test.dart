@@ -139,7 +139,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('오늘 기록'), findsOneWidget);
-    expect(find.text('최근 2주 기록'), findsOneWidget);
+    expect(find.text('이번 달 기록'), findsOneWidget);
     expect(find.text('완료율 20% (1/5)'), findsOneWidget);
   });
 
@@ -389,6 +389,7 @@ void main() {
     final state = container.read(historyViewModelProvider);
 
     expect(state.todaySummary.date.day, DateTime.now().day);
+    expect(state.monthSummaries, isNotEmpty);
     expect(state.recentSummaries, hasLength(13));
     expect(state.isEmpty, isFalse);
   });

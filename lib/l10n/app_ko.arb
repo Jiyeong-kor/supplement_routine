@@ -127,6 +127,8 @@
   },
   "historyRecentTitle": "최근 2주 기록",
   "historyRecentDescription": "입력한 복용 규칙을 기준으로 날짜별 완료 여부를 확인합니다.",
+  "historyMonthTitle": "이번 달 기록",
+  "historyMonthDescription": "완료율이 높을수록 진한 색으로 표시됩니다.",
   "historyDate": "{month}월 {day}일 {weekday}요일",
   "@historyDate": {
     "placeholders": {

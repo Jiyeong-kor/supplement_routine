@@ -50,6 +50,30 @@ final historySummariesProvider = Provider<List<DailyHistorySummary>>((ref) {
   });
 });
 
+final currentMonthHistorySummariesProvider =
+    Provider<List<DailyHistorySummary>>((ref) {
+      final supplements = ref.watch(supplementListProvider);
+      final mealTimeSettings = ref.watch(mealTimeSettingsProvider);
+      final records = ref.watch(intakeRecordProvider);
+      final today = DateTime.now();
+      final lastDay = DateTime(today.year, today.month + 1, 0).day;
+
+      return List.generate(lastDay, (index) {
+        final date = DateTime(today.year, today.month, index + 1);
+
+        if (date.isAfter(DateTime(today.year, today.month, today.day))) {
+          return DailyHistorySummary(date: date, doneCount: 0, totalCount: 0);
+        }
+
+        return _createSummary(
+          date: date,
+          supplements: supplements,
+          records: records,
+          mealTimeSettings: mealTimeSettings,
+        );
+      });
+    });
+
 DailyHistorySummary _createSummary({
   required DateTime date,
   required List<Supplement> supplements,
