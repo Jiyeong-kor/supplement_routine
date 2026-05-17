@@ -1,54 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'app/app_config.dart';
-import 'app/supplement_routine_app.dart';
-import 'features/history/data/local_intake_record_repository.dart';
-import 'features/history/data/mock_intake_records.dart';
-import 'features/history/intake_record_provider.dart';
-import 'features/settings/data/local_settings_repository.dart';
-import 'features/settings/settings_provider.dart';
-import 'features/supplement/data/local_supplement_repository.dart';
-import 'features/supplement/data/mock_supplements.dart';
-import 'features/supplement/supplement_provider.dart';
+import 'app/app_bootstrap.dart';
 
-Future<void> main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  final preferences = await SharedPreferencesWithCache.create(
-    cacheOptions: const SharedPreferencesWithCacheOptions(
-      allowList: {
-        LocalSupplementRepository.storageKey,
-        LocalIntakeRecordRepository.storageKey,
-        LocalSettingsRepository.mealTimeSettingsKey,
-        LocalSettingsRepository.notificationEnabledKey,
-      },
-    ),
-  );
-
-  runApp(
-    ProviderScope(
-      overrides: [
-        supplementRepositoryProvider.overrideWithValue(
-          LocalSupplementRepository(
-            preferences,
-            seedSupplements: AppConfig.isMockDataEnabled
-                ? mockSupplements
-                : const [],
-          ),
-        ),
-        intakeRecordRepositoryProvider.overrideWithValue(
-          LocalIntakeRecordRepository(
-            preferences,
-            seedRecords: AppConfig.isMockDataEnabled
-                ? createMockIntakeRecords()
-                : const {},
-          ),
-        ),
-        settingsRepositoryProvider.overrideWithValue(
-          LocalSettingsRepository(preferences),
-        ),
-      ],
-      child: const SupplementRoutineApp(),
-    ),
-  );
+  runApp(const AppBootstrap());
 }
