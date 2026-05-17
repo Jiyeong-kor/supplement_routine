@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supplement_routine/app/app_layout.dart';
 import 'package:supplement_routine/app/app_spacing.dart';
 import 'package:supplement_routine/core/models/supplement.dart';
 import 'package:supplement_routine/features/supplement/presentation/supplement_display_text.dart';
@@ -110,26 +111,53 @@ class _SupplementListBody extends StatelessWidget {
       return const _SupplementEmptyState();
     }
 
-    return ListView.separated(
-      padding: AppSpacing.screenPadding,
-      itemCount: supplements.length,
-      separatorBuilder: (context, index) =>
-          const SizedBox(height: AppSpacing.md),
-      itemBuilder: (context, index) {
-        final supplement = supplements[index];
+    return AppConstrainedContent(
+      maxWidth: AppLayout.wideContentWidth,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final useGrid = constraints.maxWidth >= AppLayout.expandedBreakpoint;
 
-        return _SupplementListItem(
-          supplement: supplement,
-          onEdit: () {
-            onEdit(supplement);
-          },
-          onDelete: () {
-            onDelete(supplement);
-          },
-          onToggleNotification: () {
-            onToggleNotification(supplement);
-          },
-        );
+          if (useGrid) {
+            return GridView.builder(
+              padding: AppSpacing.screenPadding,
+              itemCount: supplements.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: AppSpacing.md,
+                mainAxisSpacing: AppSpacing.md,
+                childAspectRatio: 2.05,
+              ),
+              itemBuilder: (context, index) {
+                return _buildItem(supplements[index]);
+              },
+            );
+          }
+
+          return ListView.separated(
+            padding: AppSpacing.screenPadding,
+            itemCount: supplements.length,
+            separatorBuilder: (context, index) =>
+                const SizedBox(height: AppSpacing.md),
+            itemBuilder: (context, index) {
+              return _buildItem(supplements[index]);
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildItem(Supplement supplement) {
+    return _SupplementListItem(
+      supplement: supplement,
+      onEdit: () {
+        onEdit(supplement);
+      },
+      onDelete: () {
+        onDelete(supplement);
+      },
+      onToggleNotification: () {
+        onToggleNotification(supplement);
       },
     );
   }

@@ -285,9 +285,22 @@ void main() {
     expect(find.byType(NavigationBar), findsNothing);
   });
 
-  testWidgets('처음 시작할 때 선택하지 않은 탭 화면은 지연 생성한다', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('넓은 화면의 영양제 목록은 2열 그리드를 사용한다', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1200, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const ProviderScope(child: SupplementRoutineApp()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('영양제'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(GridView), findsOneWidget);
+  });
+
+  testWidgets('처음 시작할 때 선택하지 않은 탭 화면은 지연 생성한다', (WidgetTester tester) async {
     await tester.pumpWidget(const ProviderScope(child: SupplementRoutineApp()));
 
     expect(find.text('이번 달 기록'), findsNothing);

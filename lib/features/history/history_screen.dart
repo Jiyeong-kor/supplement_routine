@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supplement_routine/app/app_layout.dart';
 import 'package:supplement_routine/app/app_radius.dart';
 import 'package:supplement_routine/app/app_spacing.dart';
 import 'package:supplement_routine/features/history/history_summary_provider.dart';
@@ -16,35 +17,77 @@ class HistoryScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.historyTitle)),
-      body: ListView(
-        padding: AppSpacing.screenPadding,
-        children: [
-          _HistoryOverviewCard(summary: state.todaySummary),
-          const SizedBox(height: AppSpacing.xxl),
-          _HistorySectionHeader(
-            title: l10n.historyMonthTitle,
-            description: l10n.historyMonthDescription,
-          ),
-          const SizedBox(height: AppSpacing.md),
-          _MonthHistoryCard(summaries: state.monthSummaries),
-          const SizedBox(height: AppSpacing.xxl),
-          _HistorySectionHeader(
-            title: l10n.historyRecentTitle,
-            description: l10n.historyRecentDescription,
-          ),
-          const SizedBox(height: AppSpacing.md),
-          if (state.isEmpty)
-            const _HistoryEmptyState()
-          else
-            ...state.recentSummaries.map(
-              (summary) => _HistoryItem(
-                dateText: _dateLabel(l10n, summary.date),
-                done: summary.doneCount,
-                total: summary.totalCount,
-                completion: summary.completionRate,
-              ),
+      body: AppConstrainedContent(
+        maxWidth: AppLayout.wideContentWidth,
+        child: ListView(
+          padding: AppSpacing.screenPadding,
+          children: [
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final useTwoColumns =
+                    constraints.maxWidth >= AppLayout.expandedBreakpoint;
+
+                if (!useTwoColumns) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _HistoryOverviewCard(summary: state.todaySummary),
+                      const SizedBox(height: AppSpacing.xxl),
+                      _HistorySectionHeader(
+                        title: l10n.historyMonthTitle,
+                        description: l10n.historyMonthDescription,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      _MonthHistoryCard(summaries: state.monthSummaries),
+                    ],
+                  );
+                }
+
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 4,
+                      child: _HistoryOverviewCard(summary: state.todaySummary),
+                    ),
+                    const SizedBox(width: AppSpacing.lg),
+                    Expanded(
+                      flex: 6,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _HistorySectionHeader(
+                            title: l10n.historyMonthTitle,
+                            description: l10n.historyMonthDescription,
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          _MonthHistoryCard(summaries: state.monthSummaries),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
-        ],
+            const SizedBox(height: AppSpacing.xxl),
+            _HistorySectionHeader(
+              title: l10n.historyRecentTitle,
+              description: l10n.historyRecentDescription,
+            ),
+            const SizedBox(height: AppSpacing.md),
+            if (state.isEmpty)
+              const _HistoryEmptyState()
+            else
+              ...state.recentSummaries.map(
+                (summary) => _HistoryItem(
+                  dateText: _dateLabel(l10n, summary.date),
+                  done: summary.doneCount,
+                  total: summary.totalCount,
+                  completion: summary.completionRate,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

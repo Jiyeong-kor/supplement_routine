@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supplement_routine/app/app_layout.dart';
 import 'package:supplement_routine/app/app_radius.dart';
 import 'package:supplement_routine/app/app_spacing.dart';
 import 'package:supplement_routine/core/models/supplement.dart';
@@ -176,88 +177,91 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
           style: textTheme.titleLarge,
         ),
       ),
-      body: SingleChildScrollView(
-        padding: AppSpacing.screenPadding,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _SectionTitle(l10n.supplementNameSection),
-            _SupplementTextField(
-              controller: _nameController,
-              hintText: l10n.supplementNameHint,
-            ),
-            const SizedBox(height: AppSpacing.xxl),
+      body: AppConstrainedContent(
+        child: SingleChildScrollView(
+          padding: AppSpacing.screenPadding,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _SectionTitle(l10n.supplementNameSection),
+              _SupplementTextField(
+                controller: _nameController,
+                hintText: l10n.supplementNameHint,
+              ),
+              const SizedBox(height: AppSpacing.xxl),
 
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _SectionTitle(l10n.supplementDosageSection),
-                      _SupplementTextField(
-                        controller: _dosageValueController,
-                        keyboardType: const TextInputType.numberWithOptions(
-                          decimal: true,
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _SectionTitle(l10n.supplementDosageSection),
+                        _SupplementTextField(
+                          controller: _dosageValueController,
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _SectionTitle(l10n.supplementUnitSection),
-                      DropdownButtonFormField<String>(
-                        initialValue: _unit,
-                        decoration: const InputDecoration(),
-                        items: SupplementFormPolicy.dosageUnits
-                            .map(
-                              (u) => DropdownMenuItem(value: u, child: Text(u)),
-                            )
-                            .toList(),
-                        onChanged: (v) => setState(() => _unit = v!),
-                      ),
-                    ],
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _SectionTitle(l10n.supplementUnitSection),
+                        DropdownButtonFormField<String>(
+                          initialValue: _unit,
+                          decoration: const InputDecoration(),
+                          items: SupplementFormPolicy.dosageUnits
+                              .map(
+                                (u) =>
+                                    DropdownMenuItem(value: u, child: Text(u)),
+                              )
+                              .toList(),
+                          onChanged: (v) => setState(() => _unit = v!),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.xxl),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.xxl),
 
-            _SectionTitle(l10n.supplementMethodSection),
-            _buildTopMethodSelector(),
-            const SizedBox(height: AppSpacing.xxl),
+              _SectionTitle(l10n.supplementMethodSection),
+              _buildTopMethodSelector(),
+              const SizedBox(height: AppSpacing.xxl),
 
-            _buildDetailSection(),
+              _buildDetailSection(),
 
-            const SizedBox(height: AppSpacing.xxl),
-            _SectionTitle(l10n.supplementOtherSettingsSection),
-            SwitchListTile(
-              title: Text(l10n.supplementNotificationSwitch),
-              value: _isNotificationEnabled,
-              contentPadding: EdgeInsets.zero,
-              onChanged: (v) => setState(() => _isNotificationEnabled = v),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            _SectionTitle(l10n.supplementMemoSection),
-            _SupplementTextField(
-              controller: _memoController,
-              maxLines: 2,
-              hintText: l10n.supplementMemoHint,
-            ),
-            const SizedBox(height: AppSpacing.xxxl),
+              const SizedBox(height: AppSpacing.xxl),
+              _SectionTitle(l10n.supplementOtherSettingsSection),
+              SwitchListTile(
+                title: Text(l10n.supplementNotificationSwitch),
+                value: _isNotificationEnabled,
+                contentPadding: EdgeInsets.zero,
+                onChanged: (v) => setState(() => _isNotificationEnabled = v),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              _SectionTitle(l10n.supplementMemoSection),
+              _SupplementTextField(
+                controller: _memoController,
+                maxLines: 2,
+                hintText: l10n.supplementMemoHint,
+              ),
+              const SizedBox(height: AppSpacing.xxxl),
 
-            _SaveSupplementButton(
-              label: _isEditMode
-                  ? l10n.supplementEditDone
-                  : l10n.supplementAddDone,
-              onPressed: _saveSupplement,
-            ),
-          ],
+              _SaveSupplementButton(
+                label: _isEditMode
+                    ? l10n.supplementEditDone
+                    : l10n.supplementAddDone,
+                onPressed: _saveSupplement,
+              ),
+            ],
+          ),
         ),
       ),
     );

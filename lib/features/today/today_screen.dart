@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supplement_routine/app/app_layout.dart';
 import 'package:supplement_routine/app/app_radius.dart';
 import 'package:supplement_routine/app/app_spacing.dart';
 import 'package:supplement_routine/features/supplement/presentation/supplement_display_text.dart';
@@ -36,42 +37,47 @@ class TodayScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.todayAppBarTitle)),
-      body: SingleChildScrollView(
-        padding: AppSpacing.screenPadding,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(dateString, style: Theme.of(context).textTheme.bodyMedium),
-            const SizedBox(height: AppSpacing.lg),
-            _TodayQuoteCard(icon: Icons.auto_awesome, text: quoteText),
-            const SizedBox(height: AppSpacing.xxl),
-            _TodayProgressCard(done: doneCount, total: totalCount),
-            const SizedBox(height: AppSpacing.xxxl),
-            Text(
-              l10n.todayListTitle,
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            if (todayList.isEmpty)
-              const _TodayEmptyState()
-            else
-              ...todayList.map(
-                (item) => _TodaySupplementItem(
-                  time: item.record.scheduledTime.format(context),
-                  name: item.supplement.name,
-                  label: SupplementDisplayText.scheduleLabel(l10n, item.label),
-                  dosageUnit: item.supplement.dosageUnit,
-                  dosageValue: item.supplement.dosageValue,
-                  isDone: item.record.isDone,
-                  memo: item.supplement.memo,
-                  onTap: () => ref
-                      .read(todayListProvider.notifier)
-                      .toggleRecord(item.record.id),
-                ),
+      body: AppConstrainedContent(
+        child: SingleChildScrollView(
+          padding: AppSpacing.screenPadding,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(dateString, style: Theme.of(context).textTheme.bodyMedium),
+              const SizedBox(height: AppSpacing.lg),
+              _TodayQuoteCard(icon: Icons.auto_awesome, text: quoteText),
+              const SizedBox(height: AppSpacing.xxl),
+              _TodayProgressCard(done: doneCount, total: totalCount),
+              const SizedBox(height: AppSpacing.xxxl),
+              Text(
+                l10n.todayListTitle,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
               ),
-          ],
+              const SizedBox(height: AppSpacing.md),
+              if (todayList.isEmpty)
+                const _TodayEmptyState()
+              else
+                ...todayList.map(
+                  (item) => _TodaySupplementItem(
+                    time: item.record.scheduledTime.format(context),
+                    name: item.supplement.name,
+                    label: SupplementDisplayText.scheduleLabel(
+                      l10n,
+                      item.label,
+                    ),
+                    dosageUnit: item.supplement.dosageUnit,
+                    dosageValue: item.supplement.dosageValue,
+                    isDone: item.record.isDone,
+                    memo: item.supplement.memo,
+                    onTap: () => ref
+                        .read(todayListProvider.notifier)
+                        .toggleRecord(item.record.id),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(

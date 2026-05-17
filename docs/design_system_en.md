@@ -23,6 +23,7 @@ Supplement Routine is a routine and record management app, not a medical advice 
 - Cards: Tonal low surfaces with outline variant borders.
 - Dialogs and bottom sheets: Rounded 24px containers using M3 surface containers.
 - Navigation: NavigationBar on compact widths and NavigationRail on expanded widths.
+- Layout: Keep content within readable maximum widths, and let list/history screens use expanded layouts on larger screens.
 
 ## Tokens
 
@@ -42,6 +43,7 @@ Supplement Routine is a routine and record management app, not a medical advice 
 | --- | --- |
 | AppBar | `centerTitle: false`, surface background, low scrolled-under elevation |
 | Navigation | NavigationBar on compact widths, NavigationRail on expanded widths |
+| Layout | `720px` for readable content, `1040px` for wide content |
 | Card | Low tonal surface, zero elevation, outline variant border |
 | FilledButton | Primary actions such as save/complete |
 | TextButton | Secondary dialog actions |

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supplement_routine/app/app_layout.dart';
 import 'package:supplement_routine/l10n/generated/app_localizations.dart';
 
 import 'today/today_screen.dart';
@@ -16,12 +17,7 @@ class MainNavigationScreen extends StatefulWidget {
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget?> _screens = [
-    const TodayScreen(),
-    null,
-    null,
-    null,
-  ];
+  final List<Widget?> _screens = [const TodayScreen(), null, null, null];
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +47,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final useNavigationRail = constraints.maxWidth >= 840;
+        final useNavigationRail =
+            constraints.maxWidth >= AppLayout.expandedBreakpoint;
 
         if (useNavigationRail) {
           return Scaffold(
@@ -111,9 +108,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   List<Widget> get _stackChildren {
-    return _screens
-        .map((screen) => screen ?? const SizedBox.shrink())
-        .toList();
+    return _screens.map((screen) => screen ?? const SizedBox.shrink()).toList();
   }
 
   Widget _buildScreen(int index) {

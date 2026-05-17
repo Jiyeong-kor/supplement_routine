@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supplement_routine/app/app_layout.dart';
 import 'package:supplement_routine/app/app_spacing.dart';
 import 'package:supplement_routine/app/app_config.dart';
 import 'package:supplement_routine/core/utils/time_utils.dart';
@@ -19,75 +20,77 @@ class SettingsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.settingsTitle)),
-      body: ListView(
-        children: [
-          _SettingsSectionTitle(l10n.settingsDefaultSection),
-          ListTile(
-            leading: Icon(Icons.restaurant, color: colorScheme.primary),
-            title: Text(l10n.settingsMealTimeTitle),
-            subtitle: Text(
-              l10n.settingsMealTimeSummary(
-                mealTimeSettings.breakfastTime.to24hString(),
-                mealTimeSettings.lunchTime.to24hString(),
-                mealTimeSettings.dinnerTime.to24hString(),
+      body: AppConstrainedContent(
+        child: ListView(
+          children: [
+            _SettingsSectionTitle(l10n.settingsDefaultSection),
+            ListTile(
+              leading: Icon(Icons.restaurant, color: colorScheme.primary),
+              title: Text(l10n.settingsMealTimeTitle),
+              subtitle: Text(
+                l10n.settingsMealTimeSummary(
+                  mealTimeSettings.breakfastTime.to24hString(),
+                  mealTimeSettings.lunchTime.to24hString(),
+                  mealTimeSettings.dinnerTime.to24hString(),
+                ),
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                _showMealTimeSheet(context);
+              },
+            ),
+            SwitchListTile(
+              secondary: Icon(Icons.notifications, color: colorScheme.primary),
+              title: Text(l10n.settingsNotificationTitle),
+              subtitle: Text(
+                isNotificationEnabled
+                    ? l10n.settingsNotificationOn
+                    : l10n.settingsNotificationOff,
+              ),
+              value: isNotificationEnabled,
+              onChanged: (value) {
+                ref
+                    .read(notificationSettingsProvider.notifier)
+                    .updateEnabled(value);
+              },
+            ),
+            const Divider(),
+            _SettingsSectionTitle(l10n.settingsDataSection),
+            ListTile(
+              leading: Icon(Icons.delete_forever, color: colorScheme.error),
+              title: Text(
+                l10n.settingsResetTitle,
+                style: TextStyle(color: colorScheme.error),
+              ),
+              onTap: () {
+                _showResetDialog(context, ref);
+              },
+            ),
+            const Divider(),
+            _SettingsSectionTitle(l10n.settingsInfoSection),
+            ListTile(
+              leading: Icon(Icons.help_outline, color: colorScheme.primary),
+              title: Text(l10n.settingsUsageGuideTitle),
+              onTap: () {
+                _showUsageGuideDialog(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.info_outline, color: colorScheme.primary),
+              title: Text(l10n.settingsDisclaimerTitle),
+              onTap: () {
+                _showDisclaimerDialog(context);
+              },
+            ),
+            ListTile(
+              title: Text(l10n.settingsVersionTitle),
+              trailing: Text(
+                AppConfig.appVersion,
+                style: TextStyle(color: colorScheme.onSurfaceVariant),
               ),
             ),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              _showMealTimeSheet(context);
-            },
-          ),
-          SwitchListTile(
-            secondary: Icon(Icons.notifications, color: colorScheme.primary),
-            title: Text(l10n.settingsNotificationTitle),
-            subtitle: Text(
-              isNotificationEnabled
-                  ? l10n.settingsNotificationOn
-                  : l10n.settingsNotificationOff,
-            ),
-            value: isNotificationEnabled,
-            onChanged: (value) {
-              ref
-                  .read(notificationSettingsProvider.notifier)
-                  .updateEnabled(value);
-            },
-          ),
-          const Divider(),
-          _SettingsSectionTitle(l10n.settingsDataSection),
-          ListTile(
-            leading: Icon(Icons.delete_forever, color: colorScheme.error),
-            title: Text(
-              l10n.settingsResetTitle,
-              style: TextStyle(color: colorScheme.error),
-            ),
-            onTap: () {
-              _showResetDialog(context, ref);
-            },
-          ),
-          const Divider(),
-          _SettingsSectionTitle(l10n.settingsInfoSection),
-          ListTile(
-            leading: Icon(Icons.help_outline, color: colorScheme.primary),
-            title: Text(l10n.settingsUsageGuideTitle),
-            onTap: () {
-              _showUsageGuideDialog(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.info_outline, color: colorScheme.primary),
-            title: Text(l10n.settingsDisclaimerTitle),
-            onTap: () {
-              _showDisclaimerDialog(context);
-            },
-          ),
-          ListTile(
-            title: Text(l10n.settingsVersionTitle),
-            trailing: Text(
-              AppConfig.appVersion,
-              style: TextStyle(color: colorScheme.onSurfaceVariant),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
