@@ -736,6 +736,30 @@ abstract class AppLocalizations {
   /// **'정확한 알림 권한이 아직 꺼져 있습니다.'**
   String get settingsExactAlarmStillDisabled;
 
+  /// No description provided for @settingsWindowsStartupTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'Windows 시작 시 실행'**
+  String get settingsWindowsStartupTitle;
+
+  /// No description provided for @settingsWindowsStartupChecking.
+  ///
+  /// In ko, this message translates to:
+  /// **'자동 시작 상태를 확인하는 중입니다'**
+  String get settingsWindowsStartupChecking;
+
+  /// No description provided for @settingsWindowsStartupOn.
+  ///
+  /// In ko, this message translates to:
+  /// **'Windows 로그인 후 자동으로 열립니다'**
+  String get settingsWindowsStartupOn;
+
+  /// No description provided for @settingsWindowsStartupOff.
+  ///
+  /// In ko, this message translates to:
+  /// **'Windows 로그인 시 자동으로 열지 않습니다'**
+  String get settingsWindowsStartupOff;
+
   /// No description provided for @settingsDataSection.
   ///
   /// In ko, this message translates to:

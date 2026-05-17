@@ -5,6 +5,7 @@ import 'package:supplement_routine/app/app_layout.dart';
 import 'package:supplement_routine/app/app_spacing.dart';
 import 'package:supplement_routine/app/app_config.dart';
 import 'package:supplement_routine/core/services/intake_notification_service.dart';
+import 'package:supplement_routine/core/services/windows_startup_service.dart';
 import 'package:supplement_routine/core/utils/time_utils.dart';
 import 'package:supplement_routine/features/settings/settings_provider.dart';
 import 'package:supplement_routine/features/supplement/supplement_provider.dart';
@@ -21,6 +22,7 @@ class SettingsScreen extends ConsumerWidget {
     final isNotificationEnabled = ref.watch(notificationSettingsProvider);
     final exactAlarmPermission = ref.watch(exactAlarmPermissionProvider);
     final isExactAlarmGranted = exactAlarmPermission.asData?.value;
+    final windowsStartup = ref.watch(windowsStartupProvider);
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
@@ -102,6 +104,30 @@ class SettingsScreen extends ConsumerWidget {
                         );
                       }
                     : null,
+              ),
+            if (WindowsStartupService.isSupported)
+              SwitchListTile(
+                secondary: Icon(
+                  Icons.desktop_windows,
+                  color: colorScheme.primary,
+                ),
+                title: Text(l10n.settingsWindowsStartupTitle),
+                subtitle: Text(
+                  windowsStartup.when(
+                    data: (isEnabled) => isEnabled
+                        ? l10n.settingsWindowsStartupOn
+                        : l10n.settingsWindowsStartupOff,
+                    loading: () => l10n.settingsWindowsStartupChecking,
+                    error: (_, _) => l10n.settingsWindowsStartupOff,
+                  ),
+                ),
+                value: windowsStartup.asData?.value ?? false,
+                onChanged: windowsStartup.isLoading
+                    ? null
+                    : (value) async {
+                        await WindowsStartupService.setEnabled(value);
+                        ref.invalidate(windowsStartupProvider);
+                      },
               ),
             const Divider(),
             _SettingsSectionTitle(l10n.settingsDataSection),

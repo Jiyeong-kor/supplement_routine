@@ -361,6 +361,18 @@ class AppLocalizationsKo extends AppLocalizations {
   String get settingsExactAlarmStillDisabled => '정확한 알림 권한이 아직 꺼져 있습니다.';
 
   @override
+  String get settingsWindowsStartupTitle => 'Windows 시작 시 실행';
+
+  @override
+  String get settingsWindowsStartupChecking => '자동 시작 상태를 확인하는 중입니다';
+
+  @override
+  String get settingsWindowsStartupOn => 'Windows 로그인 후 자동으로 열립니다';
+
+  @override
+  String get settingsWindowsStartupOff => 'Windows 로그인 시 자동으로 열지 않습니다';
+
+  @override
   String get settingsDataSection => '데이터 관리';
 
   @override

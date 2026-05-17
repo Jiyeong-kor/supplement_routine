@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supplement_routine/core/models/meal_time_settings.dart';
 import 'package:supplement_routine/core/services/intake_notification_service.dart';
+import 'package:supplement_routine/core/services/windows_startup_service.dart';
 import 'package:supplement_routine/features/settings/data/memory_settings_repository.dart';
 import 'package:supplement_routine/features/settings/data/settings_repository.dart';
 
@@ -53,4 +54,8 @@ final notificationSettingsProvider =
 
 final exactAlarmPermissionProvider = FutureProvider<bool>((ref) {
   return IntakeNotificationService.canScheduleExactNotifications();
+});
+
+final windowsStartupProvider = FutureProvider<bool>((ref) {
+  return WindowsStartupService.isEnabled();
 });
