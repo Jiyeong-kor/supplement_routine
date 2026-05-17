@@ -29,6 +29,7 @@ Current assets:
 
 - `docs/assets/store/feature_graphic.svg`
 - `docs/assets/screenshots/today.png`
+- `docs/assets/screenshots/today_dark.png`
 - `docs/assets/screenshots/supplements.png`
 - `docs/assets/screenshots/history.png`
 - `docs/assets/screenshots/settings.png`

@@ -209,7 +209,13 @@ Supplement Routine은 Android 우선 앱으로 Material Design 3를 따릅니다
 | --- | --- |
 | ![기록 화면](docs/assets/screenshots/history.png) | ![설정 화면](docs/assets/screenshots/settings.png) |
 
-### 홈 위젯
+### 라이트 / 다크 모드
+
+| 라이트 모드 | 다크 모드 |
+| --- | --- |
+| ![라이트 모드 오늘 화면](docs/assets/screenshots/today.png) | ![다크 모드 오늘 화면](docs/assets/screenshots/today_dark.png) |
+
+### Android 홈 위젯
 
 ![홈 위젯](docs/assets/screenshots/widget.png)
 

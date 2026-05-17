@@ -210,7 +210,13 @@ See also:
 | --- | --- |
 | ![History screen](docs/assets/screenshots/history.png) | ![Settings screen](docs/assets/screenshots/settings.png) |
 
-### Home Widget
+### Light / Dark Mode
+
+| Light mode | Dark mode |
+| --- | --- |
+| ![Light mode today screen](docs/assets/screenshots/today.png) | ![Dark mode today screen](docs/assets/screenshots/today_dark.png) |
+
+### Android Home Widget
 
 ![Home widget](docs/assets/screenshots/widget.png)
 
