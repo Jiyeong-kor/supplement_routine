@@ -90,6 +90,25 @@ class IntakeNotificationService {
     }
   }
 
+  static Future<void> showPreviewReminder(String supplementName) async {
+    if (kIsWeb || !_isInitialized) {
+      return;
+    }
+
+    try {
+      await _notifications.show(
+        id: 0,
+        title: _copy.notificationTitle,
+        body: reminderBody(supplementName),
+        notificationDetails: _notificationDetails,
+      );
+    } on MissingPluginException {
+      return;
+    } on PlatformException {
+      return;
+    }
+  }
+
   static Future<void> _requestAndroidNotificationPermission() async {
     final androidImplementation = _notifications
         .resolvePlatformSpecificImplementation<

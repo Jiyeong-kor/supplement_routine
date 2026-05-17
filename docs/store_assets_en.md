@@ -34,6 +34,7 @@ Current assets:
 - `docs/assets/screenshots/history.png`
 - `docs/assets/screenshots/settings.png`
 - `docs/assets/screenshots/widget.png`
+- `docs/assets/screenshots/notification.png`
 
 ## Capture Checklist
 

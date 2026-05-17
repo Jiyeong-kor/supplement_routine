@@ -28,6 +28,11 @@ class AppConfig {
     defaultValue: !kReleaseMode,
   );
 
+  static const isNotificationPreviewEnabled = bool.fromEnvironment(
+    'NOTIFICATION_PREVIEW',
+    defaultValue: false,
+  );
+
   static AppFlavor get flavor {
     return flavorName == 'prod' ? AppFlavor.prod : AppFlavor.dev;
   }

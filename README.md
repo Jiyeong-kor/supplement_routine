@@ -156,6 +156,7 @@ flutter run --dart-define=MOCK_DATA=false
 | `APP_VERSION` | `1.0.0` | 앱 버전 표시용 값 |
 | `LOG_LEVEL` | `debug` | 로그 레벨 |
 | `MOCK_DATA` | debug: true, release: false | 개발용 mock 데이터 사용 여부 |
+| `NOTIFICATION_PREVIEW` | `false` | 문서 캡처용 즉시 알림 표시 여부 |
 
 비밀 값, keystore 비밀번호, 민감한 API key는 코드와 Git 저장소에 포함하지 않는 것을 원칙으로 합니다.
 
@@ -218,6 +219,10 @@ Supplement Routine은 Android 우선 앱으로 Material Design 3를 따릅니다
 ### Android 홈 위젯
 
 ![홈 위젯](docs/assets/screenshots/widget.png)
+
+### 복용 알림
+
+![복용 알림](docs/assets/screenshots/notification.png)
 
 ## 테스트 범위
 

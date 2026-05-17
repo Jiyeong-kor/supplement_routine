@@ -157,6 +157,7 @@ flutter run --dart-define=MOCK_DATA=false
 | `APP_VERSION` | `1.0.0` | Display version |
 | `LOG_LEVEL` | `debug` | Log level |
 | `MOCK_DATA` | debug: true, release: false | Whether to inject development mock data |
+| `NOTIFICATION_PREVIEW` | `false` | Whether to show an immediate notification for documentation capture |
 
 Secrets such as signing passwords, keystore paths, and sensitive API keys should not be committed to code or Git.
 
@@ -219,6 +220,10 @@ See also:
 ### Android Home Widget
 
 ![Home widget](docs/assets/screenshots/widget.png)
+
+### Intake Notification
+
+![Intake notification](docs/assets/screenshots/notification.png)
 
 ## Test Coverage
 

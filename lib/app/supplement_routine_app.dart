@@ -50,7 +50,14 @@ class _SupplementRoutineAppState extends ConsumerState<SupplementRoutineApp> {
       copy: IntakeNotificationCopy.fromLocalizations(AppLocalizationsKo()),
     );
     _areDeferredServicesReady = true;
-    await _syncTodaySideEffects(ref.read(todayListProvider));
+    final todayList = ref.read(todayListProvider);
+    await _syncTodaySideEffects(todayList);
+
+    if (AppConfig.isNotificationPreviewEnabled && todayList.isNotEmpty) {
+      await IntakeNotificationService.showPreviewReminder(
+        todayList.first.supplement.name,
+      );
+    }
   }
 
   Future<void> _syncTodaySideEffects(List<TodayDisplayItem> todayList) async {
