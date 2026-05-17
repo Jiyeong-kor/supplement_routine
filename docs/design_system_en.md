@@ -12,8 +12,8 @@ Supplement Routine is a routine and record management app, not a medical advice 
 
 ## Material Design 3 Decisions
 
-- Color scheme: Indigo seed color for trust and routine management. Success, warning, and error colors are explicit app tokens.
-- Typography: Pretendard static font files, weights 400, 500, 600, and 700. Material 3 text roles are preserved and tuned with heavier title/label weights.
+- Color scheme: Sage green seed color with warm neutral surfaces for a calm routine-management tone. Success, warning, and error colors are explicit app tokens.
+- Typography: Pretendard static font files, weights 400, 500, 600, and 700. Material 3 text roles are preserved, body copy stays light, and emphasis increases gradually across title roles.
 - Spacing: 4-point scale with common screen and card padding tokens.
 - Shape: 8px for compact controls, 12px for cards and inputs, 16px for prominent actions, 24px for dialogs and bottom sheets.
 - Elevation: Mostly zero elevation with outlined/tonal surfaces. This keeps the app quiet and suitable for repeated daily use.
@@ -29,10 +29,10 @@ Supplement Routine is a routine and record management app, not a medical advice 
 
 | Category | Token | Value | Preview |
 | --- | --- | --- | --- |
-| Color | `AppColors.seed` | `#1A237E` | ![Seed](assets/colors/seed.svg) |
-| Color | `AppColors.success` | `#1B5E20` | ![Success](assets/colors/success.svg) |
-| Color | `AppColors.warning` | `#E65100` | ![Warning](assets/colors/warning.svg) |
-| Color | `AppColors.error` | `#B71C1C` | ![Error](assets/colors/error.svg) |
+| Color | `AppColors.seed` | `#5C8A73` | ![Seed](assets/colors/seed.svg) |
+| Color | `AppColors.success` | `#466C59` | ![Success](assets/colors/success.svg) |
+| Color | `AppColors.warning` | `#B26A00` | ![Warning](assets/colors/warning.svg) |
+| Color | `AppColors.error` | `#B3261E` | ![Error](assets/colors/error.svg) |
 | Spacing | `xxs / xs / sm / md / lg / xl / xxl / xxxl` | `4 / 6 / 8 / 12 / 16 / 20 / 24 / 32` |
 | Radius | `sm / md / lg / xl / pill` | `8 / 12 / 16 / 24 / 999` |
 | Typography | `Pretendard` | `400 / 500 / 600 / 700` |

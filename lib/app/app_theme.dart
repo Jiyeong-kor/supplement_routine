@@ -28,7 +28,7 @@ class AppTheme {
         scrolledUnderElevation: 1,
         backgroundColor: colorScheme.surfaceContainer,
         foregroundColor: colorScheme.onSurface,
-        titleTextStyle: textTheme.titleLarge,
+        titleTextStyle: textTheme.titleMedium,
         elevation: 0,
       ),
       cardTheme: CardThemeData(
@@ -73,7 +73,7 @@ class AppTheme {
 
           return textTheme.labelMedium?.copyWith(
             color: color,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600,
           );
         }),
       ),
@@ -97,7 +97,7 @@ class AppTheme {
           elevation: 0,
           shape: RoundedRectangleBorder(borderRadius: AppRadius.mdBorder),
           textStyle: textTheme.labelLarge?.copyWith(
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),
@@ -127,7 +127,7 @@ class AppTheme {
         iconColor: colorScheme.onSurfaceVariant,
         textColor: colorScheme.onSurface,
         titleTextStyle: textTheme.bodyLarge?.copyWith(
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w500,
         ),
         subtitleTextStyle: textTheme.bodySmall?.copyWith(
           color: colorScheme.onSurfaceVariant,

@@ -51,9 +51,7 @@ class TodayScreen extends ConsumerWidget {
               const SizedBox(height: AppSpacing.xxxl),
               Text(
                 l10n.todayListTitle,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: AppSpacing.md),
               if (todayList.isEmpty)
@@ -169,15 +167,13 @@ class _TodayProgressCard extends StatelessWidget {
               children: [
                 Text(
                   l10n.todayRoutineTitle,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                  style: Theme.of(context).textTheme.titleSmall,
                 ),
                 Text(
                   l10n.todayProgressCount(done, total),
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
                     color: colorScheme.primary,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
@@ -243,7 +239,7 @@ class _TodaySupplementItem extends StatelessWidget {
                 child: Text(
                   time,
                   style: textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     color: colorScheme.primary,
                   ),
                 ),
@@ -256,7 +252,6 @@ class _TodaySupplementItem extends StatelessWidget {
                     Text(
                       name,
                       style: textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
                         color: isDone
                             ? colorScheme.onSurfaceVariant
                             : colorScheme.onSurface,
@@ -322,7 +317,7 @@ class _TodayEmptyState extends StatelessWidget {
               l10n.todayEmptyTitle,
               style: Theme.of(
                 context,
-              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+              ).textTheme.titleSmall,
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(

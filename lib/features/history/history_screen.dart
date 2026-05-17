@@ -130,7 +130,7 @@ class _HistorySectionHeader extends StatelessWidget {
       children: [
         Text(
           title,
-          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          style: textTheme.titleMedium,
         ),
         const SizedBox(height: AppSpacing.xxs),
         Text(
@@ -227,7 +227,7 @@ class _WeekdayHeader extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: textTheme.labelSmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
@@ -410,7 +410,6 @@ class _HistoryOverviewCard extends StatelessWidget {
               l10n.historyTodayOverviewTitle,
               style: textTheme.titleSmall?.copyWith(
                 color: colorScheme.onPrimaryContainer,
-                fontWeight: FontWeight.w700,
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -418,7 +417,7 @@ class _HistoryOverviewCard extends StatelessWidget {
               l10n.historyPercent(percent),
               style: textTheme.displaySmall?.copyWith(
                 color: colorScheme.onPrimaryContainer,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -487,7 +486,7 @@ class _HistoryItem extends StatelessWidget {
                     '${(completion * 100).round()}',
                     style: textTheme.labelLarge?.copyWith(
                       color: colorScheme.onPrimary,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
@@ -501,7 +500,6 @@ class _HistoryItem extends StatelessWidget {
                   Text(
                     dateText,
                     style: textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
                       color: colorScheme.onSurface,
                     ),
                   ),

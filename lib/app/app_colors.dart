@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const seed = Color(0xFF1A237E);
+  static const seed = Color(0xFF5C8A73);
 
-  static const success = Color(0xFF1B5E20);
-  static const warning = Color(0xFFE65100);
-  static const error = Color(0xFFB71C1C);
+  static const success = Color(0xFF466C59);
+  static const warning = Color(0xFFB26A00);
+  static const error = Color(0xFFB3261E);
 
   static ColorScheme lightScheme =
       ColorScheme.fromSeed(
@@ -14,21 +14,27 @@ class AppColors {
       ).copyWith(
         primary: seed,
         onPrimary: Colors.white,
-        primaryContainer: const Color(0xFFE8EAF6),
-        onPrimaryContainer: const Color(0xFF101A5C),
-        secondary: const Color(0xFF455A64),
+        primaryContainer: const Color(0xFFE4ECE7),
+        onPrimaryContainer: const Color(0xFF1B2922),
+        secondary: const Color(0xFF6B756F),
         onSecondary: Colors.white,
-        secondaryContainer: const Color(0xFFECEFF1),
-        onSecondaryContainer: const Color(0xFF263238),
-        surface: Colors.white,
-        onSurface: const Color(0xFF1A1C1E),
-        surfaceContainerLow: Colors.white,
-        surfaceContainer: const Color(0xFFF2F2F4),
-        surfaceContainerHigh: const Color(0xFFE8E8EA),
+        secondaryContainer: const Color(0xFFF4F2EB),
+        onSecondaryContainer: const Color(0xFF2A2925),
+        tertiary: const Color(0xFF7B6B54),
+        onTertiary: Colors.white,
+        tertiaryContainer: const Color(0xFFEDE3D6),
+        onTertiaryContainer: const Color(0xFF2F2417),
+        surface: const Color(0xFFFAF9F5),
+        onSurface: const Color(0xFF1C1B19),
+        surfaceContainerLow: const Color(0xFFFFFEFA),
+        surfaceContainer: const Color(0xFFF4F2EB),
+        surfaceContainerHigh: const Color(0xFFECE8DD),
+        surfaceContainerHighest: const Color(0xFFE6E2D5),
+        onSurfaceVariant: const Color(0xFF4A4842),
         error: error,
         onError: Colors.white,
-        outline: const Color(0xFF9E9E9E),
-        outlineVariant: const Color(0xFFEEEEEE),
+        outline: const Color(0xFFA7A092),
+        outlineVariant: const Color(0xFFD4CFC1),
       );
 
   static ColorScheme darkScheme =
@@ -36,28 +42,28 @@ class AppColors {
         seedColor: seed,
         brightness: Brightness.dark,
       ).copyWith(
-        primary: const Color(0xFFBEC2FF),
-        onPrimary: const Color(0xFF202B78),
-        primaryContainer: const Color(0xFF313A8F),
-        onPrimaryContainer: const Color(0xFFE0E0FF),
-        secondary: const Color(0xFFC4C7D0),
-        onSecondary: const Color(0xFF2D3038),
-        secondaryContainer: const Color(0xFF424650),
-        onSecondaryContainer: const Color(0xFFE0E2EC),
-        tertiary: const Color(0xFFE0B8FF),
-        onTertiary: const Color(0xFF44235E),
-        tertiaryContainer: const Color(0xFF5D3A77),
-        onTertiaryContainer: const Color(0xFFF3DAFF),
-        surface: const Color(0xFF141318),
-        onSurface: const Color(0xFFE6E1E9),
-        surfaceContainerLow: const Color(0xFF1D1B20),
-        surfaceContainer: const Color(0xFF211F26),
-        surfaceContainerHigh: const Color(0xFF2B2930),
-        surfaceContainerHighest: const Color(0xFF36343B),
-        onSurfaceVariant: const Color(0xFFC9C5D0),
+        primary: const Color(0xFFA3C2B1),
+        onPrimary: const Color(0xFF1B2922),
+        primaryContainer: const Color(0xFF365345),
+        onPrimaryContainer: const Color(0xFFE4ECE7),
+        secondary: const Color(0xFFD4CFC1),
+        onSecondary: const Color(0xFF2A2925),
+        secondaryContainer: const Color(0xFF3A3832),
+        onSecondaryContainer: const Color(0xFFF4F2EB),
+        tertiary: const Color(0xFFD9C2A3),
+        onTertiary: const Color(0xFF352716),
+        tertiaryContainer: const Color(0xFF4B3924),
+        onTertiaryContainer: const Color(0xFFF4E4CC),
+        surface: const Color(0xFF1C1B19),
+        onSurface: const Color(0xFFF4F2EB),
+        surfaceContainerLow: const Color(0xFF24231F),
+        surfaceContainer: const Color(0xFF2A2925),
+        surfaceContainerHigh: const Color(0xFF34322D),
+        surfaceContainerHighest: const Color(0xFF403D37),
+        onSurfaceVariant: const Color(0xFFD4CFC1),
         error: const Color(0xFFFFB4AB),
         onError: const Color(0xFF690005),
-        outline: const Color(0xFF938F99),
-        outlineVariant: const Color(0xFF49454F),
+        outline: const Color(0xFF938D81),
+        outlineVariant: const Color(0xFF4A4842),
       );
 }
