@@ -2,7 +2,7 @@
 
 > 사용자가 직접 입력한 영양제 복용 규칙을 기반으로 오늘의 복용 일정, 체크, 기록, 알림, 홈 위젯을 관리하는 Flutter Android 앱입니다.
 
-[English README](README_EN.md)
+[English README](README_en.md)
 
 ## 프로젝트 소개
 
@@ -192,11 +192,10 @@ Supplement Routine은 Android 우선 앱으로 Material Design 3를 따릅니다
 
 자세한 디자인 결정은 다음 문서를 참고합니다.
 
-- [정보 구조(IA)](docs/information_architecture_ko.md)
-- [사용자 흐름](docs/user_flow_ko.md)
-- [디자인 시스템 문서](docs/design_system_ko.md)
-- [Design System](docs/design_system.md)
-- [Android 릴리즈 서명](docs/release_signing_ko.md)
+- [정보 구조(IA)](docs/information_architecture.md)
+- [사용자 흐름](docs/user_flow.md)
+- [디자인 시스템 문서](docs/design_system.md)
+- [Android 릴리즈 서명](docs/release_signing.md)
 
 ## 테스트 범위
 

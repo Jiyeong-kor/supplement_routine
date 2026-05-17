@@ -1,0 +1,79 @@
+# Supplement Routine Design System
+
+## UI/UX Direction
+
+Supplement Routine is a routine and record management app, not a medical advice app. The UI should feel calm, predictable, and scan-friendly. The primary user flow is:
+
+1. Check today's scheduled intakes.
+2. Mark completed intakes.
+3. Add or edit supplement rules.
+4. Review completion history.
+5. Adjust routine settings.
+
+## Material Design 3 Decisions
+
+- Color scheme: Indigo seed color for trust and routine management. Success, warning, and error colors are explicit app tokens.
+- Typography: Pretendard static font files, weights 400, 500, 600, and 700. Material 3 text roles are preserved and tuned with heavier title/label weights.
+- Spacing: 4-point scale with common screen and card padding tokens.
+- Shape: 8px for compact controls, 12px for cards and inputs, 16px for prominent actions, 24px for dialogs and bottom sheets.
+- Elevation: Mostly zero elevation with outlined/tonal surfaces. This keeps the app quiet and suitable for repeated daily use.
+- Icons: Material outlined icons by default, filled icons for selected navigation state.
+- Buttons: Filled buttons for primary form actions, text buttons for dialogs.
+- Text fields: Filled M3 fields with clear focused and error borders.
+- Cards: Tonal low surfaces with outline variant borders.
+- Dialogs and bottom sheets: Rounded 24px containers using M3 surface containers.
+- Navigation: Bottom NavigationBar with always visible labels for 4 primary destinations.
+
+## Tokens
+
+| Category | Token | Preview | Value |
+| --- | --- | --- | --- |
+| Color | `AppColors.seed` | ![Seed](assets/colors/seed.svg) | `#1A237E` |
+| Color | `AppColors.success` | ![Success](assets/colors/success.svg) | `#1B5E20` |
+| Color | `AppColors.warning` | ![Warning](assets/colors/warning.svg) | `#E65100` |
+| Color | `AppColors.error` | ![Error](assets/colors/error.svg) | `#B71C1C` |
+| Spacing | `xxs / xs / sm / md / lg / xl / xxl / xxxl` | `4 / 6 / 8 / 12 / 16 / 20 / 24 / 32` |
+| Radius | `sm / md / lg / xl / pill` | `8 / 12 / 16 / 24 / 999` |
+| Typography | `Pretendard` | `400 / 500 / 600 / 700` |
+
+## Component Rules
+
+| Component | Rule |
+| --- | --- |
+| AppBar | `centerTitle: false`, surface background, zero elevation |
+| NavigationBar | Four destinations, labels always visible |
+| Card | Low tonal surface, zero elevation, outline variant border |
+| FilledButton | Primary actions such as save/complete |
+| TextButton | Secondary dialog actions |
+| TextField | Filled field, 12px radius, distinct focus/error borders |
+| BottomSheet | 24px top radius, drag handle |
+| Dialog | 16px+ radius, clear CTA |
+| Empty State | Icon + title + short recovery copy |
+
+## Implementation Files
+
+- `lib/app/app_colors.dart`
+- `lib/app/app_typography.dart`
+- `lib/app/app_spacing.dart`
+- `lib/app/app_radius.dart`
+- `lib/app/app_components.dart`
+- `lib/app/app_theme.dart`
+
+## States
+
+- Loading: Use Material progress indicators with the active ColorScheme primary color.
+- Empty: Use a low surface Card, neutral outlined icon, title, and short recovery action text.
+- Error: Use ColorScheme.error and short user-actionable copy.
+- Disabled: Use default Material disabled treatment from ThemeData.
+- Success: Use `AppColors.success` when a dedicated success signal is needed; completion checks primarily use ColorScheme.primary.
+
+## Accessibility
+
+- Do not communicate status by color alone; pair icons and text.
+- Keep primary tap targets at Material defaults.
+- Use TextTheme roles instead of fixed font sizes so user font scaling remains viable.
+- Prefer ColorScheme pairs such as `primary/onPrimary` and `surface/onSurface` for contrast.
+
+## Dark Mode
+
+Dark mode uses the same seed color with dark brightness. Components rely on ColorScheme surface containers, not hardcoded white/black values.

@@ -1,106 +1,106 @@
-# Supplement Routine User Flow
+# Supplement Routine 사용자 흐름
 
-## 1. Primary User Goals
+## 1. 대표 사용자 목표
 
-1. Check what to take today.
-2. Mark an intake as completed.
-3. Register a new supplement rule.
-4. Review recent history.
-5. Adjust reminder and meal-time defaults.
+1. 오늘 먹어야 할 영양제를 확인한다.
+2. 복용 후 체크한다.
+3. 새로운 영양제 복용 규칙을 등록한다.
+4. 최근 기록을 돌아본다.
+5. 알림과 식사 시간 기준을 조정한다.
 
-## 2. Core Flow
+## 2. 기본 흐름
 
 ```mermaid
 flowchart TD
-    A["Open App"] --> B["Today Screen"]
-    B --> C{"Any schedule today?"}
-    C -->|Yes| D["Review intake list"]
-    D --> E["Check completed intake"]
-    E --> F["Progress updates"]
-    C -->|No| G["Empty state"]
-    G --> H["Go to add supplement"]
+    A["앱 실행"] --> B["오늘 화면"]
+    B --> C{"오늘 일정 있음?"}
+    C -->|예| D["복용 목록 확인"]
+    D --> E["복용 후 체크"]
+    E --> F["진행률 갱신"]
+    C -->|아니오| G["빈 상태 확인"]
+    G --> H["영양제 등록 이동"]
 ```
 
-## 3. Add Supplement Flow
+## 3. 영양제 등록 흐름
 
 ```mermaid
 flowchart TD
-    A["Today or Supplements"] --> B["Tap add"]
-    B --> C["Enter name"]
-    C --> D["Enter dosage"]
-    D --> E{"Choose method"}
-    E -->|Routine-based| F["Choose intake slots"]
-    E -->|Manual time| G{"Choose detail"}
-    G -->|Fixed time| H["Enter times"]
-    G -->|Interval| I["Enter start time and interval"]
-    F --> J["Set reminder and memo"]
+    A["오늘 또는 영양제 화면"] --> B["추가 버튼"]
+    B --> C["이름 입력"]
+    C --> D["복용량 입력"]
+    D --> E{"복용 방식 선택"}
+    E -->|식사/생활 루틴| F["복용 조건 선택"]
+    E -->|직접 시간 지정| G{"세부 방식"}
+    G -->|특정 시각| H["복용 시각 입력"]
+    G -->|일정 간격| I["시작 시각과 간격 입력"]
+    F --> J["알림 여부와 메모 입력"]
     H --> J
     I --> J
-    J --> K["Save"]
-    K --> L["Today schedule updates"]
+    J --> K["등록 완료"]
+    K --> L["오늘 일정 반영"]
 ```
 
-## 4. Check-In Flow
+## 4. 복용 체크 흐름
 
 ```mermaid
 flowchart TD
-    A["Today Screen"] --> B["Tap intake item"]
-    B --> C{"Current state"}
-    C -->|Incomplete| D["Mark done"]
-    C -->|Done| E["Undo completion"]
-    D --> F["Persist record"]
+    A["오늘 화면"] --> B["복용 항목 탭"]
+    B --> C{"현재 상태"}
+    C -->|미완료| D["완료 처리"]
+    C -->|완료| E["완료 해제"]
+    D --> F["기록 저장"]
     E --> F
-    F --> G["Update progress / widget / history"]
+    F --> G["진행률/홈 위젯/기록 화면 갱신"]
 ```
 
-## 5. History Flow
+## 5. 기록 확인 흐름
 
 ```mermaid
 flowchart TD
-    A["History tab"] --> B["Today's summary"]
-    B --> C["Monthly completion calendar"]
-    C --> D["Recent two-week list"]
+    A["하단 기록 탭"] --> B["오늘 기록 요약"]
+    B --> C["이번 달 완료율 캘린더"]
+    C --> D["최근 2주 기록 리스트"]
 ```
 
-## 6. Settings Flow
+## 6. 설정 변경 흐름
 
 ```mermaid
 flowchart TD
-    A["Settings tab"] --> B{"What changes?"}
-    B -->|Meal time| C["Meal time bottom sheet"]
-    C --> D["Recalculate today's schedule"]
-    B -->|Default reminder| E["Toggle default"]
-    E --> F["Apply to future add form"]
-    B -->|Reset data| G["Confirm dialog"]
-    G --> H["Delete supplements and records"]
+    A["설정 탭"] --> B{"무엇을 바꿀까?"}
+    B -->|식사 시간| C["식사 시간 Bottom Sheet"]
+    C --> D["오늘 일정 재계산"]
+    B -->|기본 알림| E["알림 기본값 토글"]
+    E --> F["다음 등록 폼 기본값 반영"]
+    B -->|데이터 초기화| G["확인 Dialog"]
+    G --> H["영양제와 기록 삭제"]
 ```
 
-## 7. Notification Flow
+## 7. 알림 흐름
 
 ```mermaid
 flowchart TD
-    A["Supplement reminder enabled"] --> B["Generate today's schedule"]
-    B --> C["Check exact alarm permission"]
-    C -->|Granted| D["Schedule exact reminder"]
-    C -->|Denied| E["Schedule inexact fallback"]
-    D --> F["On-time notification"]
-    E --> G["Potentially delayed notification"]
+    A["알림 사용 영양제 존재"] --> B["오늘 일정 생성"]
+    B --> C["정확한 알림 권한 확인"]
+    C -->|허용| D["exact 알림 예약"]
+    C -->|미허용| E["inexact 알림 예약"]
+    D --> F["예정 시각 알림"]
+    E --> G["지연 가능 알림"]
 ```
 
-## 8. Exception Flows
+## 8. 예외 흐름
 
-| Situation | System Response | User Need |
+| 상황 | 시스템 반응 | 사용자 기대 |
 | --- | --- | --- |
-| Missing supplement name | Block save + validation message | Know what to fix immediately |
-| Dosage is zero or less | Block save + validation message | Understand allowed input |
-| Routine slots missing | Block save + validation message | Know that a required field is missing |
-| No schedule today | Show empty state | Reach registration action quickly |
-| Exact alarm permission denied | Fall back to inexact reminders | Need future settings guidance |
+| 영양제 이름 누락 | 저장 차단 + 오류 문구 | 무엇을 고쳐야 하는지 즉시 알 수 있음 |
+| 복용량 0 이하 | 저장 차단 + 오류 문구 | 허용 범위를 이해할 수 있음 |
+| 루틴 조건 미선택 | 저장 차단 + 오류 문구 | 필수 입력 누락을 알 수 있음 |
+| 일정 없음 | 빈 상태 노출 | 바로 등록 행동으로 이어질 수 있음 |
+| 정확한 알림 권한 미허용 | inexact 알림 폴백 | 향후 설정 안내가 필요함 |
 
-## 9. UX Principles
+## 9. UX 원칙
 
-- Users should understand today's next action within 3 seconds.
-- Check-in should take one tap.
-- Registration should not require health expertise.
-- High-frequency screens favor scanability over decoration.
-- Medical judgment stays outside product scope.
+- 첫 진입 후 3초 안에 오늘 할 일을 이해할 수 있어야 합니다.
+- 복용 체크는 한 번의 탭으로 끝나야 합니다.
+- 등록 흐름은 건강 지식이 없어도 완료할 수 있어야 합니다.
+- 사용자가 반복적으로 보는 화면일수록 장식보다 스캔성을 우선합니다.
+- 의료적 판단이 필요한 질문은 제품 범위 밖으로 둡니다.
