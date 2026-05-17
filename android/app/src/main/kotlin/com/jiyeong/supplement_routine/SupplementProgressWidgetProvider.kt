@@ -91,6 +91,11 @@ class SupplementProgressWidgetProvider : AppWidgetProvider() {
                     nextName.orEmpty(),
                 )
             }
+            val nextLabel = if (hasNext) {
+                context.getString(R.string.widget_next_label)
+            } else {
+                context.getString(R.string.widget_status_label)
+            }
 
             val views = RemoteViews(context.packageName, R.layout.supplement_progress_widget)
             views.setTextViewText(R.id.widgetTitle, context.getString(R.string.widget_title))
@@ -99,6 +104,7 @@ class SupplementProgressWidgetProvider : AppWidgetProvider() {
                 R.id.widgetCount,
                 context.getString(R.string.widget_progress_count, doneCount, totalCount),
             )
+            views.setTextViewText(R.id.widgetNextLabel, nextLabel)
             views.setTextViewText(R.id.widgetNext, nextText)
             views.setProgressBar(R.id.widgetProgress, 100, percent, false)
             views.setOnClickPendingIntent(R.id.widgetRoot, createLaunchPendingIntent(context))

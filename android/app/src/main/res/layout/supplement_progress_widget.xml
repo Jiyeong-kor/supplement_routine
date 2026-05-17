@@ -11,31 +11,81 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
+        android:gravity="bottom"
         android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/widgetTitle"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="@string/widget_title"
-            android:textColor="@color/widget_on_surface"
-            android:textSize="@dimen/widget_title_text_size"
-            android:textStyle="bold" />
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/widgetPercent"
+            <TextView
+                android:id="@+id/widgetTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/widget_title"
+                android:textColor="@color/widget_on_surface_variant"
+                android:textSize="@dimen/widget_title_text_size"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widgetNextLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/widget_next_label_margin_top"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/widget_next_label"
+                android:textColor="@color/widget_on_surface_variant"
+                android:textSize="@dimen/widget_label_text_size" />
+
+            <TextView
+                android:id="@+id/widgetNext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/widget_next_margin_top"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/widget_empty"
+                android:textColor="@color/widget_on_surface"
+                android:textSize="@dimen/widget_next_text_size"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="@string/widget_percent_default"
-            android:textColor="@color/widget_primary"
-            android:textSize="@dimen/widget_percent_text_size"
-            android:textStyle="bold" />
+            android:gravity="end"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/widgetPercent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/widget_percent_default"
+                android:textColor="@color/widget_primary"
+                android:textSize="@dimen/widget_percent_text_size"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widgetCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/supplement_widget_count_background"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:paddingHorizontal="@dimen/widget_count_horizontal_padding"
+                android:paddingVertical="@dimen/widget_count_vertical_padding"
+                android:text="@string/widget_progress_count_default"
+                android:textColor="@color/widget_on_primary_container"
+                android:textSize="@dimen/widget_body_text_size"
+                android:textStyle="bold" />
+        </LinearLayout>
     </LinearLayout>
 
     <ProgressBar
@@ -47,37 +97,4 @@
         android:max="100"
         android:progress="0"
         android:progressDrawable="@drawable/supplement_widget_progress" />
-
-    <TextView
-        android:id="@+id/widgetCount"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/widget_section_margin_top"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:text="@string/widget_progress_count_default"
-        android:textColor="@color/widget_on_surface_variant"
-        android:textSize="@dimen/widget_body_text_size" />
-
-    <TextView
-        android:id="@+id/widgetNextLabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/widget_next_label_margin_top"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:text="@string/widget_next_label"
-        android:textColor="@color/widget_on_surface_variant"
-        android:textSize="@dimen/widget_label_text_size" />
-
-    <TextView
-        android:id="@+id/widgetNext"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/widget_next_margin_top"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:text="@string/widget_empty"
-        android:textColor="@color/widget_on_surface"
-        android:textSize="@dimen/widget_body_text_size" />
 </LinearLayout>
