@@ -193,6 +193,8 @@ Supplement Routine targets Android first and follows Material Design 3.
 
 See also:
 
+- [Information Architecture](docs/information_architecture.md)
+- [User Flow](docs/user_flow.md)
 - [Korean Design System](docs/design_system_ko.md)
 - [Design System](docs/design_system.md)
 - [Android Release Signing](docs/release_signing.md)

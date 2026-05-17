@@ -24,6 +24,41 @@ Supplement Routine is a routine and record management app, not a medical advice 
 - Dialogs and bottom sheets: Rounded 24px containers using M3 surface containers.
 - Navigation: Bottom NavigationBar with always visible labels for 4 primary destinations.
 
+## Tokens
+
+| Category | Token | Value |
+| --- | --- | --- |
+| Color | `AppColors.seed` | `#1A237E` |
+| Color | `AppColors.success` | `#1B5E20` |
+| Color | `AppColors.warning` | `#E65100` |
+| Color | `AppColors.error` | `#B71C1C` |
+| Spacing | `xxs / xs / sm / md / lg / xl / xxl / xxxl` | `4 / 6 / 8 / 12 / 16 / 20 / 24 / 32` |
+| Radius | `sm / md / lg / xl / pill` | `8 / 12 / 16 / 24 / 999` |
+| Typography | `Pretendard` | `400 / 500 / 600 / 700` |
+
+## Component Rules
+
+| Component | Rule |
+| --- | --- |
+| AppBar | `centerTitle: false`, surface background, zero elevation |
+| NavigationBar | Four destinations, labels always visible |
+| Card | Low tonal surface, zero elevation, outline variant border |
+| FilledButton | Primary actions such as save/complete |
+| TextButton | Secondary dialog actions |
+| TextField | Filled field, 12px radius, distinct focus/error borders |
+| BottomSheet | 24px top radius, drag handle |
+| Dialog | 16px+ radius, clear CTA |
+| Empty State | Icon + title + short recovery copy |
+
+## Implementation Files
+
+- `lib/app/app_colors.dart`
+- `lib/app/app_typography.dart`
+- `lib/app/app_spacing.dart`
+- `lib/app/app_radius.dart`
+- `lib/app/app_components.dart`
+- `lib/app/app_theme.dart`
+
 ## States
 
 - Loading: Use Material progress indicators with the active ColorScheme primary color.

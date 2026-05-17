@@ -192,6 +192,8 @@ Supplement Routine은 Android 우선 앱으로 Material Design 3를 따릅니다
 
 자세한 디자인 결정은 다음 문서를 참고합니다.
 
+- [정보 구조(IA)](docs/information_architecture_ko.md)
+- [사용자 흐름](docs/user_flow_ko.md)
 - [디자인 시스템 문서](docs/design_system_ko.md)
 - [Design System](docs/design_system.md)
 - [Android 릴리즈 서명](docs/release_signing_ko.md)
