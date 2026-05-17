@@ -26,12 +26,12 @@ Supplement Routine is a routine and record management app, not a medical advice 
 
 ## Tokens
 
-| Category | Token | Preview | Value |
+| Category | Token | Value | Preview |
 | --- | --- | --- | --- |
-| Color | `AppColors.seed` | ![Seed](assets/colors/seed.svg) | `#1A237E` |
-| Color | `AppColors.success` | ![Success](assets/colors/success.svg) | `#1B5E20` |
-| Color | `AppColors.warning` | ![Warning](assets/colors/warning.svg) | `#E65100` |
-| Color | `AppColors.error` | ![Error](assets/colors/error.svg) | `#B71C1C` |
+| Color | `AppColors.seed` | `#1A237E` | ![Seed](assets/colors/seed.svg) |
+| Color | `AppColors.success` | `#1B5E20` | ![Success](assets/colors/success.svg) |
+| Color | `AppColors.warning` | `#E65100` | ![Warning](assets/colors/warning.svg) |
+| Color | `AppColors.error` | `#B71C1C` | ![Error](assets/colors/error.svg) |
 | Spacing | `xxs / xs / sm / md / lg / xl / xxl / xxxl` | `4 / 6 / 8 / 12 / 16 / 20 / 24 / 32` |
 | Radius | `sm / md / lg / xl / pill` | `8 / 12 / 16 / 24 / 999` |
 | Typography | `Pretendard` | `400 / 500 / 600 / 700` |
