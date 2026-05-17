@@ -700,6 +700,42 @@ abstract class AppLocalizations {
   /// **'새 영양제 등록 시 알림을 기본으로 끕니다'**
   String get settingsNotificationOff;
 
+  /// No description provided for @settingsExactAlarmTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'정확한 알림 권한'**
+  String get settingsExactAlarmTitle;
+
+  /// No description provided for @settingsExactAlarmChecking.
+  ///
+  /// In ko, this message translates to:
+  /// **'권한 상태를 확인하는 중입니다'**
+  String get settingsExactAlarmChecking;
+
+  /// No description provided for @settingsExactAlarmGranted.
+  ///
+  /// In ko, this message translates to:
+  /// **'예정한 시각에 맞춰 알림을 보낼 수 있습니다'**
+  String get settingsExactAlarmGranted;
+
+  /// No description provided for @settingsExactAlarmRequired.
+  ///
+  /// In ko, this message translates to:
+  /// **'정확한 알림이 꺼져 있어 알림이 늦어질 수 있습니다'**
+  String get settingsExactAlarmRequired;
+
+  /// No description provided for @settingsExactAlarmEnabled.
+  ///
+  /// In ko, this message translates to:
+  /// **'정확한 알림을 사용할 수 있습니다.'**
+  String get settingsExactAlarmEnabled;
+
+  /// No description provided for @settingsExactAlarmStillDisabled.
+  ///
+  /// In ko, this message translates to:
+  /// **'정확한 알림 권한이 아직 꺼져 있습니다.'**
+  String get settingsExactAlarmStillDisabled;
+
   /// No description provided for @settingsDataSection.
   ///
   /// In ko, this message translates to:

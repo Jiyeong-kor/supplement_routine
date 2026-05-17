@@ -95,7 +95,7 @@ flowchart TD
 | Dosage is zero or less | Block save + validation message | Understand allowed input |
 | Routine slots missing | Block save + validation message | Know that a required field is missing |
 | No schedule today | Show empty state | Reach registration action quickly |
-| Exact alarm permission denied | Fall back to inexact reminders | Need future settings guidance |
+| Exact alarm permission denied | Fall back to inexact reminders and show guidance in Settings | Users can understand the delay risk and re-enable the permission |
 
 ## 9. UX Principles
 

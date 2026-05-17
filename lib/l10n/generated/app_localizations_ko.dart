@@ -343,6 +343,24 @@ class AppLocalizationsKo extends AppLocalizations {
   String get settingsNotificationOff => '새 영양제 등록 시 알림을 기본으로 끕니다';
 
   @override
+  String get settingsExactAlarmTitle => '정확한 알림 권한';
+
+  @override
+  String get settingsExactAlarmChecking => '권한 상태를 확인하는 중입니다';
+
+  @override
+  String get settingsExactAlarmGranted => '예정한 시각에 맞춰 알림을 보낼 수 있습니다';
+
+  @override
+  String get settingsExactAlarmRequired => '정확한 알림이 꺼져 있어 알림이 늦어질 수 있습니다';
+
+  @override
+  String get settingsExactAlarmEnabled => '정확한 알림을 사용할 수 있습니다.';
+
+  @override
+  String get settingsExactAlarmStillDisabled => '정확한 알림 권한이 아직 꺼져 있습니다.';
+
+  @override
   String get settingsDataSection => '데이터 관리';
 
   @override

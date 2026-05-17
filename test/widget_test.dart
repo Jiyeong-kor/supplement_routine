@@ -211,6 +211,15 @@ void main() {
     expect(find.byIcon(Icons.notifications_off_outlined), findsWidgets);
   });
 
+  testWidgets('설정 화면은 정확한 알림 권한 상태를 안내한다', (WidgetTester tester) async {
+    await tester.pumpWidget(const ProviderScope(child: SupplementRoutineApp()));
+
+    await tester.tap(find.text('설정'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('정확한 알림 권한'), findsOneWidget);
+  });
+
   testWidgets('영양제 목록에서 알림 여부를 변경한다', (WidgetTester tester) async {
     await tester.pumpWidget(const ProviderScope(child: SupplementRoutineApp()));
 
@@ -315,9 +324,7 @@ void main() {
     expect(find.byType(GridView), findsOneWidget);
   });
 
-  testWidgets('태블릿 가로 화면의 기록은 2단 구성을 사용한다', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('태블릿 가로 화면의 기록은 2단 구성을 사용한다', (WidgetTester tester) async {
     tester.view.physicalSize = const Size(1280, 800);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);

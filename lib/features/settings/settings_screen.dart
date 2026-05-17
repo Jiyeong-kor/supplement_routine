@@ -1,11 +1,14 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supplement_routine/app/app_layout.dart';
 import 'package:supplement_routine/app/app_spacing.dart';
 import 'package:supplement_routine/app/app_config.dart';
+import 'package:supplement_routine/core/services/intake_notification_service.dart';
 import 'package:supplement_routine/core/utils/time_utils.dart';
 import 'package:supplement_routine/features/settings/settings_provider.dart';
 import 'package:supplement_routine/features/supplement/supplement_provider.dart';
+import 'package:supplement_routine/features/today/today_provider.dart';
 import 'package:supplement_routine/l10n/generated/app_localizations.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -16,6 +19,8 @@ class SettingsScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final mealTimeSettings = ref.watch(mealTimeSettingsProvider);
     final isNotificationEnabled = ref.watch(notificationSettingsProvider);
+    final exactAlarmPermission = ref.watch(exactAlarmPermissionProvider);
+    final isExactAlarmGranted = exactAlarmPermission.asData?.value;
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
@@ -54,6 +59,50 @@ class SettingsScreen extends ConsumerWidget {
                     .updateEnabled(value);
               },
             ),
+            if (defaultTargetPlatform == TargetPlatform.android)
+              ListTile(
+                leading: Icon(Icons.alarm, color: colorScheme.primary),
+                title: Text(l10n.settingsExactAlarmTitle),
+                subtitle: Text(
+                  exactAlarmPermission.when(
+                    data: (isGranted) => isGranted
+                        ? l10n.settingsExactAlarmGranted
+                        : l10n.settingsExactAlarmRequired,
+                    loading: () => l10n.settingsExactAlarmChecking,
+                    error: (_, _) => l10n.settingsExactAlarmRequired,
+                  ),
+                ),
+                trailing: isExactAlarmGranted == false
+                    ? const Icon(Icons.chevron_right)
+                    : null,
+                onTap: isExactAlarmGranted == false
+                    ? () async {
+                        final isGranted =
+                            await IntakeNotificationService.requestExactAlarmPermission();
+                        ref.invalidate(exactAlarmPermissionProvider);
+
+                        if (isGranted) {
+                          await IntakeNotificationService.syncTodayReminders(
+                            ref.read(todayListProvider),
+                          );
+                        }
+
+                        if (!context.mounted) {
+                          return;
+                        }
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              isGranted
+                                  ? l10n.settingsExactAlarmEnabled
+                                  : l10n.settingsExactAlarmStillDisabled,
+                            ),
+                          ),
+                        );
+                      }
+                    : null,
+              ),
             const Divider(),
             _SettingsSectionTitle(l10n.settingsDataSection),
             ListTile(

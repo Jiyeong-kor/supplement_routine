@@ -40,7 +40,7 @@ class IntakeNotificationService {
 
       await _notifications.initialize(settings: initializationSettings);
       await _requestAndroidNotificationPermission();
-      await _requestExactAlarmPermission();
+      await requestExactAlarmPermission();
       _isInitialized = true;
     } on MissingPluginException {
       return;
@@ -118,21 +118,41 @@ class IntakeNotificationService {
     await androidImplementation?.requestNotificationsPermission();
   }
 
-  static Future<void> _requestExactAlarmPermission() async {
+  static Future<bool> canScheduleExactNotifications() async {
+    if (kIsWeb) {
+      return true;
+    }
+
+    try {
+      final androidImplementation = _notifications
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
+
+      _canScheduleExactNotifications =
+          await androidImplementation?.canScheduleExactNotifications() ?? false;
+      return _canScheduleExactNotifications;
+    } on MissingPluginException {
+      return false;
+    } on PlatformException {
+      return false;
+    }
+  }
+
+  static Future<bool> requestExactAlarmPermission() async {
     final androidImplementation = _notifications
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
         >();
 
-    final canScheduleExactNotifications =
-        await androidImplementation?.canScheduleExactNotifications() ?? false;
-    if (canScheduleExactNotifications) {
-      _canScheduleExactNotifications = true;
-      return;
+    final canSchedule = await canScheduleExactNotifications();
+    if (canSchedule) {
+      return true;
     }
 
     _canScheduleExactNotifications =
         await androidImplementation?.requestExactAlarmsPermission() ?? false;
+    return _canScheduleExactNotifications;
   }
 
   static String reminderBody(String supplementName) {
