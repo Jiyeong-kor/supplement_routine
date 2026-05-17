@@ -285,6 +285,21 @@ void main() {
     expect(find.byType(NavigationBar), findsNothing);
   });
 
+  testWidgets('태블릿 가로 화면에서는 navigation rail을 사용한다', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1280, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const ProviderScope(child: SupplementRoutineApp()));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(NavigationRail), findsOneWidget);
+    expect(find.byType(NavigationBar), findsNothing);
+  });
+
   testWidgets('넓은 화면의 영양제 목록은 2열 그리드를 사용한다', (WidgetTester tester) async {
     tester.view.physicalSize = const Size(1200, 900);
     tester.view.devicePixelRatio = 1;
@@ -298,6 +313,25 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(GridView), findsOneWidget);
+  });
+
+  testWidgets('태블릿 가로 화면의 기록은 2단 구성을 사용한다', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1280, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const ProviderScope(child: SupplementRoutineApp()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.calendar_month_outlined));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Row), findsWidgets);
+    expect(find.text('오늘 기록'), findsOneWidget);
+    expect(find.text('이번 달 기록'), findsOneWidget);
   });
 
   testWidgets('처음 시작할 때 선택하지 않은 탭 화면은 지연 생성한다', (WidgetTester tester) async {
