@@ -31,8 +31,33 @@ class AppColors {
         outlineVariant: const Color(0xFFEEEEEE),
       );
 
-  static ColorScheme darkScheme = ColorScheme.fromSeed(
-    seedColor: seed,
-    brightness: Brightness.dark,
-  ).copyWith(surface: const Color(0xFF121212), onSurface: Colors.white);
+  static ColorScheme darkScheme =
+      ColorScheme.fromSeed(
+        seedColor: seed,
+        brightness: Brightness.dark,
+      ).copyWith(
+        primary: const Color(0xFFBEC2FF),
+        onPrimary: const Color(0xFF202B78),
+        primaryContainer: const Color(0xFF313A8F),
+        onPrimaryContainer: const Color(0xFFE0E0FF),
+        secondary: const Color(0xFFC4C7D0),
+        onSecondary: const Color(0xFF2D3038),
+        secondaryContainer: const Color(0xFF424650),
+        onSecondaryContainer: const Color(0xFFE0E2EC),
+        tertiary: const Color(0xFFE0B8FF),
+        onTertiary: const Color(0xFF44235E),
+        tertiaryContainer: const Color(0xFF5D3A77),
+        onTertiaryContainer: const Color(0xFFF3DAFF),
+        surface: const Color(0xFF141318),
+        onSurface: const Color(0xFFE6E1E9),
+        surfaceContainerLow: const Color(0xFF1D1B20),
+        surfaceContainer: const Color(0xFF211F26),
+        surfaceContainerHigh: const Color(0xFF2B2930),
+        surfaceContainerHighest: const Color(0xFF36343B),
+        onSurfaceVariant: const Color(0xFFC9C5D0),
+        error: const Color(0xFFFFB4AB),
+        onError: const Color(0xFF690005),
+        outline: const Color(0xFF938F99),
+        outlineVariant: const Color(0xFF49454F),
+      );
 }

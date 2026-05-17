@@ -141,7 +141,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: AppRadius.smBorder),
         labelStyle: textTheme.labelLarge,
         selectedColor: colorScheme.primary,
-        secondaryLabelStyle: const TextStyle(color: Colors.white),
+        secondaryLabelStyle: TextStyle(color: colorScheme.onPrimary),
         side: BorderSide(color: colorScheme.outlineVariant),
       ),
     );

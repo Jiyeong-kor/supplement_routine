@@ -22,7 +22,7 @@ Supplement Routine is a routine and record management app, not a medical advice 
 - Text fields: Filled M3 fields with clear focused and error borders.
 - Cards: Tonal low surfaces with outline variant borders.
 - Dialogs and bottom sheets: Rounded 24px containers using M3 surface containers.
-- Navigation: Bottom NavigationBar with always visible labels for 4 primary destinations.
+- Navigation: NavigationBar on compact widths and NavigationRail on expanded widths.
 
 ## Tokens
 
@@ -40,8 +40,8 @@ Supplement Routine is a routine and record management app, not a medical advice 
 
 | Component | Rule |
 | --- | --- |
-| AppBar | `centerTitle: false`, surface background, zero elevation |
-| NavigationBar | Four destinations, labels always visible |
+| AppBar | `centerTitle: false`, surface background, low scrolled-under elevation |
+| Navigation | NavigationBar on compact widths, NavigationRail on expanded widths |
 | Card | Low tonal surface, zero elevation, outline variant border |
 | FilledButton | Primary actions such as save/complete |
 | TextButton | Secondary dialog actions |
@@ -76,4 +76,4 @@ Supplement Routine is a routine and record management app, not a medical advice 
 
 ## Dark Mode
 
-Dark mode uses the same seed color with dark brightness. Components rely on ColorScheme surface containers, not hardcoded white/black values.
+Dark mode keeps the same seed family while tuning `surface`, `surfaceContainer*`, `onSurface*`, and `primaryContainer` values separately so hierarchy and contrast remain clear. Components rely on ColorScheme surfaces instead of hardcoded white or black values.
