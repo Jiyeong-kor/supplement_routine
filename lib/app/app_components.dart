@@ -7,14 +7,14 @@ class AppComponents {
   static ButtonStyle filledButtonStyle(ColorScheme colorScheme) {
     return FilledButton.styleFrom(
       minimumSize: const Size.fromHeight(52),
-      shape: RoundedRectangleBorder(borderRadius: AppRadius.mdBorder),
+      shape: const StadiumBorder(),
       textStyle: const TextStyle(fontWeight: FontWeight.w600),
     );
   }
 
   static ButtonStyle textButtonStyle(ColorScheme colorScheme) {
     return TextButton.styleFrom(
-      shape: RoundedRectangleBorder(borderRadius: AppRadius.mdBorder),
+      shape: const StadiumBorder(),
       textStyle: const TextStyle(fontWeight: FontWeight.w600),
     );
   }

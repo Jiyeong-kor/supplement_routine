@@ -37,7 +37,7 @@ class AppTheme {
           horizontal: AppSpacing.screen,
           vertical: AppSpacing.xs,
         ),
-        color: colorScheme.surface,
+        color: colorScheme.surfaceContainerLow,
         shape: AppComponents.cardShape(colorScheme),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -80,8 +80,8 @@ class AppTheme {
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: colorScheme.primary,
         foregroundColor: colorScheme.onPrimary,
-        elevation: 4,
-        shape: const CircleBorder(),
+        elevation: 3,
+        shape: RoundedRectangleBorder(borderRadius: AppRadius.lgBorder),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: AppComponents.filledButtonStyle(colorScheme),
@@ -90,31 +90,31 @@ class AppTheme {
         style: AppComponents.textButtonStyle(colorScheme),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
-        style: FilledButton.styleFrom(
-          backgroundColor: colorScheme.primary,
-          foregroundColor: colorScheme.onPrimary,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: colorScheme.surfaceContainerLow,
+          foregroundColor: colorScheme.primary,
           minimumSize: const Size.fromHeight(54),
-          elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: AppRadius.mdBorder),
+          elevation: 1,
+          shape: const StadiumBorder(),
           textStyle: textTheme.labelLarge?.copyWith(
             fontWeight: FontWeight.w600,
           ),
         ),
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: colorScheme.surface,
+        backgroundColor: colorScheme.surfaceContainer,
         surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: AppRadius.lgBorder),
+        shape: RoundedRectangleBorder(borderRadius: AppRadius.xxlBorder),
         titleTextStyle: textTheme.titleLarge,
         contentTextStyle: textTheme.bodyMedium,
       ),
       bottomSheetTheme: BottomSheetThemeData(
-        backgroundColor: colorScheme.surface,
-        modalBackgroundColor: colorScheme.surface,
+        backgroundColor: colorScheme.surfaceContainer,
+        modalBackgroundColor: colorScheme.surfaceContainer,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
-            top: Radius.circular(AppRadius.xl),
+            top: Radius.circular(AppRadius.xxl),
           ),
         ),
       ),

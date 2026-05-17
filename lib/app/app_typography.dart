@@ -14,7 +14,7 @@ class AppTypography {
     return themedBase.copyWith(
       titleLarge: themedBase.titleLarge?.copyWith(
         fontFamily: fontFamily,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w700,
         letterSpacing: 0,
       ),
       titleMedium: themedBase.titleMedium?.copyWith(

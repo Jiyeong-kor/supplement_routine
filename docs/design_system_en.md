@@ -15,7 +15,7 @@ Supplement Routine is a routine and record management app, not a medical advice 
 - Color scheme: Sage green seed color with warm neutral surfaces for a calm routine-management tone. Success, warning, and error colors are explicit app tokens.
 - Typography: Pretendard static font files, weights 400, 500, 600, and 700. Material 3 text roles are preserved, body copy stays light, and emphasis increases gradually across title roles.
 - Spacing: 4-point scale with common screen and card padding tokens.
-- Shape: 8px for compact controls, 12px for cards and inputs, 16px for prominent actions, 24px for dialogs and bottom sheets.
+- Shape: 8px for compact controls, 12px for cards and inputs, 16px for prominent actions, and 28px for larger containers.
 - Elevation: Mostly zero elevation with outlined/tonal surfaces. This keeps the app quiet and suitable for repeated daily use.
 - Icons: Material outlined icons by default, filled icons for selected navigation state.
 - Buttons: Filled buttons for primary form actions, text buttons for dialogs.
@@ -34,7 +34,7 @@ Supplement Routine is a routine and record management app, not a medical advice 
 | Color | `AppColors.warning` | `#B26A00` | ![Warning](assets/colors/warning.svg) |
 | Color | `AppColors.error` | `#B3261E` | ![Error](assets/colors/error.svg) |
 | Spacing | `xxs / xs / sm / md / lg / xl / xxl / xxxl` | `4 / 6 / 8 / 12 / 16 / 20 / 24 / 32` |
-| Radius | `sm / md / lg / xl / pill` | `8 / 12 / 16 / 24 / 999` |
+| Radius | `sm / md / lg / xl / xxl / pill` | `8 / 12 / 16 / 24 / 28 / 999` |
 | Typography | `Pretendard` | `400 / 500 / 600 / 700` |
 
 ## Component Rules
@@ -48,8 +48,8 @@ Supplement Routine is a routine and record management app, not a medical advice 
 | FilledButton | Primary actions such as save/complete |
 | TextButton | Secondary dialog actions |
 | TextField | Filled field, 12px radius, distinct focus/error borders |
-| BottomSheet | 24px top radius, drag handle |
-| Dialog | 16px+ radius, clear CTA |
+| BottomSheet | 28px top radius, drag handle |
+| Dialog | 28px radius, clear CTA |
 | Empty State | Icon + title + short recovery copy |
 
 ## Implementation Files
