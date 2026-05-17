@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:supplement_routine/core/services/intake_notification_copy.dart';
 import 'package:supplement_routine/core/services/intake_notification_service.dart';
 
@@ -22,5 +23,23 @@ void main() {
     );
 
     expect(IntakeNotificationService.reminderBody('비타민 D'), '비타민 D 테스트 알림');
+  });
+
+  test('정확한 알림 권한이 있으면 exact 스케줄 모드를 사용한다', () {
+    expect(
+      IntakeNotificationService.scheduleModeFor(
+        canScheduleExactNotifications: true,
+      ),
+      AndroidScheduleMode.exactAllowWhileIdle,
+    );
+  });
+
+  test('정확한 알림 권한이 없으면 inexact 스케줄 모드로 폴백한다', () {
+    expect(
+      IntakeNotificationService.scheduleModeFor(
+        canScheduleExactNotifications: false,
+      ),
+      AndroidScheduleMode.inexactAllowWhileIdle,
+    );
   });
 }

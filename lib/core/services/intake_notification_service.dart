@@ -14,6 +14,7 @@ class IntakeNotificationService {
       FlutterLocalNotificationsPlugin();
 
   static var _isInitialized = false;
+  static var _canScheduleExactNotifications = false;
   static var _copy = IntakeNotificationCopy.ko();
 
   static const _channelId = 'intake_reminders';
@@ -39,6 +40,7 @@ class IntakeNotificationService {
 
       await _notifications.initialize(settings: initializationSettings);
       await _requestAndroidNotificationPermission();
+      await _requestExactAlarmPermission();
       _isInitialized = true;
     } on MissingPluginException {
       return;
@@ -74,7 +76,9 @@ class IntakeNotificationService {
           body: reminderBody(item.supplement.name),
           scheduledDate: _nextSchedule(item),
           notificationDetails: _notificationDetails,
-          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+          androidScheduleMode: scheduleModeFor(
+            canScheduleExactNotifications: _canScheduleExactNotifications,
+          ),
           matchDateTimeComponents: DateTimeComponents.time,
           payload: item.record.id,
         );
@@ -95,8 +99,33 @@ class IntakeNotificationService {
     await androidImplementation?.requestNotificationsPermission();
   }
 
+  static Future<void> _requestExactAlarmPermission() async {
+    final androidImplementation = _notifications
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+
+    final canScheduleExactNotifications =
+        await androidImplementation?.canScheduleExactNotifications() ?? false;
+    if (canScheduleExactNotifications) {
+      _canScheduleExactNotifications = true;
+      return;
+    }
+
+    _canScheduleExactNotifications =
+        await androidImplementation?.requestExactAlarmsPermission() ?? false;
+  }
+
   static String reminderBody(String supplementName) {
     return _copy.reminderBody(supplementName);
+  }
+
+  static AndroidScheduleMode scheduleModeFor({
+    required bool canScheduleExactNotifications,
+  }) {
+    return canScheduleExactNotifications
+        ? AndroidScheduleMode.exactAllowWhileIdle
+        : AndroidScheduleMode.inexactAllowWhileIdle;
   }
 
   static NotificationDetails get _notificationDetails {
