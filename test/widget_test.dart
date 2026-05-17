@@ -285,6 +285,19 @@ void main() {
     expect(find.byType(NavigationBar), findsNothing);
   });
 
+  testWidgets('처음 시작할 때 선택하지 않은 탭 화면은 지연 생성한다', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const ProviderScope(child: SupplementRoutineApp()));
+
+    expect(find.text('이번 달 기록'), findsNothing);
+
+    await tester.tap(find.byIcon(Icons.calendar_month_outlined));
+    await tester.pumpAndSettle();
+
+    expect(find.text('이번 달 기록'), findsOneWidget);
+  });
+
   test('식사 시간 설정 변경은 오늘 루틴 일정에 반영된다', () {
     final container = ProviderContainer();
     addTearDown(container.dispose);

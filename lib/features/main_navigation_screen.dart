@@ -16,11 +16,11 @@ class MainNavigationScreen extends StatefulWidget {
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _screens = [
+  final List<Widget?> _screens = [
     const TodayScreen(),
-    const SupplementListScreen(),
-    const HistoryScreen(),
-    const SettingsScreen(),
+    null,
+    null,
+    null,
   ];
 
   @override
@@ -75,7 +75,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 Expanded(
                   child: IndexedStack(
                     index: _selectedIndex,
-                    children: _screens,
+                    children: _stackChildren,
                   ),
                 ),
               ],
@@ -84,7 +84,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         }
 
         return Scaffold(
-          body: IndexedStack(index: _selectedIndex, children: _screens),
+          body: IndexedStack(index: _selectedIndex, children: _stackChildren),
           bottomNavigationBar: NavigationBar(
             selectedIndex: _selectedIndex,
             onDestinationSelected: _selectDestination,
@@ -106,7 +106,24 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   void _selectDestination(int index) {
     setState(() {
       _selectedIndex = index;
+      _screens[index] ??= _buildScreen(index);
     });
+  }
+
+  List<Widget> get _stackChildren {
+    return _screens
+        .map((screen) => screen ?? const SizedBox.shrink())
+        .toList();
+  }
+
+  Widget _buildScreen(int index) {
+    return switch (index) {
+      0 => const TodayScreen(),
+      1 => const SupplementListScreen(),
+      2 => const HistoryScreen(),
+      3 => const SettingsScreen(),
+      _ => const SizedBox.shrink(),
+    };
   }
 }
 

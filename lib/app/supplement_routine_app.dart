@@ -25,6 +25,7 @@ class SupplementRoutineApp extends ConsumerStatefulWidget {
 class _SupplementRoutineAppState extends ConsumerState<SupplementRoutineApp> {
   late final ProviderSubscription<List<TodayDisplayItem>>
   _todayWidgetSubscription;
+  var _areDeferredServicesReady = false;
 
   @override
   void initState() {
@@ -32,12 +33,12 @@ class _SupplementRoutineAppState extends ConsumerState<SupplementRoutineApp> {
     _todayWidgetSubscription = ref.listenManual<List<TodayDisplayItem>>(
       todayListProvider,
       (_, todayList) {
-        HomeWidgetService.updateTodaySummary(
-          HomeWidgetSummary.fromTodayList(todayList),
-        );
-        IntakeNotificationService.syncTodayReminders(todayList);
+        if (!_areDeferredServicesReady) {
+          return;
+        }
+
+        unawaited(_syncTodaySideEffects(todayList));
       },
-      fireImmediately: true,
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       unawaited(_initializeDeferredServices());
@@ -48,9 +49,15 @@ class _SupplementRoutineAppState extends ConsumerState<SupplementRoutineApp> {
     await IntakeNotificationService.initialize(
       copy: IntakeNotificationCopy.fromLocalizations(AppLocalizationsKo()),
     );
-    await IntakeNotificationService.syncTodayReminders(
-      ref.read(todayListProvider),
+    _areDeferredServicesReady = true;
+    await _syncTodaySideEffects(ref.read(todayListProvider));
+  }
+
+  Future<void> _syncTodaySideEffects(List<TodayDisplayItem> todayList) async {
+    await HomeWidgetService.updateTodaySummary(
+      HomeWidgetSummary.fromTodayList(todayList),
     );
+    await IntakeNotificationService.syncTodayReminders(todayList);
   }
 
   @override
