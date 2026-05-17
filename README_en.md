@@ -200,6 +200,7 @@ See also:
 - [CI/CD](docs/ci_cd_en.md)
 - [Store Assets](docs/store_assets_en.md)
 - [Android Release Signing](docs/release_signing_en.md)
+- [Windows Support](docs/windows_support_en.md)
 
 ## Screenshots
 
@@ -224,6 +225,10 @@ See also:
 ### Intake Notification
 
 ![Intake notification](docs/assets/screenshots/notification.png)
+
+### Usage Flow
+
+![Usage flow](docs/assets/demos/usage_flow.gif)
 
 ## Test Coverage
 
@@ -251,10 +256,6 @@ The project currently has an MVP scope with a release-oriented structure.
 - Material Design 3 design system
 - basic Android notifications and home widget
 - passing tests and debug APK build
-
-## Roadmap
-
-- add a real interaction-flow GIF
 
 ## License
 

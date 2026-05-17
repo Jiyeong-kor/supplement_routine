@@ -199,6 +199,7 @@ Supplement Routine은 Android 우선 앱으로 Material Design 3를 따릅니다
 - [CI/CD](docs/ci_cd.md)
 - [스토어 에셋](docs/store_assets.md)
 - [Android 릴리즈 서명](docs/release_signing.md)
+- [Windows 지원](docs/windows_support.md)
 
 ## 화면 미리보기
 
@@ -223,6 +224,10 @@ Supplement Routine은 Android 우선 앱으로 Material Design 3를 따릅니다
 ### 복용 알림
 
 ![복용 알림](docs/assets/screenshots/notification.png)
+
+### 사용 흐름
+
+![사용 흐름](docs/assets/demos/usage_flow.gif)
 
 ## 테스트 범위
 
@@ -250,10 +255,6 @@ Supplement Routine은 Android 우선 앱으로 Material Design 3를 따릅니다
 - Material Design 3 기반 디자인 시스템 적용
 - Android 알림과 홈 위젯 기본 구현
 - 테스트와 debug APK 빌드 통과
-
-## 향후 작업
-
-- 실제 사용 흐름 GIF 추가
 
 ## 라이선스
 

@@ -35,6 +35,7 @@ Current assets:
 - `docs/assets/screenshots/settings.png`
 - `docs/assets/screenshots/widget.png`
 - `docs/assets/screenshots/notification.png`
+- `docs/assets/demos/usage_flow.gif`
 
 ## Capture Checklist
 
