@@ -62,6 +62,21 @@ class AppLocalizationsKo extends AppLocalizations {
   String get habitQuoteReviewToday => '오늘 복용할 항목을 확인하고 완료 여부를 기록해보세요.';
 
   @override
+  String get notificationChannelName => '복용 일정 알림';
+
+  @override
+  String get notificationChannelDescription =>
+      '사용자가 입력한 복용 일정에 맞춰 체크 알림을 보냅니다.';
+
+  @override
+  String get notificationTitle => '복용 일정 확인';
+
+  @override
+  String notificationReminderBody(String supplementName) {
+    return '$supplementName 복용할 시간이에요.';
+  }
+
+  @override
   String get todayRoutineTitle => '오늘의 루틴';
 
   @override

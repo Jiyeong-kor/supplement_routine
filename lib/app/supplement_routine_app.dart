@@ -6,9 +6,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supplement_routine/app/app_config.dart';
 import 'package:supplement_routine/app/app_theme.dart';
 import 'package:supplement_routine/core/services/home_widget_service.dart';
+import 'package:supplement_routine/core/services/intake_notification_copy.dart';
 import 'package:supplement_routine/core/services/intake_notification_service.dart';
 import 'package:supplement_routine/features/today/today_provider.dart';
 import 'package:supplement_routine/l10n/generated/app_localizations.dart';
+import 'package:supplement_routine/l10n/generated/app_localizations_ko.dart';
 
 import '../features/main_navigation_screen.dart';
 
@@ -43,7 +45,9 @@ class _SupplementRoutineAppState extends ConsumerState<SupplementRoutineApp> {
   }
 
   Future<void> _initializeDeferredServices() async {
-    await IntakeNotificationService.initialize();
+    await IntakeNotificationService.initialize(
+      copy: IntakeNotificationCopy.fromLocalizations(AppLocalizationsKo()),
+    );
     await IntakeNotificationService.syncTodayReminders(
       ref.read(todayListProvider),
     );

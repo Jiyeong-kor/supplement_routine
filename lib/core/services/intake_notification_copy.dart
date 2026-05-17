@@ -1,3 +1,5 @@
+import 'package:supplement_routine/l10n/generated/app_localizations.dart';
+
 class IntakeNotificationCopy {
   const IntakeNotificationCopy({
     required this.channelName,
@@ -12,6 +14,15 @@ class IntakeNotificationCopy {
       channelDescription: '사용자가 입력한 복용 일정에 맞춰 체크 알림을 보냅니다.',
       notificationTitle: '복용 일정 확인',
       reminderBodyBuilder: (supplementName) => '$supplementName 복용할 시간이에요.',
+    );
+  }
+
+  factory IntakeNotificationCopy.fromLocalizations(AppLocalizations l10n) {
+    return IntakeNotificationCopy(
+      channelName: l10n.notificationChannelName,
+      channelDescription: l10n.notificationChannelDescription,
+      notificationTitle: l10n.notificationTitle,
+      reminderBodyBuilder: l10n.notificationReminderBody,
     );
   }
 

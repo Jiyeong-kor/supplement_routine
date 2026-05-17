@@ -196,7 +196,18 @@ Supplement Routine은 Android 우선 앱으로 Material Design 3를 따릅니다
 - [사용자 흐름](docs/user_flow.md)
 - [디자인 시스템 문서](docs/design_system.md)
 - [CI/CD](docs/ci_cd.md)
+- [스토어 에셋](docs/store_assets.md)
 - [Android 릴리즈 서명](docs/release_signing.md)
+
+## 화면 미리보기
+
+| 오늘 | 영양제 |
+| --- | --- |
+| ![오늘 화면](docs/assets/screenshots/today.png) | ![영양제 화면](docs/assets/screenshots/supplements.png) |
+
+| 기록 | 설정 |
+| --- | --- |
+| ![기록 화면](docs/assets/screenshots/history.png) | ![설정 화면](docs/assets/screenshots/settings.png) |
 
 ## 테스트 범위
 
@@ -227,10 +238,7 @@ Supplement Routine은 Android 우선 앱으로 Material Design 3를 따릅니다
 
 ## 향후 작업
 
-- 알림 채널/본문 문구의 localization 정리
-- 영양제 등록 화면의 디자인 토큰 추가 정리
-- 스토어 등록용 그래픽 정리
-- 스크린샷/GIF 추가
+- 실제 사용 흐름 GIF 추가
 
 ## 라이선스
 

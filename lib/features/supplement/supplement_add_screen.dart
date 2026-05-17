@@ -177,7 +177,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.xl),
+        padding: AppSpacing.screenPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -213,13 +213,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
                       _SectionTitle(l10n.supplementUnitSection),
                       DropdownButtonFormField<String>(
                         initialValue: _unit,
-                        decoration: InputDecoration(
-                          filled: true,
-                          border: OutlineInputBorder(
-                            borderRadius: AppRadius.mdBorder,
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
+                        decoration: const InputDecoration(),
                         items: SupplementFormPolicy.dosageUnits
                             .map(
                               (u) => DropdownMenuItem(value: u, child: Text(u)),
@@ -411,52 +405,51 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
     final l10n = AppLocalizations.of(context);
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Container(
-      padding: AppSpacing.cardPadding,
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
-        borderRadius: AppRadius.mdBorder,
-        border: Border.all(color: colorScheme.outlineVariant),
-      ),
-      child: Column(
-        children: [
-          _buildCounterRow(
-            l10n.supplementDailyCountLabel,
-            _intervalCount,
-            (v) => setState(() => _intervalCount = v),
-          ),
-          const Divider(height: AppSpacing.xxl),
-          ListTile(
-            title: Text(
-              l10n.supplementStartTimeLabel,
-              style: Theme.of(context).textTheme.bodyLarge,
+    return Card.outlined(
+      margin: EdgeInsets.zero,
+      color: colorScheme.surfaceContainerLow,
+      child: Padding(
+        padding: AppSpacing.cardPadding,
+        child: Column(
+          children: [
+            _buildCounterRow(
+              l10n.supplementDailyCountLabel,
+              _intervalCount,
+              (v) => setState(() => _intervalCount = v),
             ),
-            trailing: Text(
-              _startTime.format(context),
-              style: Theme.of(context).textTheme.labelLarge,
+            const Divider(height: AppSpacing.xxl),
+            ListTile(
+              title: Text(
+                l10n.supplementStartTimeLabel,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              trailing: Text(
+                _startTime.format(context),
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
+              onTap: () async {
+                final picked = await showTimePicker(
+                  context: context,
+                  initialTime: _startTime,
+                );
+                if (picked != null) {
+                  setState(() => _startTime = picked);
+                }
+              },
+              contentPadding: EdgeInsets.zero,
             ),
-            onTap: () async {
-              final picked = await showTimePicker(
-                context: context,
-                initialTime: _startTime,
-              );
-              if (picked != null) {
-                setState(() => _startTime = picked);
-              }
-            },
-            contentPadding: EdgeInsets.zero,
-          ),
-          const Divider(height: AppSpacing.xxl),
-          _buildCounterRow(
-            l10n.supplementIntervalHoursLabel,
-            _intervalHours,
-            (v) => setState(() => _intervalHours = v),
-            min: SupplementFormPolicy.minIntervalHours,
-            max: SupplementFormPolicy.maxIntervalHours,
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Text(l10n.supplementIntervalNotice),
-        ],
+            const Divider(height: AppSpacing.xxl),
+            _buildCounterRow(
+              l10n.supplementIntervalHoursLabel,
+              _intervalHours,
+              (v) => setState(() => _intervalHours = v),
+              min: SupplementFormPolicy.minIntervalHours,
+              max: SupplementFormPolicy.maxIntervalHours,
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Text(l10n.supplementIntervalNotice),
+          ],
+        ),
       ),
     );
   }

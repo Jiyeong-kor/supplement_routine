@@ -196,6 +196,30 @@ abstract class AppLocalizations {
   /// **'오늘 복용할 항목을 확인하고 완료 여부를 기록해보세요.'**
   String get habitQuoteReviewToday;
 
+  /// No description provided for @notificationChannelName.
+  ///
+  /// In ko, this message translates to:
+  /// **'복용 일정 알림'**
+  String get notificationChannelName;
+
+  /// No description provided for @notificationChannelDescription.
+  ///
+  /// In ko, this message translates to:
+  /// **'사용자가 입력한 복용 일정에 맞춰 체크 알림을 보냅니다.'**
+  String get notificationChannelDescription;
+
+  /// No description provided for @notificationTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'복용 일정 확인'**
+  String get notificationTitle;
+
+  /// No description provided for @notificationReminderBody.
+  ///
+  /// In ko, this message translates to:
+  /// **'{supplementName} 복용할 시간이에요.'**
+  String notificationReminderBody(String supplementName);
+
   /// No description provided for @todayRoutineTitle.
   ///
   /// In ko, this message translates to:

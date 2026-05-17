@@ -197,7 +197,18 @@ See also:
 - [User Flow](docs/user_flow_en.md)
 - [Design System](docs/design_system_en.md)
 - [CI/CD](docs/ci_cd_en.md)
+- [Store Assets](docs/store_assets_en.md)
 - [Android Release Signing](docs/release_signing_en.md)
+
+## Screenshots
+
+| Today | Supplements |
+| --- | --- |
+| ![Today screen](docs/assets/screenshots/today.png) | ![Supplements screen](docs/assets/screenshots/supplements.png) |
+
+| History | Settings |
+| --- | --- |
+| ![History screen](docs/assets/screenshots/history.png) | ![Settings screen](docs/assets/screenshots/settings.png) |
 
 ## Test Coverage
 
@@ -228,10 +239,7 @@ The project currently has an MVP scope with a release-oriented structure.
 
 ## Roadmap
 
-- localize notification channel/body strings
-- continue replacing hardcoded UI tokens in the supplement form
-- prepare store graphics
-- add screenshots/GIFs
+- add a real interaction-flow GIF
 
 ## License
 

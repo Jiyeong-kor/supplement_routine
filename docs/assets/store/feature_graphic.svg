@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500" role="img" aria-label="Supplement Routine feature graphic">
+  <rect width="1024" height="500" fill="#F2F2F4"/>
+  <rect x="48" y="48" width="928" height="404" rx="28" fill="#FFFFFF"/>
+  <text x="96" y="152" fill="#1A237E" font-family="Pretendard, Arial, sans-serif" font-size="54" font-weight="700">Supplement Routine</text>
+  <text x="96" y="214" fill="#1A1C1E" font-family="Pretendard, Arial, sans-serif" font-size="28" font-weight="500">직접 입력한 복용 일정을 오늘의 루틴으로 관리하세요</text>
+  <rect x="96" y="266" width="268" height="92" rx="20" fill="#E8EAF6"/>
+  <text x="124" y="306" fill="#101A5C" font-family="Pretendard, Arial, sans-serif" font-size="24" font-weight="700">오늘 루틴</text>
+  <text x="124" y="338" fill="#101A5C" font-family="Pretendard, Arial, sans-serif" font-size="22" font-weight="500">복용 기록 · 알림 · 위젯</text>
+  <rect x="644" y="86" width="220" height="328" rx="28" fill="#1A237E"/>
+  <rect x="664" y="106" width="180" height="288" rx="22" fill="#FFFFFF"/>
+  <rect x="690" y="144" width="128" height="20" rx="10" fill="#E8EAF6"/>
+  <rect x="690" y="184" width="128" height="54" rx="16" fill="#ECEFF1"/>
+  <rect x="690" y="252" width="128" height="54" rx="16" fill="#ECEFF1"/>
+  <rect x="690" y="320" width="128" height="36" rx="16" fill="#1A237E"/>
+</svg>
