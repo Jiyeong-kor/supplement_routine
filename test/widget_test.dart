@@ -241,6 +241,50 @@ void main() {
     );
   });
 
+  testWidgets('영양제 등록 화면은 Material 3 segmented button을 사용한다', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const ProviderScope(child: SupplementRoutineApp()));
+
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+
+    final segmentedButtons = find.byWidgetPredicate(
+      (widget) => widget.runtimeType.toString().startsWith('SegmentedButton'),
+    );
+    expect(segmentedButtons, findsOneWidget);
+
+    await tester.tap(find.text('직접 시간 지정'));
+    await tester.pumpAndSettle();
+
+    expect(segmentedButtons, findsNWidgets(2));
+  });
+
+  testWidgets('기록 화면은 월간 범례를 함께 표시한다', (WidgetTester tester) async {
+    await tester.pumpWidget(const ProviderScope(child: SupplementRoutineApp()));
+
+    await tester.tap(find.byIcon(Icons.calendar_month_outlined));
+    await tester.pumpAndSettle();
+
+    expect(find.text('80% 이상'), findsOneWidget);
+    expect(find.text('40~79%'), findsOneWidget);
+    expect(find.text('40% 미만'), findsOneWidget);
+    expect(find.text('일정 없음'), findsOneWidget);
+  });
+
+  testWidgets('넓은 화면에서는 navigation rail을 사용한다', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1200, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const ProviderScope(child: SupplementRoutineApp()));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(NavigationRail), findsOneWidget);
+    expect(find.byType(NavigationBar), findsNothing);
+  });
+
   test('식사 시간 설정 변경은 오늘 루틴 일정에 반영된다', () {
     final container = ProviderContainer();
     addTearDown(container.dispose);
