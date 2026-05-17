@@ -196,6 +196,7 @@ See also:
 - [Information Architecture](docs/information_architecture_en.md)
 - [User Flow](docs/user_flow_en.md)
 - [Design System](docs/design_system_en.md)
+- [CI/CD](docs/ci_cd_en.md)
 - [Android Release Signing](docs/release_signing_en.md)
 
 ## Test Coverage
