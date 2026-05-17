@@ -586,6 +586,30 @@ abstract class AppLocalizations {
   /// **'완료율이 높을수록 진한 색으로 표시됩니다.'**
   String get historyMonthDescription;
 
+  /// No description provided for @historyLegendHigh.
+  ///
+  /// In ko, this message translates to:
+  /// **'80% 이상'**
+  String get historyLegendHigh;
+
+  /// No description provided for @historyLegendMedium.
+  ///
+  /// In ko, this message translates to:
+  /// **'40~79%'**
+  String get historyLegendMedium;
+
+  /// No description provided for @historyLegendLow.
+  ///
+  /// In ko, this message translates to:
+  /// **'40% 미만'**
+  String get historyLegendLow;
+
+  /// No description provided for @historyLegendEmpty.
+  ///
+  /// In ko, this message translates to:
+  /// **'일정 없음'**
+  String get historyLegendEmpty;
+
   /// No description provided for @historyDate.
   ///
   /// In ko, this message translates to:

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -34,6 +36,16 @@ class _SupplementRoutineAppState extends ConsumerState<SupplementRoutineApp> {
         IntakeNotificationService.syncTodayReminders(todayList);
       },
       fireImmediately: true,
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(_initializeDeferredServices());
+    });
+  }
+
+  Future<void> _initializeDeferredServices() async {
+    await IntakeNotificationService.initialize();
+    await IntakeNotificationService.syncTodayReminders(
+      ref.read(todayListProvider),
     );
   }
 

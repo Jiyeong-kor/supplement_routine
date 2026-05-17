@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'app/app_config.dart';
 import 'app/supplement_routine_app.dart';
-import 'core/services/intake_notification_service.dart';
 import 'features/history/data/local_intake_record_repository.dart';
 import 'features/history/data/mock_intake_records.dart';
 import 'features/history/intake_record_provider.dart';
@@ -15,7 +14,6 @@ import 'features/supplement/supplement_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await IntakeNotificationService.initialize();
   final preferences = await SharedPreferencesWithCache.create(
     cacheOptions: const SharedPreferencesWithCacheOptions(
       allowList: {

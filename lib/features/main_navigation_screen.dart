@@ -26,39 +26,98 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-
-    return Scaffold(
-      body: IndexedStack(index: _selectedIndex, children: _screens),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.today_outlined),
-            selectedIcon: const Icon(Icons.today),
-            label: l10n.navToday,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.medication_outlined),
-            selectedIcon: const Icon(Icons.medication),
-            label: l10n.navSupplements,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.calendar_month_outlined),
-            selectedIcon: const Icon(Icons.calendar_month),
-            label: l10n.navHistory,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.settings_outlined),
-            selectedIcon: const Icon(Icons.settings),
-            label: l10n.navSettings,
-          ),
-        ],
+    final destinations = [
+      _NavigationDestinationData(
+        icon: Icons.today_outlined,
+        selectedIcon: Icons.today,
+        label: l10n.navToday,
       ),
+      _NavigationDestinationData(
+        icon: Icons.medication_outlined,
+        selectedIcon: Icons.medication,
+        label: l10n.navSupplements,
+      ),
+      _NavigationDestinationData(
+        icon: Icons.calendar_month_outlined,
+        selectedIcon: Icons.calendar_month,
+        label: l10n.navHistory,
+      ),
+      _NavigationDestinationData(
+        icon: Icons.settings_outlined,
+        selectedIcon: Icons.settings,
+        label: l10n.navSettings,
+      ),
+    ];
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final useNavigationRail = constraints.maxWidth >= 840;
+
+        if (useNavigationRail) {
+          return Scaffold(
+            body: Row(
+              children: [
+                NavigationRail(
+                  selectedIndex: _selectedIndex,
+                  labelType: NavigationRailLabelType.all,
+                  onDestinationSelected: _selectDestination,
+                  destinations: destinations
+                      .map(
+                        (destination) => NavigationRailDestination(
+                          icon: Icon(destination.icon),
+                          selectedIcon: Icon(destination.selectedIcon),
+                          label: Text(destination.label),
+                        ),
+                      )
+                      .toList(),
+                ),
+                const VerticalDivider(width: 1),
+                Expanded(
+                  child: IndexedStack(
+                    index: _selectedIndex,
+                    children: _screens,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return Scaffold(
+          body: IndexedStack(index: _selectedIndex, children: _screens),
+          bottomNavigationBar: NavigationBar(
+            selectedIndex: _selectedIndex,
+            onDestinationSelected: _selectDestination,
+            destinations: destinations
+                .map(
+                  (destination) => NavigationDestination(
+                    icon: Icon(destination.icon),
+                    selectedIcon: Icon(destination.selectedIcon),
+                    label: destination.label,
+                  ),
+                )
+                .toList(),
+          ),
+        );
+      },
     );
   }
+
+  void _selectDestination(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+}
+
+class _NavigationDestinationData {
+  const _NavigationDestinationData({
+    required this.icon,
+    required this.selectedIcon,
+    required this.label,
+  });
+
+  final IconData icon;
+  final IconData selectedIcon;
+  final String label;
 }

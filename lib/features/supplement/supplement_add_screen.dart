@@ -271,66 +271,32 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
 
   Widget _buildTopMethodSelector() {
     final l10n = AppLocalizations.of(context);
-    final colorScheme = Theme.of(context).colorScheme;
 
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHigh,
-        borderRadius: AppRadius.mdBorder,
-      ),
-      child: Row(
-        children: [
-          _buildTopMethodItem(
-            l10n.supplementRoutineMethod,
-            _isRoutineBased,
-            () => setState(() => _isRoutineBased = true),
+      child: SegmentedButton<_TopMethod>(
+        segments: [
+          ButtonSegment<_TopMethod>(
+            value: _TopMethod.routine,
+            label: Text(l10n.supplementRoutineMethod),
           ),
-          _buildTopMethodItem(
-            l10n.supplementManualTimeMethod,
-            !_isRoutineBased,
-            () => setState(() => _isRoutineBased = false),
+          ButtonSegment<_TopMethod>(
+            value: _TopMethod.manual,
+            label: Text(l10n.supplementManualTimeMethod),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildTopMethodItem(
-    String title,
-    bool isSelected,
-    VoidCallback onTap,
-  ) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-          decoration: BoxDecoration(
-            color: isSelected ? colorScheme.primary : Colors.transparent,
-            borderRadius: AppRadius.mdBorder,
-          ),
-          child: Text(
-            title,
-            textAlign: TextAlign.center,
-            style: textTheme.labelLarge?.copyWith(
-              color: isSelected
-                  ? colorScheme.onPrimary
-                  : colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
+        selected: {_isRoutineBased ? _TopMethod.routine : _TopMethod.manual},
+        onSelectionChanged: (selection) {
+          setState(() {
+            _isRoutineBased = selection.first == _TopMethod.routine;
+          });
+        },
       ),
     );
   }
 
   Widget _buildDetailSection() {
     final l10n = AppLocalizations.of(context);
-    final colorScheme = Theme.of(context).colorScheme;
 
     if (_isRoutineBased) {
       return Column(
@@ -362,25 +328,30 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
     } else {
       return Column(
         children: [
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.xxs),
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerHigh,
-              borderRadius: AppRadius.mdBorder,
-            ),
-            child: Row(
-              children: [
-                _buildSubMethodItem(
-                  l10n.supplementSpecificTimeMethod,
-                  _isSpecificTime,
-                  () => setState(() => _isSpecificTime = true),
+          SizedBox(
+            width: double.infinity,
+            child: SegmentedButton<_ManualMethod>(
+              segments: [
+                ButtonSegment<_ManualMethod>(
+                  value: _ManualMethod.specificTime,
+                  label: Text(l10n.supplementSpecificTimeMethod),
                 ),
-                _buildSubMethodItem(
-                  l10n.supplementIntervalMethod,
-                  !_isSpecificTime,
-                  () => setState(() => _isSpecificTime = false),
+                ButtonSegment<_ManualMethod>(
+                  value: _ManualMethod.interval,
+                  label: Text(l10n.supplementIntervalMethod),
                 ),
               ],
+              selected: {
+                _isSpecificTime
+                    ? _ManualMethod.specificTime
+                    : _ManualMethod.interval,
+              },
+              onSelectionChanged: (selection) {
+                setState(() {
+                  _isSpecificTime =
+                      selection.first == _ManualMethod.specificTime;
+                });
+              },
             ),
           ),
           const SizedBox(height: AppSpacing.xl),
@@ -388,46 +359,6 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
         ],
       );
     }
-  }
-
-  Widget _buildSubMethodItem(
-    String title,
-    bool isSelected,
-    VoidCallback onTap,
-  ) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-          decoration: BoxDecoration(
-            color: isSelected ? colorScheme.surface : Colors.transparent,
-            borderRadius: AppRadius.smBorder,
-            boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                      color: colorScheme.shadow.withValues(alpha: 0.05),
-                      blurRadius: AppSpacing.xxs,
-                    ),
-                  ]
-                : [],
-          ),
-          child: Text(
-            title,
-            textAlign: TextAlign.center,
-            style: textTheme.labelMedium?.copyWith(
-              color: isSelected
-                  ? colorScheme.onSurface
-                  : colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-      ),
-    );
   }
 
   Widget _buildFixedTimeUI() {
@@ -641,3 +572,7 @@ class _SaveSupplementButton extends StatelessWidget {
     );
   }
 }
+
+enum _TopMethod { routine, manual }
+
+enum _ManualMethod { specificTime, interval }

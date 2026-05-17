@@ -156,6 +156,8 @@ class _MonthHistoryCard extends StatelessWidget {
                 return _MonthDayTile(summary: summary);
               },
             ),
+            const SizedBox(height: AppSpacing.md),
+            const _MonthHistoryLegend(),
           ],
         ),
       ),
@@ -210,16 +212,38 @@ class _MonthDayTile extends StatelessWidget {
         borderRadius: AppRadius.smBorder,
         border: isToday ? Border.all(color: colorScheme.primary) : null,
       ),
-      child: Center(
-        child: Text(
-          '${summary.date.day}',
-          style: textTheme.labelMedium?.copyWith(
-            color: _foregroundColor(colorScheme, completion, summary.isEmpty),
-            fontWeight: isToday ? FontWeight.w700 : FontWeight.w500,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            '${summary.date.day}',
+            style: textTheme.labelMedium?.copyWith(
+              color: _foregroundColor(colorScheme, completion, summary.isEmpty),
+              fontWeight: isToday ? FontWeight.w700 : FontWeight.w500,
+            ),
           ),
-        ),
+          const SizedBox(height: AppSpacing.xxs),
+          Icon(
+            _statusIcon(completion, summary.isEmpty),
+            size: 12,
+            color: _foregroundColor(colorScheme, completion, summary.isEmpty),
+          ),
+        ],
       ),
     );
+  }
+
+  IconData _statusIcon(double completion, bool isEmpty) {
+    if (isEmpty) {
+      return Icons.remove;
+    }
+    if (completion >= 0.8) {
+      return Icons.check;
+    }
+    if (completion >= 0.4) {
+      return Icons.horizontal_rule;
+    }
+    return Icons.close;
   }
 
   bool _isSameDate(DateTime a, DateTime b) {
@@ -255,6 +279,67 @@ class _MonthDayTile extends StatelessWidget {
       return colorScheme.onSurfaceVariant;
     }
     return colorScheme.onSurface;
+  }
+}
+
+class _MonthHistoryLegend extends StatelessWidget {
+  const _MonthHistoryLegend();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Wrap(
+      spacing: AppSpacing.md,
+      runSpacing: AppSpacing.sm,
+      children: [
+        _LegendItem(
+          icon: Icons.check,
+          color: colorScheme.primary,
+          label: l10n.historyLegendHigh,
+        ),
+        _LegendItem(
+          icon: Icons.horizontal_rule,
+          color: colorScheme.tertiary,
+          label: l10n.historyLegendMedium,
+        ),
+        _LegendItem(
+          icon: Icons.close,
+          color: colorScheme.outline,
+          label: l10n.historyLegendLow,
+        ),
+        _LegendItem(
+          icon: Icons.remove,
+          color: colorScheme.onSurfaceVariant,
+          label: l10n.historyLegendEmpty,
+        ),
+      ],
+    );
+  }
+}
+
+class _LegendItem extends StatelessWidget {
+  const _LegendItem({
+    required this.icon,
+    required this.color,
+    required this.label,
+  });
+
+  final IconData icon;
+  final Color color;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14, color: color),
+        const SizedBox(width: AppSpacing.xxs),
+        Text(label, style: Theme.of(context).textTheme.labelSmall),
+      ],
+    );
   }
 }
 

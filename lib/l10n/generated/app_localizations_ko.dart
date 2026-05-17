@@ -271,6 +271,18 @@ class AppLocalizationsKo extends AppLocalizations {
   String get historyMonthDescription => '완료율이 높을수록 진한 색으로 표시됩니다.';
 
   @override
+  String get historyLegendHigh => '80% 이상';
+
+  @override
+  String get historyLegendMedium => '40~79%';
+
+  @override
+  String get historyLegendLow => '40% 미만';
+
+  @override
+  String get historyLegendEmpty => '일정 없음';
+
+  @override
   String historyDate(int month, int day, String weekday) {
     return '$month월 $day일 $weekday요일';
   }

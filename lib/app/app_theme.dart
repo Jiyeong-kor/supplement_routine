@@ -25,7 +25,7 @@ class AppTheme {
       visualDensity: VisualDensity.standard,
       appBarTheme: AppBarTheme(
         centerTitle: false,
-        scrolledUnderElevation: 0,
+        scrolledUnderElevation: 1,
         backgroundColor: colorScheme.surfaceContainer,
         foregroundColor: colorScheme.onSurface,
         titleTextStyle: textTheme.titleLarge,
