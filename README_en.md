@@ -210,6 +210,10 @@ See also:
 | --- | --- |
 | ![History screen](docs/assets/screenshots/history.png) | ![Settings screen](docs/assets/screenshots/settings.png) |
 
+### Home Widget
+
+![Home widget](docs/assets/screenshots/widget.png)
+
 ## Test Coverage
 
 Current tests cover:

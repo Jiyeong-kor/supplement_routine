@@ -209,6 +209,10 @@ Supplement Routine은 Android 우선 앱으로 Material Design 3를 따릅니다
 | --- | --- |
 | ![기록 화면](docs/assets/screenshots/history.png) | ![설정 화면](docs/assets/screenshots/settings.png) |
 
+### 홈 위젯
+
+![홈 위젯](docs/assets/screenshots/widget.png)
+
 ## 테스트 범위
 
 현재 테스트는 다음 영역을 검증합니다.
