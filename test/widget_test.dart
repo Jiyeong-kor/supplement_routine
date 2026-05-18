@@ -80,6 +80,8 @@ void main() {
     expect(find.text('1회 1 개'), findsWidgets);
 
     await tester.ensureVisible(find.byTooltip('삭제').last);
+    await tester.drag(find.byType(ListView), const Offset(0, -120));
+    await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('삭제').last);
     await tester.pumpAndSettle();
 
@@ -241,6 +243,8 @@ void main() {
     await tester.tap(find.text('설정'));
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('앱 사용 가이드'));
+    await tester.drag(find.byType(ListView), const Offset(0, -120));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('앱 사용 가이드'));
     await tester.pumpAndSettle();
 
