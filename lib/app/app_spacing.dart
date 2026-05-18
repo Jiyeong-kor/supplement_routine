@@ -12,6 +12,12 @@ class AppSpacing {
   static const double screen = 16;
 
   static const EdgeInsets screenPadding = EdgeInsets.all(screen);
+  static const EdgeInsets screenPaddingWithFab = EdgeInsets.fromLTRB(
+    screen,
+    screen,
+    screen,
+    96,
+  );
   static const EdgeInsets cardPadding = EdgeInsets.all(lg);
   static const EdgeInsets sectionTitlePadding = EdgeInsets.fromLTRB(
     lg,

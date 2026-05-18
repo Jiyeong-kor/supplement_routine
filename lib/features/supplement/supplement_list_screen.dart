@@ -120,7 +120,7 @@ class _SupplementListBody extends StatelessWidget {
 
           if (useGrid) {
             return GridView.builder(
-              padding: AppSpacing.screenPadding,
+              padding: AppSpacing.screenPaddingWithFab,
               itemCount: supplements.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
@@ -135,7 +135,7 @@ class _SupplementListBody extends StatelessWidget {
           }
 
           return ListView.separated(
-            padding: AppSpacing.screenPadding,
+            padding: AppSpacing.screenPaddingWithFab,
             itemCount: supplements.length,
             separatorBuilder: (context, index) =>
                 const SizedBox(height: AppSpacing.md),

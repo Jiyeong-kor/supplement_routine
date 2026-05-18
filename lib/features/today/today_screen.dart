@@ -39,7 +39,7 @@ class TodayScreen extends ConsumerWidget {
       appBar: AppBar(title: Text(l10n.todayAppBarTitle)),
       body: AppConstrainedContent(
         child: SingleChildScrollView(
-          padding: AppSpacing.screenPadding,
+          padding: AppSpacing.screenPaddingWithFab,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
