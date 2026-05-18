@@ -79,10 +79,10 @@ void main() {
     expect(find.text('식사 기준 · 하루 1회'), findsWidgets);
     expect(find.text('1회 1 개'), findsWidgets);
 
-    await tester.ensureVisible(find.byTooltip('삭제').last);
+    await tester.ensureVisible(find.byIcon(Icons.delete_outline).last);
     await tester.drag(find.byType(ListView), const Offset(0, -120));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('삭제').last);
+    await tester.tap(find.byIcon(Icons.delete_outline).last);
     await tester.pumpAndSettle();
 
     expect(find.text('영양제 삭제'), findsOneWidget);
