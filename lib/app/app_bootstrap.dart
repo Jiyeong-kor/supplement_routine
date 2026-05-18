@@ -2,15 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supplement_routine/app/app_config.dart';
-import 'package:supplement_routine/app/app_theme.dart';
 import 'package:supplement_routine/app/supplement_routine_app.dart';
+import 'package:supplement_routine/features/history/data/intake_record_repository.dart';
 import 'package:supplement_routine/features/history/data/local_intake_record_repository.dart';
+import 'package:supplement_routine/features/history/data/mock_intake_record_repository.dart';
 import 'package:supplement_routine/features/history/data/mock_intake_records.dart';
 import 'package:supplement_routine/features/history/intake_record_provider.dart';
 import 'package:supplement_routine/features/settings/data/local_settings_repository.dart';
+import 'package:supplement_routine/features/settings/data/memory_settings_repository.dart';
+import 'package:supplement_routine/features/settings/data/settings_repository.dart';
 import 'package:supplement_routine/features/settings/settings_provider.dart';
 import 'package:supplement_routine/features/supplement/data/local_supplement_repository.dart';
+import 'package:supplement_routine/features/supplement/data/mock_supplement_repository.dart';
 import 'package:supplement_routine/features/supplement/data/mock_supplements.dart';
+import 'package:supplement_routine/features/supplement/data/supplement_repository.dart';
 import 'package:supplement_routine/features/supplement/supplement_provider.dart';
 
 class AppBootstrap extends StatefulWidget {
@@ -21,35 +26,43 @@ class AppBootstrap extends StatefulWidget {
 }
 
 class _AppBootstrapState extends State<AppBootstrap> {
-  late final Future<_RepositoryBundle> _repositories = _createRepositories();
+  late _RepositoryBundle _repositories = _RepositoryBundle.fallback();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRepositories();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<_RepositoryBundle>(
-      future: _repositories,
-      builder: (context, snapshot) {
-        final repositories = snapshot.data;
-
-        if (repositories == null) {
-          return const _BootstrapLoadingApp();
-        }
-
-        return ProviderScope(
-          overrides: [
-            supplementRepositoryProvider.overrideWithValue(
-              repositories.supplementRepository,
-            ),
-            intakeRecordRepositoryProvider.overrideWithValue(
-              repositories.intakeRecordRepository,
-            ),
-            settingsRepositoryProvider.overrideWithValue(
-              repositories.settingsRepository,
-            ),
-          ],
-          child: const SupplementRoutineApp(),
-        );
-      },
+    return ProviderScope(
+      key: ValueKey(_repositories),
+      overrides: [
+        supplementRepositoryProvider.overrideWithValue(
+          _repositories.supplementRepository,
+        ),
+        intakeRecordRepositoryProvider.overrideWithValue(
+          _repositories.intakeRecordRepository,
+        ),
+        settingsRepositoryProvider.overrideWithValue(
+          _repositories.settingsRepository,
+        ),
+      ],
+      child: const SupplementRoutineApp(),
     );
+  }
+
+  Future<void> _loadRepositories() async {
+    final repositories = await _createRepositories();
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _repositories = repositories;
+    });
   }
 
   Future<_RepositoryBundle> _createRepositories() async {
@@ -89,22 +102,23 @@ class _RepositoryBundle {
     required this.settingsRepository,
   });
 
-  final LocalSupplementRepository supplementRepository;
-  final LocalIntakeRecordRepository intakeRecordRepository;
-  final LocalSettingsRepository settingsRepository;
-}
-
-class _BootstrapLoadingApp extends StatelessWidget {
-  const _BootstrapLoadingApp();
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      home: const Scaffold(),
+  factory _RepositoryBundle.fallback() {
+    return _RepositoryBundle(
+      supplementRepository: MockSupplementRepository(
+        initialSupplements: AppConfig.isMockDataEnabled
+            ? mockSupplements
+            : const [],
+      ),
+      intakeRecordRepository: MockIntakeRecordRepository(
+        initialRecords: AppConfig.isMockDataEnabled
+            ? createMockIntakeRecords()
+            : const {},
+      ),
+      settingsRepository: MemorySettingsRepository(),
     );
   }
+
+  final SupplementRepository supplementRepository;
+  final IntakeRecordRepository intakeRecordRepository;
+  final SettingsRepository settingsRepository;
 }
