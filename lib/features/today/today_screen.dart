@@ -148,7 +148,7 @@ class _TodayHeader extends StatelessWidget {
                 Expanded(
                   child: Text(
                     quoteText,
-                    style: textTheme.bodyLarge?.copyWith(
+                    style: textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onPrimaryContainer,
                     ),
                   ),
@@ -314,6 +314,7 @@ class _TodaySupplementItem extends StatelessWidget {
                             : colorScheme.onSurface,
                       ),
                     ),
+                    const SizedBox(height: AppSpacing.xs),
                     Wrap(
                       spacing: AppSpacing.xs,
                       runSpacing: AppSpacing.xs,
