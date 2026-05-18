@@ -183,74 +183,74 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _SectionTitle(l10n.supplementNameSection),
-              _SupplementTextField(
-                controller: _nameController,
-                hintText: l10n.supplementNameHint,
-              ),
-              const SizedBox(height: AppSpacing.xxl),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _SectionTitle(l10n.supplementDosageSection),
-                        _SupplementTextField(
-                          controller: _dosageValueController,
-                          keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _SectionTitle(l10n.supplementUnitSection),
-                        DropdownButtonFormField<String>(
-                          initialValue: _unit,
-                          decoration: const InputDecoration(),
-                          items: SupplementFormPolicy.dosageUnits
-                              .map(
-                                (u) =>
-                                    DropdownMenuItem(value: u, child: Text(u)),
-                              )
-                              .toList(),
-                          onChanged: (v) => setState(() => _unit = v!),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.xxl),
-
-              _SectionTitle(l10n.supplementMethodSection),
-              _buildTopMethodSelector(),
-              const SizedBox(height: AppSpacing.xxl),
-
-              _buildDetailSection(),
-
-              const SizedBox(height: AppSpacing.xxl),
-              _SectionTitle(l10n.supplementOtherSettingsSection),
-              SwitchListTile(
-                title: Text(l10n.supplementNotificationSwitch),
-                value: _isNotificationEnabled,
-                contentPadding: EdgeInsets.zero,
-                onChanged: (v) => setState(() => _isNotificationEnabled = v),
+              _FormSectionCard(
+                title: l10n.supplementNameSection,
+                child: _SupplementTextField(
+                  controller: _nameController,
+                  hintText: l10n.supplementNameHint,
+                ),
               ),
               const SizedBox(height: AppSpacing.md),
-              _SectionTitle(l10n.supplementMemoSection),
-              _SupplementTextField(
-                controller: _memoController,
-                maxLines: 2,
-                hintText: l10n.supplementMemoHint,
+              _FormSectionCard(
+                title: l10n.supplementDosageSection,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _SupplementTextField(
+                        controller: _dosageValueController,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    SizedBox(
+                      width: 116,
+                      child: DropdownButtonFormField<String>(
+                        initialValue: _unit,
+                        decoration: InputDecoration(
+                          labelText: l10n.supplementUnitSection,
+                        ),
+                        items: SupplementFormPolicy.dosageUnits
+                            .map(
+                              (u) => DropdownMenuItem(value: u, child: Text(u)),
+                            )
+                            .toList(),
+                        onChanged: (v) => setState(() => _unit = v!),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+
+              _FormSectionCard(
+                title: l10n.supplementMethodSection,
+                child: _buildTopMethodSelector(),
+              ),
+              const SizedBox(height: AppSpacing.md),
+
+              _FormSectionCard(child: _buildDetailSection()),
+
+              const SizedBox(height: AppSpacing.md),
+              _FormSectionCard(
+                title: l10n.supplementOtherSettingsSection,
+                child: SwitchListTile(
+                  title: Text(l10n.supplementNotificationSwitch),
+                  value: _isNotificationEnabled,
+                  contentPadding: EdgeInsets.zero,
+                  onChanged: (v) => setState(() => _isNotificationEnabled = v),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              _FormSectionCard(
+                title: l10n.supplementMemoSection,
+                child: _SupplementTextField(
+                  controller: _memoController,
+                  maxLines: 2,
+                  hintText: l10n.supplementMemoHint,
+                ),
               ),
               const SizedBox(height: AppSpacing.xxxl),
 
@@ -502,6 +502,35 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
           ],
         ),
       ],
+    );
+  }
+}
+
+class _FormSectionCard extends StatelessWidget {
+  const _FormSectionCard({required this.child, this.title});
+
+  final String? title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final title = this.title;
+
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (title != null) ...[
+              _SectionTitle(title),
+              const SizedBox(height: AppSpacing.xs),
+            ],
+            child,
+          ],
+        ),
+      ),
     );
   }
 }
