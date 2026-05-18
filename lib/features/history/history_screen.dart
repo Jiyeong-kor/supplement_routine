@@ -128,10 +128,7 @@ class _HistorySectionHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: textTheme.titleMedium,
-        ),
+        Text(title, style: textTheme.titleMedium),
         const SizedBox(height: AppSpacing.xxs),
         Text(
           description,
@@ -415,7 +412,7 @@ class _HistoryOverviewCard extends StatelessWidget {
             const SizedBox(height: AppSpacing.sm),
             Text(
               l10n.historyPercent(percent),
-              style: textTheme.displaySmall?.copyWith(
+              style: textTheme.headlineLarge?.copyWith(
                 color: colorScheme.onPrimaryContainer,
                 fontWeight: FontWeight.w600,
               ),

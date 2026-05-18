@@ -43,10 +43,8 @@ class TodayScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(dateString, style: Theme.of(context).textTheme.bodyMedium),
+              _TodayHeader(dateText: dateString, quoteText: quoteText),
               const SizedBox(height: AppSpacing.lg),
-              _TodayQuoteCard(icon: Icons.auto_awesome, text: quoteText),
-              const SizedBox(height: AppSpacing.xxl),
               _TodayProgressCard(done: doneCount, total: totalCount),
               const SizedBox(height: AppSpacing.xxxl),
               Text(
@@ -107,37 +105,59 @@ class TodayScreen extends ConsumerWidget {
   }
 }
 
-class _TodayQuoteCard extends StatelessWidget {
-  const _TodayQuoteCard({required this.icon, required this.text});
+class _TodayHeader extends StatelessWidget {
+  const _TodayHeader({required this.dateText, required this.quoteText});
 
-  final IconData icon;
-  final String text;
+  final String dateText;
+  final String quoteText;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
-    return Card.filled(
-      margin: EdgeInsets.zero,
-      color: colorScheme.secondaryContainer,
-      child: Padding(
-        padding: AppSpacing.cardPadding,
-        child: Row(
-          children: [
-            Icon(icon, color: colorScheme.onSecondaryContainer),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Text(
-                text,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSecondaryContainer,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          dateText,
+          style: textTheme.labelLarge?.copyWith(
+            color: colorScheme.primary,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-      ),
+        const SizedBox(height: AppSpacing.sm),
+        Card.filled(
+          margin: EdgeInsets.zero,
+          color: colorScheme.primaryContainer,
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            child: Row(
+              children: [
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary.withValues(alpha: 0.12),
+                    borderRadius: AppRadius.lgBorder,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Icon(Icons.auto_awesome, color: colorScheme.primary),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Text(
+                    quoteText,
+                    style: textTheme.bodyLarge?.copyWith(
+                      color: colorScheme.onPrimaryContainer,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -153,32 +173,43 @@ class _TodayProgressCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final double percent = total > 0 ? done / total : 0;
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Card(
       margin: EdgeInsets.zero,
       color: colorScheme.surfaceContainerLow,
       child: Padding(
-        padding: AppSpacing.cardPadding,
+        padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  l10n.todayRoutineTitle,
-                  style: Theme.of(context).textTheme.titleSmall,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l10n.todayRoutineTitle, style: textTheme.titleSmall),
+                    const SizedBox(height: AppSpacing.xxs),
+                    Text(
+                      l10n.todayProgressCount(done, total),
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
                 ),
                 Text(
-                  l10n.todayProgressCount(done, total),
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  '${(percent * 100).round()}%',
+                  style: textTheme.headlineMedium?.copyWith(
                     color: colorScheme.primary,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: AppSpacing.md),
+            const SizedBox(height: AppSpacing.lg),
             ClipRRect(
               borderRadius: AppRadius.pillBorder,
               child: LinearProgressIndicator(
@@ -228,19 +259,45 @@ class _TodaySupplementItem extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       color: isDone ? colorScheme.surfaceContainerHighest : null,
       child: InkWell(
-        borderRadius: AppRadius.mdBorder,
+        borderRadius: AppRadius.xxlBorder,
         onTap: onTap,
         child: Padding(
-          padding: AppSpacing.cardPadding,
+          padding: const EdgeInsets.all(AppSpacing.lg),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                width: 60,
-                child: Text(
-                  time,
-                  style: textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: colorScheme.primary,
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: colorScheme.primaryContainer,
+                  borderRadius: AppRadius.lgBorder,
+                ),
+                child: SizedBox(
+                  width: 64,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: AppSpacing.md,
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          time.split(' ').first,
+                          style: textTheme.labelSmall?.copyWith(
+                            color: colorScheme.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.xxs),
+                        Text(
+                          time.split(' ').skip(1).join(' '),
+                          textAlign: TextAlign.center,
+                          style: textTheme.labelLarge?.copyWith(
+                            color: colorScheme.onPrimaryContainer,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -257,15 +314,17 @@ class _TodaySupplementItem extends StatelessWidget {
                             : colorScheme.onSurface,
                       ),
                     ),
-                    Text(
-                      '$label | $dosageStr $dosageUnit',
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
+                    Wrap(
+                      spacing: AppSpacing.xs,
+                      runSpacing: AppSpacing.xs,
+                      children: [
+                        _MetaChip(label: label),
+                        _MetaChip(label: '$dosageStr $dosageUnit'),
+                      ],
                     ),
                     if (memoText != null)
                       Padding(
-                        padding: const EdgeInsets.only(top: AppSpacing.xxs),
+                        padding: const EdgeInsets.only(top: AppSpacing.sm),
                         child: Text(
                           memoText,
                           style: textTheme.bodySmall?.copyWith(
@@ -283,6 +342,36 @@ class _TodaySupplementItem extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MetaChip extends StatelessWidget {
+  const _MetaChip({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest,
+        borderRadius: AppRadius.pillBorder,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm,
+          vertical: AppSpacing.xxs,
+        ),
+        child: Text(
+          label,
+          style: Theme.of(
+            context,
+          ).textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
         ),
       ),
     );
@@ -315,9 +404,7 @@ class _TodayEmptyState extends StatelessWidget {
             const SizedBox(height: AppSpacing.md),
             Text(
               l10n.todayEmptyTitle,
-              style: Theme.of(
-                context,
-              ).textTheme.titleSmall,
+              style: Theme.of(context).textTheme.titleSmall,
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(

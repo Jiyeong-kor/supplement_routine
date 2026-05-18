@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supplement_routine/app/app_layout.dart';
+import 'package:supplement_routine/app/app_radius.dart';
 import 'package:supplement_routine/app/app_spacing.dart';
 import 'package:supplement_routine/core/models/supplement.dart';
 import 'package:supplement_routine/features/supplement/presentation/supplement_display_text.dart';
@@ -186,58 +187,75 @@ class _SupplementListItem extends StatelessWidget {
       margin: EdgeInsets.zero,
       color: colorScheme.surfaceContainerLow,
       child: Padding(
-        padding: AppSpacing.cardPadding,
-        child: Column(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: colorScheme.primaryContainer,
+                borderRadius: AppRadius.lgBorder,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Icon(
+                  Icons.medication_outlined,
+                  color: colorScheme.primary,
+                ),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
                     supplement.name,
                     style: textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
                       color: colorScheme.onSurface,
                     ),
                   ),
-                ),
-                _SupplementItemActions(
-                  isNotificationEnabled: supplement.isNotificationEnabled,
-                  onEdit: onEdit,
-                  onDelete: onDelete,
-                  onToggleNotification: onToggleNotification,
-                ),
-              ],
+                  const SizedBox(height: AppSpacing.sm),
+                  Wrap(
+                    spacing: AppSpacing.xs,
+                    runSpacing: AppSpacing.xs,
+                    children: [
+                      _SupplementMetaChip(
+                        label: l10n.supplementDailyCount(
+                          SupplementDisplayText.methodLabel(
+                            l10n,
+                            supplement.method,
+                          ),
+                          supplement.dailyCount,
+                        ),
+                      ),
+                      _SupplementMetaChip(
+                        label: l10n.supplementDosage(
+                          _formatDosage(supplement.dosageValue),
+                          supplement.dosageUnit,
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (supplement.memo != null) ...[
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      supplement.memo!,
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.tertiary,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
             ),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              l10n.supplementDailyCount(
-                SupplementDisplayText.methodLabel(l10n, supplement.method),
-                supplement.dailyCount,
-              ),
-              style: textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
+            const SizedBox(width: AppSpacing.sm),
+            _SupplementItemActions(
+              isNotificationEnabled: supplement.isNotificationEnabled,
+              onEdit: onEdit,
+              onDelete: onDelete,
+              onToggleNotification: onToggleNotification,
             ),
-            const SizedBox(height: AppSpacing.xxs),
-            Text(
-              l10n.supplementDosage(
-                _formatDosage(supplement.dosageValue),
-                supplement.dosageUnit,
-              ),
-              style: textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-            if (supplement.memo != null) ...[
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                supplement.memo!,
-                style: textTheme.bodySmall?.copyWith(
-                  color: colorScheme.tertiary,
-                ),
-              ),
-            ],
           ],
         ),
       ),
@@ -250,6 +268,36 @@ class _SupplementListItem extends StatelessWidget {
     }
 
     return value.toString();
+  }
+}
+
+class _SupplementMetaChip extends StatelessWidget {
+  const _SupplementMetaChip({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest,
+        borderRadius: AppRadius.pillBorder,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm,
+          vertical: AppSpacing.xxs,
+        ),
+        child: Text(
+          label,
+          style: Theme.of(
+            context,
+          ).textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
+        ),
+      ),
+    );
   }
 }
 
