@@ -52,6 +52,14 @@ void main() {
     ]);
   });
 
+  test('정해진 시간 방식은 값이 없으면 기본 시간을 사용한다', () {
+    final result = SchedulingService.calculateIntakeTimes(
+      supplement(id: 'fixed_default', method: IntakeMethod.fixedTime),
+    );
+
+    expect(result.single.time, const TimeOfDay(hour: 9, minute: 0));
+  });
+
   test('일정 간격 방식은 자정을 넘는 일정을 생성하지 않는다', () {
     final result = SchedulingService.calculateIntakeTimes(
       supplement(
@@ -66,6 +74,21 @@ void main() {
     expect(result.map((item) => item.time).toList(), [
       const TimeOfDay(hour: 20, minute: 0),
       const TimeOfDay(hour: 23, minute: 0),
+    ]);
+  });
+
+  test('일정 간격 방식은 시작 시간과 간격 기본값을 사용한다', () {
+    final result = SchedulingService.calculateIntakeTimes(
+      supplement(
+        id: 'interval_default',
+        method: IntakeMethod.interval,
+        dailyCount: 2,
+      ),
+    );
+
+    expect(result.map((item) => item.time).toList(), [
+      const TimeOfDay(hour: 8, minute: 0),
+      const TimeOfDay(hour: 16, minute: 0),
     ]);
   });
 
@@ -105,6 +128,27 @@ void main() {
       const TimeOfDay(hour: 10, minute: 0),
       const TimeOfDay(hour: 22, minute: 0),
     ]);
+  });
+
+  test('식간 루틴은 점심과 저녁 사이도 계산한다', () {
+    final result = SchedulingService.calculateIntakeTimes(
+      supplement(
+        id: 'between_lunch_dinner',
+        method: IntakeMethod.mealBased,
+        selectedSlots: const [
+          IntakeSlot(
+            mealType: MealType.lunch,
+            condition: IntakeCondition.betweenMeals,
+          ),
+        ],
+      ),
+      mealTimeSettings: const MealTimeSettings(
+        lunchTime: TimeOfDay(hour: 12, minute: 0),
+        dinnerTime: TimeOfDay(hour: 18, minute: 0),
+      ),
+    );
+
+    expect(result.single.time, const TimeOfDay(hour: 15, minute: 0));
   });
 
   test('일일 기록은 시간순으로 정렬된다', () {

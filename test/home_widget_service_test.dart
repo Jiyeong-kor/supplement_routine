@@ -76,4 +76,48 @@ void main() {
     expect(summary.hasNext, isFalse);
     expect(summary.nextName, isNull);
   });
+
+  test('홈 위젯 요약은 일정이 없으면 빈 상태를 계산한다', () {
+    final summary = HomeWidgetSummary.fromTodayList(const []);
+
+    expect(summary.doneCount, 0);
+    expect(summary.totalCount, 0);
+    expect(summary.hasSchedule, isFalse);
+    expect(summary.hasNext, isFalse);
+    expect(summary.toMap(), {
+      'doneCount': 0,
+      'totalCount': 0,
+      'hasNext': false,
+      'hasSchedule': false,
+      'nextName': null,
+      'nextHour': null,
+      'nextMinute': null,
+    });
+  });
+
+  test('홈 위젯 요약은 첫 번째 미완료 일정만 다음 일정으로 사용한다', () {
+    final summary = HomeWidgetSummary.fromTodayList([
+      createTodayItem(
+        id: 'vitamin_d',
+        supplementName: '비타민 D',
+        scheduledTime: const TimeOfDay(hour: 8, minute: 0),
+        isDone: true,
+      ),
+      createTodayItem(
+        id: 'omega3',
+        supplementName: '오메가3',
+        scheduledTime: const TimeOfDay(hour: 9, minute: 0),
+        isDone: false,
+      ),
+      createTodayItem(
+        id: 'magnesium',
+        supplementName: '마그네슘',
+        scheduledTime: const TimeOfDay(hour: 21, minute: 0),
+        isDone: false,
+      ),
+    ]);
+
+    expect(summary.nextName, '오메가3');
+    expect(summary.nextHour, 9);
+  });
 }

@@ -111,4 +111,31 @@ void main() {
     );
     expect(container.read(notificationSettingsProvider), isFalse);
   });
+
+  test('오늘 목록 토글은 완료와 해제를 왕복한다', () {
+    final container = createContainer(supplements: [mealSupplement()]);
+    addTearDown(container.dispose);
+    final recordId = container.read(todayListProvider).single.record.id;
+
+    container.read(todayListProvider.notifier).toggleRecord(recordId);
+    expect(container.read(todayListProvider).single.record.isDone, isTrue);
+
+    container.read(todayListProvider.notifier).toggleRecord(recordId);
+    expect(container.read(todayListProvider).single.record.isDone, isFalse);
+    expect(container.read(todayListProvider).single.record.takenAt, isNull);
+  });
+
+  test('알림 토글은 영양제 상태를 반전한다', () {
+    final container = createContainer(supplements: [mealSupplement()]);
+    addTearDown(container.dispose);
+
+    container
+        .read(supplementListProvider.notifier)
+        .toggleNotification('vitamin_d');
+
+    expect(
+      container.read(supplementListProvider).single.isNotificationEnabled,
+      isFalse,
+    );
+  });
 }

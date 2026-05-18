@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 extension TimeOfDayExtension on TimeOfDay {
   TimeOfDay addMinutes(int minutes) {
     final totalMinutes = hour * 60 + minute + minutes;
+    final normalizedMinutes = totalMinutes % (24 * 60);
     return TimeOfDay(
-      hour: (totalMinutes ~/ 60) % 24,
-      minute: totalMinutes % 60,
+      hour: normalizedMinutes ~/ 60,
+      minute: normalizedMinutes % 60,
     );
   }
 

@@ -275,6 +275,30 @@ void main() {
     expect(segmentedButtons, findsNWidgets(2));
   });
 
+  testWidgets('영양제 등록 화면은 일정 간격 설정을 표시한다', (WidgetTester tester) async {
+    await tester.pumpWidget(const ProviderScope(child: SupplementRoutineApp()));
+
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('직접 시간 지정'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('일정 간격'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('시작 시간'), findsOneWidget);
+    expect(find.text('복용 간격(시간)'), findsOneWidget);
+    expect(find.textContaining('자정을 넘는 일정은'), findsOneWidget);
+  });
+
+  testWidgets('영양제 등록 화면은 저장 버튼을 항상 표시한다', (WidgetTester tester) async {
+    await tester.pumpWidget(const ProviderScope(child: SupplementRoutineApp()));
+
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+
+    expect(find.text('등록 완료'), findsOneWidget);
+  });
+
   testWidgets('기록 화면은 월간 범례를 함께 표시한다', (WidgetTester tester) async {
     await tester.pumpWidget(const ProviderScope(child: SupplementRoutineApp()));
 
@@ -285,6 +309,33 @@ void main() {
     expect(find.text('40~79%'), findsOneWidget);
     expect(find.text('40% 미만'), findsOneWidget);
     expect(find.text('일정 없음'), findsOneWidget);
+  });
+
+  testWidgets('설정 화면은 식사 시간 바텀시트를 연다', (WidgetTester tester) async {
+    await tester.pumpWidget(const ProviderScope(child: SupplementRoutineApp()));
+
+    await tester.tap(find.text('설정'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('식사 시간 설정'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('아침'), findsOneWidget);
+    expect(find.text('점심'), findsOneWidget);
+    expect(find.text('저녁'), findsOneWidget);
+  });
+
+  testWidgets('설정 화면은 면책 고지 다이얼로그를 연다', (WidgetTester tester) async {
+    await tester.pumpWidget(const ProviderScope(child: SupplementRoutineApp()));
+
+    await tester.tap(find.text('설정'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('면책 고지'));
+    await tester.drag(find.byType(ListView), const Offset(0, -120));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('면책 고지'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('의료적 조언을 제공하지 않습니다'), findsOneWidget);
   });
 
   testWidgets('넓은 화면에서는 navigation rail을 사용한다', (WidgetTester tester) async {

@@ -29,6 +29,14 @@ void main() {
     );
   });
 
+  test('메모리 설정 저장소는 알림 활성화 상태를 갱신한다', () {
+    final repository = MemorySettingsRepository();
+
+    expect(repository.getNotificationEnabled(), isTrue);
+    expect(repository.updateNotificationEnabled(false), isFalse);
+    expect(repository.getNotificationEnabled(), isFalse);
+  });
+
   test('mock 기록 저장소는 upsert와 개별 영양제 삭제를 처리한다', () {
     final repository = MockIntakeRecordRepository(initialRecords: const {});
     final vitaminRecord = IntakeRecord(
@@ -53,6 +61,22 @@ void main() {
     expect(remaining, hasLength(1));
     expect(remaining.values.single.id, 'record_omega');
     expect(remaining.values.single.isDone, isTrue);
+  });
+
+  test('mock 기록 저장소는 전체 삭제를 처리한다', () {
+    final repository = MockIntakeRecordRepository(
+      initialRecords: {
+        'record': IntakeRecord(
+          id: 'record',
+          supplementId: 'vitamin',
+          date: DateTime(2026, 5, 18),
+          scheduledTime: const TimeOfDay(hour: 8, minute: 0),
+          isDone: false,
+        ),
+      },
+    );
+
+    expect(repository.clearAll(), isEmpty);
   });
 
   test('mock 영양제 저장소는 없는 ID 수정 시 기존 목록을 유지한다', () {

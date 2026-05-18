@@ -22,6 +22,11 @@ void main() {
     expect(SupplementFormPolicy.parseDosage('1.5'), 1.5);
   });
 
+  test('복용량 표시는 정수와 소수를 구분한다', () {
+    expect(SupplementFormPolicy.formatDosage(2), '2');
+    expect(SupplementFormPolicy.formatDosage(1.5), '1.5');
+  });
+
   test('식사 기준 복용은 하나 이상의 시간대가 필요하다', () {
     expect(
       SupplementFormPolicy.validateRoutineSlots({}),
@@ -100,5 +105,59 @@ void main() {
     expect(supplement.method, IntakeMethod.fixedTime);
     expect(supplement.dailyCount, 2);
     expect(supplement.fixedTimes, hasLength(2));
+  });
+
+  test('직접 시간 지정 입력값으로 Supplement를 생성한다', () {
+    final supplement = SupplementFormMapper.toSupplement(
+      input: SupplementFormInput(
+        name: '오메가3',
+        dosageUnit: '캡슐',
+        dosageValue: 1,
+        isRoutineBased: false,
+        isSpecificTime: true,
+        selectedSlots: {},
+        fixedCount: 2,
+        fixedTimes: const [
+          TimeOfDay(hour: 8, minute: 0),
+          TimeOfDay(hour: 20, minute: 0),
+        ],
+        startTime: const TimeOfDay(hour: 8, minute: 0),
+        intervalHours: 8,
+        intervalCount: 1,
+        isNotificationEnabled: true,
+        memo: null,
+      ),
+    );
+
+    expect(supplement.method, IntakeMethod.fixedTime);
+    expect(supplement.dailyCount, 2);
+    expect(supplement.fixedTimes, hasLength(2));
+    expect(supplement.startTime, isNull);
+  });
+
+  test('일정 간격 입력값으로 Supplement를 생성한다', () {
+    final supplement = SupplementFormMapper.toSupplement(
+      input: SupplementFormInput(
+        name: '비타민 C',
+        dosageUnit: '정',
+        dosageValue: 1,
+        isRoutineBased: false,
+        isSpecificTime: false,
+        selectedSlots: {},
+        fixedCount: 1,
+        fixedTimes: const [TimeOfDay(hour: 8, minute: 0)],
+        startTime: const TimeOfDay(hour: 7, minute: 30),
+        intervalHours: 6,
+        intervalCount: 3,
+        isNotificationEnabled: false,
+        memo: '충분한 물과 함께',
+      ),
+    );
+
+    expect(supplement.method, IntakeMethod.interval);
+    expect(supplement.dailyCount, 3);
+    expect(supplement.startTime, const TimeOfDay(hour: 7, minute: 30));
+    expect(supplement.intervalHours, 6);
+    expect(supplement.fixedTimes, isNull);
   });
 }
