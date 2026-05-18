@@ -54,7 +54,12 @@ class _AppBootstrapState extends State<AppBootstrap> {
   }
 
   Future<void> _loadRepositories() async {
-    final repositories = await _createRepositories();
+    final _RepositoryBundle repositories;
+    try {
+      repositories = await _createRepositories();
+    } catch (_) {
+      return;
+    }
 
     if (!mounted) {
       return;
