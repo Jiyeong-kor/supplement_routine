@@ -79,6 +79,7 @@ void main() {
     expect(find.text('식사 기준 · 하루 1회'), findsWidgets);
     expect(find.text('1회 1 개'), findsWidgets);
 
+    await tester.ensureVisible(find.byTooltip('삭제').last);
     await tester.tap(find.byTooltip('삭제').last);
     await tester.pumpAndSettle();
 
@@ -239,6 +240,7 @@ void main() {
 
     await tester.tap(find.text('설정'));
     await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('앱 사용 가이드'));
     await tester.tap(find.text('앱 사용 가이드'));
     await tester.pumpAndSettle();
 
