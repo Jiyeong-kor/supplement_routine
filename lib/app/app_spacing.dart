@@ -18,6 +18,12 @@ class AppSpacing {
     screen,
     96,
   );
+  static const EdgeInsets screenPaddingWithBottomAction = EdgeInsets.fromLTRB(
+    screen,
+    screen,
+    screen,
+    xxl,
+  );
   static const EdgeInsets cardPadding = EdgeInsets.all(lg);
   static const EdgeInsets sectionTitlePadding = EdgeInsets.fromLTRB(
     lg,

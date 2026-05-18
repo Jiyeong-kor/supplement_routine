@@ -179,7 +179,7 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
       ),
       body: AppConstrainedContent(
         child: SingleChildScrollView(
-          padding: AppSpacing.screenPadding,
+          padding: AppSpacing.screenPaddingWithBottomAction,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -252,15 +252,23 @@ class _SupplementAddScreenState extends ConsumerState<SupplementAddScreen> {
                   hintText: l10n.supplementMemoHint,
                 ),
               ),
-              const SizedBox(height: AppSpacing.xxxl),
-
-              _SaveSupplementButton(
-                label: _isEditMode
-                    ? l10n.supplementEditDone
-                    : l10n.supplementAddDone,
-                onPressed: _saveSupplement,
-              ),
             ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.screen,
+            AppSpacing.sm,
+            AppSpacing.screen,
+            AppSpacing.screen,
+          ),
+          child: _SaveSupplementButton(
+            label: _isEditMode
+                ? l10n.supplementEditDone
+                : l10n.supplementAddDone,
+            onPressed: _saveSupplement,
           ),
         ),
       ),
