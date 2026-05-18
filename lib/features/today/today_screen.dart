@@ -308,7 +308,7 @@ class _TodaySupplementItem extends StatelessWidget {
                   children: [
                     Text(
                       name,
-                      style: textTheme.titleSmall?.copyWith(
+                      style: textTheme.titleMedium?.copyWith(
                         color: isDone
                             ? colorScheme.onSurfaceVariant
                             : colorScheme.onSurface,
@@ -404,7 +404,7 @@ class _TodayEmptyState extends StatelessWidget {
             const SizedBox(height: AppSpacing.md),
             Text(
               l10n.todayEmptyTitle,
-              style: Theme.of(context).textTheme.titleSmall,
+              style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(

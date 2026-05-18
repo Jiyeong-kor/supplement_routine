@@ -211,7 +211,7 @@ class _SupplementListItem extends StatelessWidget {
                 children: [
                   Text(
                     supplement.name,
-                    style: textTheme.titleSmall?.copyWith(
+                    style: textTheme.titleMedium?.copyWith(
                       color: colorScheme.onSurface,
                     ),
                   ),
@@ -378,9 +378,7 @@ class _SupplementEmptyState extends StatelessWidget {
             const SizedBox(height: AppSpacing.md),
             Text(
               l10n.supplementEmptyTitle,
-              style: Theme.of(
-                context,
-              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+              style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(

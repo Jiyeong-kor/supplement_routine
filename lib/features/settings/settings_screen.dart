@@ -322,8 +322,8 @@ class _SettingsCard extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   title,
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
@@ -363,7 +363,7 @@ class _MealTimeSheetContent extends ConsumerWidget {
             ListTile(
               title: Text(
                 l10n.settingsMealTimeTitle,
-                style: const TextStyle(fontWeight: FontWeight.w700),
+                style: Theme.of(context).textTheme.titleMedium,
               ),
               subtitle: Text(
                 l10n.settingsMealTimeDescription,
@@ -437,12 +437,7 @@ class _GuideItem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: Theme.of(
-              context,
-            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-          ),
+          Text(title, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: AppSpacing.xxs),
           Text(
             description,
@@ -477,7 +472,7 @@ class _MealTimeTile extends StatelessWidget {
         time.to24hString(),
         style: TextStyle(
           color: colorScheme.primary,
-          fontWeight: FontWeight.w700,
+          fontWeight: FontWeight.w600,
         ),
       ),
       onTap: onTap,

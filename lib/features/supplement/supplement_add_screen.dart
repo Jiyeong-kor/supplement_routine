@@ -548,8 +548,8 @@ class _SectionTitle extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: Text(
         title,
-        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-          fontWeight: FontWeight.w700,
+        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+          fontWeight: FontWeight.w600,
           color: colorScheme.primary,
         ),
       ),
