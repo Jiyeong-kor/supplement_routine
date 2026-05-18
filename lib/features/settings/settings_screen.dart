@@ -29,140 +29,156 @@ class SettingsScreen extends ConsumerWidget {
       appBar: AppBar(title: Text(l10n.settingsTitle)),
       body: AppConstrainedContent(
         child: ListView(
+          padding: AppSpacing.screenPadding,
           children: [
-            _SettingsSectionTitle(l10n.settingsDefaultSection),
-            ListTile(
-              leading: Icon(Icons.restaurant, color: colorScheme.primary),
-              title: Text(l10n.settingsMealTimeTitle),
-              subtitle: Text(
-                l10n.settingsMealTimeSummary(
-                  mealTimeSettings.breakfastTime.to24hString(),
-                  mealTimeSettings.lunchTime.to24hString(),
-                  mealTimeSettings.dinnerTime.to24hString(),
+            _SettingsCard(
+              title: l10n.settingsDefaultSection,
+              children: [
+                ListTile(
+                  leading: Icon(Icons.restaurant, color: colorScheme.primary),
+                  title: Text(l10n.settingsMealTimeTitle),
+                  subtitle: Text(
+                    l10n.settingsMealTimeSummary(
+                      mealTimeSettings.breakfastTime.to24hString(),
+                      mealTimeSettings.lunchTime.to24hString(),
+                      mealTimeSettings.dinnerTime.to24hString(),
+                    ),
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    _showMealTimeSheet(context);
+                  },
                 ),
-              ),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                _showMealTimeSheet(context);
-              },
+                SwitchListTile(
+                  secondary: Icon(
+                    Icons.notifications,
+                    color: colorScheme.primary,
+                  ),
+                  title: Text(l10n.settingsNotificationTitle),
+                  subtitle: Text(
+                    isNotificationEnabled
+                        ? l10n.settingsNotificationOn
+                        : l10n.settingsNotificationOff,
+                  ),
+                  value: isNotificationEnabled,
+                  onChanged: (value) {
+                    ref
+                        .read(notificationSettingsProvider.notifier)
+                        .updateEnabled(value);
+                  },
+                ),
+                if (defaultTargetPlatform == TargetPlatform.android)
+                  ListTile(
+                    leading: Icon(Icons.alarm, color: colorScheme.primary),
+                    title: Text(l10n.settingsExactAlarmTitle),
+                    subtitle: Text(
+                      exactAlarmPermission.when(
+                        data: (isGranted) => isGranted
+                            ? l10n.settingsExactAlarmGranted
+                            : l10n.settingsExactAlarmRequired,
+                        loading: () => l10n.settingsExactAlarmChecking,
+                        error: (_, _) => l10n.settingsExactAlarmRequired,
+                      ),
+                    ),
+                    trailing: isExactAlarmGranted == false
+                        ? const Icon(Icons.chevron_right)
+                        : null,
+                    onTap: isExactAlarmGranted == false
+                        ? () async {
+                            final isGranted =
+                                await IntakeNotificationService.requestExactAlarmPermission();
+                            ref.invalidate(exactAlarmPermissionProvider);
+
+                            if (isGranted) {
+                              await IntakeNotificationService.syncTodayReminders(
+                                ref.read(todayListProvider),
+                              );
+                            }
+
+                            if (!context.mounted) {
+                              return;
+                            }
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  isGranted
+                                      ? l10n.settingsExactAlarmEnabled
+                                      : l10n.settingsExactAlarmStillDisabled,
+                                ),
+                              ),
+                            );
+                          }
+                        : null,
+                  ),
+                if (WindowsStartupService.isSupported)
+                  SwitchListTile(
+                    secondary: Icon(
+                      Icons.desktop_windows,
+                      color: colorScheme.primary,
+                    ),
+                    title: Text(l10n.settingsWindowsStartupTitle),
+                    subtitle: Text(
+                      windowsStartup.when(
+                        data: (isEnabled) => isEnabled
+                            ? l10n.settingsWindowsStartupOn
+                            : l10n.settingsWindowsStartupOff,
+                        loading: () => l10n.settingsWindowsStartupChecking,
+                        error: (_, _) => l10n.settingsWindowsStartupOff,
+                      ),
+                    ),
+                    value: windowsStartup.asData?.value ?? false,
+                    onChanged: windowsStartup.isLoading
+                        ? null
+                        : (value) async {
+                            await WindowsStartupService.setEnabled(value);
+                            ref.invalidate(windowsStartupProvider);
+                          },
+                  ),
+              ],
             ),
-            SwitchListTile(
-              secondary: Icon(Icons.notifications, color: colorScheme.primary),
-              title: Text(l10n.settingsNotificationTitle),
-              subtitle: Text(
-                isNotificationEnabled
-                    ? l10n.settingsNotificationOn
-                    : l10n.settingsNotificationOff,
-              ),
-              value: isNotificationEnabled,
-              onChanged: (value) {
-                ref
-                    .read(notificationSettingsProvider.notifier)
-                    .updateEnabled(value);
-              },
+            const SizedBox(height: AppSpacing.md),
+            _SettingsCard(
+              title: l10n.settingsDataSection,
+              children: [
+                ListTile(
+                  leading: Icon(Icons.delete_forever, color: colorScheme.error),
+                  title: Text(
+                    l10n.settingsResetTitle,
+                    style: TextStyle(color: colorScheme.error),
+                  ),
+                  onTap: () {
+                    _showResetDialog(context, ref);
+                  },
+                ),
+              ],
             ),
-            if (defaultTargetPlatform == TargetPlatform.android)
-              ListTile(
-                leading: Icon(Icons.alarm, color: colorScheme.primary),
-                title: Text(l10n.settingsExactAlarmTitle),
-                subtitle: Text(
-                  exactAlarmPermission.when(
-                    data: (isGranted) => isGranted
-                        ? l10n.settingsExactAlarmGranted
-                        : l10n.settingsExactAlarmRequired,
-                    loading: () => l10n.settingsExactAlarmChecking,
-                    error: (_, _) => l10n.settingsExactAlarmRequired,
+            const SizedBox(height: AppSpacing.md),
+            _SettingsCard(
+              title: l10n.settingsInfoSection,
+              children: [
+                ListTile(
+                  leading: Icon(Icons.help_outline, color: colorScheme.primary),
+                  title: Text(l10n.settingsUsageGuideTitle),
+                  onTap: () {
+                    _showUsageGuideDialog(context);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.info_outline, color: colorScheme.primary),
+                  title: Text(l10n.settingsDisclaimerTitle),
+                  onTap: () {
+                    _showDisclaimerDialog(context);
+                  },
+                ),
+                ListTile(
+                  title: Text(l10n.settingsVersionTitle),
+                  trailing: Text(
+                    AppConfig.appVersion,
+                    style: TextStyle(color: colorScheme.onSurfaceVariant),
                   ),
                 ),
-                trailing: isExactAlarmGranted == false
-                    ? const Icon(Icons.chevron_right)
-                    : null,
-                onTap: isExactAlarmGranted == false
-                    ? () async {
-                        final isGranted =
-                            await IntakeNotificationService.requestExactAlarmPermission();
-                        ref.invalidate(exactAlarmPermissionProvider);
-
-                        if (isGranted) {
-                          await IntakeNotificationService.syncTodayReminders(
-                            ref.read(todayListProvider),
-                          );
-                        }
-
-                        if (!context.mounted) {
-                          return;
-                        }
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              isGranted
-                                  ? l10n.settingsExactAlarmEnabled
-                                  : l10n.settingsExactAlarmStillDisabled,
-                            ),
-                          ),
-                        );
-                      }
-                    : null,
-              ),
-            if (WindowsStartupService.isSupported)
-              SwitchListTile(
-                secondary: Icon(
-                  Icons.desktop_windows,
-                  color: colorScheme.primary,
-                ),
-                title: Text(l10n.settingsWindowsStartupTitle),
-                subtitle: Text(
-                  windowsStartup.when(
-                    data: (isEnabled) => isEnabled
-                        ? l10n.settingsWindowsStartupOn
-                        : l10n.settingsWindowsStartupOff,
-                    loading: () => l10n.settingsWindowsStartupChecking,
-                    error: (_, _) => l10n.settingsWindowsStartupOff,
-                  ),
-                ),
-                value: windowsStartup.asData?.value ?? false,
-                onChanged: windowsStartup.isLoading
-                    ? null
-                    : (value) async {
-                        await WindowsStartupService.setEnabled(value);
-                        ref.invalidate(windowsStartupProvider);
-                      },
-              ),
-            const Divider(),
-            _SettingsSectionTitle(l10n.settingsDataSection),
-            ListTile(
-              leading: Icon(Icons.delete_forever, color: colorScheme.error),
-              title: Text(
-                l10n.settingsResetTitle,
-                style: TextStyle(color: colorScheme.error),
-              ),
-              onTap: () {
-                _showResetDialog(context, ref);
-              },
-            ),
-            const Divider(),
-            _SettingsSectionTitle(l10n.settingsInfoSection),
-            ListTile(
-              leading: Icon(Icons.help_outline, color: colorScheme.primary),
-              title: Text(l10n.settingsUsageGuideTitle),
-              onTap: () {
-                _showUsageGuideDialog(context);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.info_outline, color: colorScheme.primary),
-              title: Text(l10n.settingsDisclaimerTitle),
-              onTap: () {
-                _showDisclaimerDialog(context);
-              },
-            ),
-            ListTile(
-              title: Text(l10n.settingsVersionTitle),
-              trailing: Text(
-                AppConfig.appVersion,
-                style: TextStyle(color: colorScheme.onSurfaceVariant),
-              ),
+              ],
             ),
           ],
         ),
@@ -283,20 +299,38 @@ class SettingsScreen extends ConsumerWidget {
   }
 }
 
-class _SettingsSectionTitle extends StatelessWidget {
-  const _SettingsSectionTitle(this.title);
+class _SettingsCard extends StatelessWidget {
+  const _SettingsCard({required this.title, required this.children});
 
   final String title;
+  final List<Widget> children;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: AppSpacing.sectionTitlePadding,
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-          fontWeight: FontWeight.w700,
-          color: Theme.of(context).colorScheme.primary,
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.sm,
+              ),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  title,
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+              ),
+            ),
+            ...children,
+          ],
         ),
       ),
     );
