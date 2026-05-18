@@ -13,7 +13,7 @@ Supplement Routine is a routine and record management app, not a medical advice 
 ## Material Design 3 Decisions
 
 - Color scheme: Sage green seed color with warm neutral surfaces for a calm routine-management tone. Success, warning, and error colors are explicit app tokens.
-- Typography: Pretendard static font files, weights 400, 500, 600, and 700. Material 3 text roles are preserved, body copy stays light, and emphasis increases gradually across title roles.
+- Typography: Pretendard static font files, weights 400, 500, 600, and 700. The official Material 3 type scale is declared explicitly (`titleLarge 22/28`, `bodyLarge 16/24`, `bodyMedium 14/20`, `bodySmall 12/16`), body copy stays light, and emphasis increases gradually across title roles.
 - Spacing: 4-point scale with common screen and card padding tokens.
 - Shape: 8px for compact controls, 12px for cards and inputs, 16px for prominent actions, and 28px for larger containers.
 - Elevation: Mostly zero elevation with outlined/tonal surfaces. This keeps the app quiet and suitable for repeated daily use.

@@ -49,7 +49,7 @@ class TodayScreen extends ConsumerWidget {
               const SizedBox(height: AppSpacing.xxxl),
               Text(
                 l10n.todayListTitle,
-                style: Theme.of(context).textTheme.titleMedium,
+                style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: AppSpacing.md),
               if (todayList.isEmpty)

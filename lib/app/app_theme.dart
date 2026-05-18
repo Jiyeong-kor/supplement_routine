@@ -28,7 +28,7 @@ class AppTheme {
         scrolledUnderElevation: 1,
         backgroundColor: colorScheme.surfaceContainer,
         foregroundColor: colorScheme.onSurface,
-        titleTextStyle: textTheme.titleMedium,
+        titleTextStyle: textTheme.titleLarge,
         elevation: 0,
       ),
       cardTheme: CardThemeData(
