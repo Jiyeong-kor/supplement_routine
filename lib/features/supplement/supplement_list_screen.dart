@@ -193,7 +193,7 @@ class _SupplementListItem extends StatelessWidget {
           children: [
             DecoratedBox(
               decoration: BoxDecoration(
-                color: colorScheme.primaryContainer,
+                color: colorScheme.secondaryContainer,
                 borderRadius: AppRadius.lgBorder,
               ),
               child: Padding(
@@ -282,7 +282,7 @@ class _SupplementMetaChip extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
+        color: colorScheme.primaryContainer,
         borderRadius: AppRadius.pillBorder,
       ),
       child: Padding(
@@ -292,9 +292,10 @@ class _SupplementMetaChip extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: Theme.of(
-            context,
-          ).textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            color: colorScheme.primary,
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ),
     );

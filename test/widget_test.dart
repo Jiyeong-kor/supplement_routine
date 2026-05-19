@@ -282,12 +282,12 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('직접 시간 지정'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('일정 간격'));
+    await tester.tap(find.text('일정 간격 반복'));
     await tester.pumpAndSettle();
 
-    expect(find.text('시작 시간'), findsOneWidget);
-    expect(find.text('복용 간격(시간)'), findsOneWidget);
-    expect(find.textContaining('자정을 넘는 일정은'), findsOneWidget);
+    expect(find.text('첫 복용 시작 시각'), findsOneWidget);
+    expect(find.text('반복 간격(시간)'), findsOneWidget);
+    expect(find.textContaining('오늘 자정 전까지만'), findsOneWidget);
   });
 
   testWidgets('영양제 등록 화면은 저장 버튼을 항상 표시한다', (WidgetTester tester) async {
@@ -335,7 +335,7 @@ void main() {
     await tester.tap(find.text('면책 고지'));
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('의료적 조언을 제공하지 않습니다'), findsOneWidget);
+    expect(find.textContaining('의료적 조언이나 진단을 제공하지 않습니다'), findsOneWidget);
   });
 
   testWidgets('넓은 화면에서는 navigation rail을 사용한다', (WidgetTester tester) async {

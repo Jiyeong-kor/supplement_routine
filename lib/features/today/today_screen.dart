@@ -44,7 +44,7 @@ class TodayScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _TodayHeader(dateText: dateString, quoteText: quoteText),
-              const SizedBox(height: AppSpacing.lg),
+              const SizedBox(height: AppSpacing.xl),
               _TodayProgressCard(done: doneCount, total: totalCount),
               const SizedBox(height: AppSpacing.xxxl),
               Text(
@@ -119,42 +119,31 @@ class _TodayHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          dateText,
-          style: textTheme.labelLarge?.copyWith(
-            color: colorScheme.primary,
-            fontWeight: FontWeight.w600,
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: colorScheme.primaryContainer,
+            borderRadius: AppRadius.pillBorder,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.xs,
+            ),
+            child: Text(
+              dateText,
+              style: textTheme.labelMedium?.copyWith(
+                color: colorScheme.primary,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
         ),
-        const SizedBox(height: AppSpacing.sm),
-        Card.filled(
-          margin: EdgeInsets.zero,
-          color: colorScheme.primaryContainer,
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.xl),
-            child: Row(
-              children: [
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary.withValues(alpha: 0.12),
-                    borderRadius: AppRadius.lgBorder,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    child: Icon(Icons.auto_awesome, color: colorScheme.primary),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Text(
-                    quoteText,
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onPrimaryContainer,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+        const SizedBox(height: AppSpacing.md),
+        Text(
+          quoteText,
+          style: textTheme.headlineSmall?.copyWith(
+            color: colorScheme.onSurface,
+            height: 1.28,
           ),
         ),
       ],
@@ -190,7 +179,7 @@ class _TodayProgressCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(l10n.todayRoutineTitle, style: textTheme.titleSmall),
+                    Text(l10n.todayRoutineTitle, style: textTheme.titleMedium),
                     const SizedBox(height: AppSpacing.xxs),
                     Text(
                       l10n.todayProgressCount(done, total),
@@ -214,8 +203,8 @@ class _TodayProgressCard extends StatelessWidget {
               borderRadius: AppRadius.pillBorder,
               child: LinearProgressIndicator(
                 value: percent,
-                minHeight: 10,
-                backgroundColor: colorScheme.surfaceContainerHighest,
+                minHeight: 8,
+                backgroundColor: colorScheme.primaryContainer,
               ),
             ),
           ],
@@ -268,7 +257,7 @@ class _TodaySupplementItem extends StatelessWidget {
             children: [
               DecoratedBox(
                 decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer,
+                  color: colorScheme.secondaryContainer,
                   borderRadius: AppRadius.lgBorder,
                 ),
                 child: SizedBox(
@@ -292,7 +281,7 @@ class _TodaySupplementItem extends StatelessWidget {
                           time.split(' ').skip(1).join(' '),
                           textAlign: TextAlign.center,
                           style: textTheme.labelLarge?.copyWith(
-                            color: colorScheme.onPrimaryContainer,
+                            color: colorScheme.primary,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -360,7 +349,7 @@ class _MetaChip extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
+        color: colorScheme.primaryContainer,
         borderRadius: AppRadius.pillBorder,
       ),
       child: Padding(
@@ -372,7 +361,7 @@ class _MetaChip extends StatelessWidget {
           label,
           style: Theme.of(
             context,
-          ).textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
+          ).textTheme.labelSmall?.copyWith(color: colorScheme.primary),
         ),
       ),
     );

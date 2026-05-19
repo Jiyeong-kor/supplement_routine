@@ -395,9 +395,9 @@ class _HistoryOverviewCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final percent = (summary.completionRate * 100).round();
 
-    return Card.filled(
+    return Card(
       margin: EdgeInsets.zero,
-      color: colorScheme.primaryContainer,
+      color: colorScheme.surfaceContainerLow,
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
@@ -406,15 +406,15 @@ class _HistoryOverviewCard extends StatelessWidget {
             Text(
               l10n.historyTodayOverviewTitle,
               style: textTheme.titleMedium?.copyWith(
-                color: colorScheme.onPrimaryContainer,
+                color: colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
               l10n.historyPercent(percent),
               style: textTheme.headlineLarge?.copyWith(
-                color: colorScheme.onPrimaryContainer,
-                fontWeight: FontWeight.w600,
+                color: colorScheme.primary,
+                fontWeight: FontWeight.w700,
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -427,15 +427,15 @@ class _HistoryOverviewCard extends StatelessWidget {
                       summary.totalCount,
                     ),
               style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onPrimaryContainer,
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
             LinearProgressIndicator(
               value: summary.completionRate,
-              minHeight: 10,
+              minHeight: 8,
               borderRadius: AppRadius.pillBorder,
-              backgroundColor: colorScheme.primary.withValues(alpha: 0.18),
+              backgroundColor: colorScheme.primaryContainer,
             ),
           ],
         ),
@@ -475,15 +475,15 @@ class _HistoryItem extends StatelessWidget {
               height: 44,
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  color: _statusColor(colorScheme, completion),
-                  shape: BoxShape.circle,
+                  color: colorScheme.primaryContainer,
+                  borderRadius: AppRadius.pillBorder,
                 ),
                 child: Center(
                   child: Text(
                     '${(completion * 100).round()}',
                     style: textTheme.labelLarge?.copyWith(
-                      color: colorScheme.onPrimary,
-                      fontWeight: FontWeight.w600,
+                      color: _statusColor(colorScheme, completion),
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),

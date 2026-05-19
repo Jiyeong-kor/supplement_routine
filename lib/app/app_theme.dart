@@ -21,14 +21,16 @@ class AppTheme {
       colorScheme: colorScheme,
       fontFamily: AppTypography.fontFamily,
       textTheme: textTheme,
-      scaffoldBackgroundColor: colorScheme.surfaceContainer,
+      scaffoldBackgroundColor: colorScheme.surface,
       visualDensity: VisualDensity.standard,
       appBarTheme: AppBarTheme(
         centerTitle: false,
-        scrolledUnderElevation: 1,
-        backgroundColor: colorScheme.surfaceContainer,
+        scrolledUnderElevation: 0,
+        backgroundColor: colorScheme.surface,
         foregroundColor: colorScheme.onSurface,
-        titleTextStyle: textTheme.titleLarge,
+        titleTextStyle: textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.w700,
+        ),
         elevation: 0,
       ),
       cardTheme: CardThemeData(
@@ -50,11 +52,11 @@ class AppTheme {
         border: AppComponents.inputBorder(colorScheme),
         enabledBorder: AppComponents.inputBorder(colorScheme),
         focusedBorder: OutlineInputBorder(
-          borderRadius: AppRadius.mdBorder,
-          borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
+          borderRadius: AppRadius.lgBorder,
+          borderSide: BorderSide(color: colorScheme.primary, width: 1.2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: AppRadius.mdBorder,
+          borderRadius: AppRadius.lgBorder,
           borderSide: BorderSide(color: colorScheme.error),
         ),
         hintStyle: textTheme.bodyMedium?.copyWith(
@@ -63,17 +65,25 @@ class AppTheme {
       ),
       navigationBarTheme: NavigationBarThemeData(
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-        indicatorColor: colorScheme.primary.withValues(alpha: 0.1),
+        indicatorColor: colorScheme.primaryContainer,
         backgroundColor: colorScheme.surface,
         elevation: 0,
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          final selected = states.contains(WidgetState.selected);
+
+          return IconThemeData(
+            color: selected ? colorScheme.primary : colorScheme.outline,
+            size: selected ? 26 : 24,
+          );
+        }),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final color = states.contains(WidgetState.selected)
               ? colorScheme.primary
-              : colorScheme.onSurfaceVariant;
+              : colorScheme.outline;
 
           return textTheme.labelMedium?.copyWith(
             color: color,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
           );
         }),
       ),
@@ -94,10 +104,10 @@ class AppTheme {
           backgroundColor: colorScheme.surfaceContainerLow,
           foregroundColor: colorScheme.primary,
           minimumSize: const Size.fromHeight(54),
-          elevation: 1,
+          elevation: 0,
           shape: const StadiumBorder(),
           textStyle: textTheme.labelLarge?.copyWith(
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ),
@@ -127,7 +137,7 @@ class AppTheme {
         iconColor: colorScheme.onSurfaceVariant,
         textColor: colorScheme.onSurface,
         titleTextStyle: textTheme.bodyLarge?.copyWith(
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.w600,
         ),
         subtitleTextStyle: textTheme.bodySmall?.copyWith(
           color: colorScheme.onSurfaceVariant,
@@ -138,11 +148,52 @@ class AppTheme {
         ),
       ),
       chipTheme: ChipThemeData(
-        shape: RoundedRectangleBorder(borderRadius: AppRadius.smBorder),
-        labelStyle: textTheme.labelLarge,
-        selectedColor: colorScheme.primary,
-        secondaryLabelStyle: TextStyle(color: colorScheme.onPrimary),
-        side: BorderSide(color: colorScheme.outlineVariant),
+        backgroundColor: colorScheme.secondaryContainer,
+        shape: RoundedRectangleBorder(borderRadius: AppRadius.pillBorder),
+        labelStyle: textTheme.labelLarge?.copyWith(
+          color: colorScheme.onSecondaryContainer,
+          fontWeight: FontWeight.w700,
+        ),
+        selectedColor: colorScheme.primaryContainer,
+        secondaryLabelStyle: TextStyle(
+          color: colorScheme.primary,
+          fontWeight: FontWeight.w700,
+        ),
+        side: BorderSide.none,
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          return states.contains(WidgetState.selected)
+              ? colorScheme.primary
+              : colorScheme.outline;
+        }),
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          return states.contains(WidgetState.selected)
+              ? colorScheme.primaryContainer
+              : colorScheme.surfaceContainerHighest;
+        }),
+      ),
+      segmentedButtonTheme: SegmentedButtonThemeData(
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.resolveWith((states) {
+            return states.contains(WidgetState.selected)
+                ? colorScheme.primaryContainer
+                : colorScheme.surfaceContainer;
+          }),
+          foregroundColor: WidgetStateProperty.resolveWith((states) {
+            return states.contains(WidgetState.selected)
+                ? colorScheme.primary
+                : colorScheme.onSurfaceVariant;
+          }),
+          side: WidgetStatePropertyAll(BorderSide.none),
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(borderRadius: AppRadius.pillBorder),
+          ),
+          textStyle: WidgetStatePropertyAll(
+            textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
+          ),
+        ),
       ),
     );
   }
