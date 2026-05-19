@@ -14,6 +14,7 @@ void main() {
         statusBarColor: Colors.transparent,
         systemNavigationBarDividerColor: Colors.transparent,
       ),
-    );SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    );
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   });
 }
