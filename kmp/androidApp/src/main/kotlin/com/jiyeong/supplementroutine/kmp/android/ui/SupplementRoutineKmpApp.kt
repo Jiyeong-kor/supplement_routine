@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.jiyeong.supplementroutine.kmp.android.ui.history.HistoryRoute
 import com.jiyeong.supplementroutine.kmp.android.ui.supplements.SupplementsRoute
 import com.jiyeong.supplementroutine.kmp.android.ui.today.TodayRoute
 import com.jiyeong.supplementroutine.shared.SupplementRoutineInfo
@@ -47,6 +48,7 @@ fun SupplementRoutineKmpApp() {
         ) { paddingValues ->
             when (selectedDestinationKey) {
                 "supplements" -> SupplementsRoute(contentPadding = paddingValues)
+                "history" -> HistoryRoute(contentPadding = paddingValues)
                 else -> TodayRoute(contentPadding = paddingValues)
             }
         }
