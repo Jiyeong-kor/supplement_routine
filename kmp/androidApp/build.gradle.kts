@@ -30,6 +30,7 @@ android {
 dependencies {
     implementation(project(":shared"))
     implementation("androidx.activity:activity-compose:1.11.0")
+    implementation(compose.materialIconsExtended)
     implementation(compose.material3)
     implementation(compose.ui)
 }
