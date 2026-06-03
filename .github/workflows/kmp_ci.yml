@@ -1,0 +1,41 @@
+name: KMP CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "kmp/**"
+      - ".github/workflows/kmp_ci.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: kmp-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android-and-shared:
+    name: Shared tests and Android debug build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.14"
+
+      - name: Validate KMP scaffold
+        run: gradle -p kmp clean :shared:check :androidApp:assembleDebug --no-daemon
