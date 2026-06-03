@@ -5,7 +5,7 @@ description: Supplement Routine 저장소 안에서만 사용하는 Android Jetp
 
 # Supplement Routine Android Compose UI
 
-이 skill은 이 저장소 안에서만 사용한다. Android UI는 Flutter widget을 1:1 복사한 느낌이 아니라, 네이티브 Material 3 루틴 도구처럼 느껴져야 한다. 아키텍처, SSOT, MVVM, state hoisting 판단은 `supplement-routine-android-architecture` skill을 함께 따른다.
+이 skill은 이 저장소 안에서만 사용한다. Android UI는 Flutter widget을 1:1 복사한 느낌이 아니라, 네이티브 Material 3 루틴 도구처럼 느껴져야 한다. 아키텍처, SSOT, MVVM, state hoisting 판단은 `supplement-routine-android-architecture` skill을 함께 따르고, 화면 UX 판단은 `supplement-routine-ux-review` skill을 함께 따른다.
 
 ## 기준 자료
 
