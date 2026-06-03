@@ -46,18 +46,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.jiyeong.supplementroutine.shared.domain.InstantValue
-import com.jiyeong.supplementroutine.shared.domain.IntakeCondition
-import com.jiyeong.supplementroutine.shared.domain.IntakeMethod
 import com.jiyeong.supplementroutine.shared.domain.IntakeRecord
-import com.jiyeong.supplementroutine.shared.domain.IntakeSlot
 import com.jiyeong.supplementroutine.shared.domain.LocalDateValue
 import com.jiyeong.supplementroutine.shared.domain.MealTimeSettings
-import com.jiyeong.supplementroutine.shared.domain.MealType
-import com.jiyeong.supplementroutine.shared.domain.ScheduleLabel
-import com.jiyeong.supplementroutine.shared.domain.Supplement
 import com.jiyeong.supplementroutine.shared.domain.TimeOfDayValue
 import com.jiyeong.supplementroutine.shared.scheduling.ScheduledIntakeRecord
 import com.jiyeong.supplementroutine.shared.scheduling.SchedulingService
+import com.jiyeong.supplementroutine.kmp.android.ui.common.formatDosage
+import com.jiyeong.supplementroutine.kmp.android.ui.common.formatHourMinute
+import com.jiyeong.supplementroutine.kmp.android.ui.common.formatTime
+import com.jiyeong.supplementroutine.kmp.android.ui.common.sampleSupplements
+import com.jiyeong.supplementroutine.kmp.android.ui.common.scheduleLabelText
 import java.util.Calendar
 
 @Composable
@@ -408,50 +407,6 @@ private fun rememberToday(): LocalDateValue {
     }
 }
 
-private fun sampleSupplements(): List<Supplement> {
-    return listOf(
-        Supplement(
-            id = "vitamin_d",
-            name = "비타민 D",
-            dailyCount = 1,
-            method = IntakeMethod.MealBased,
-            selectedSlots = listOf(
-                IntakeSlot(mealType = MealType.Breakfast, condition = IntakeCondition.AfterMeal),
-            ),
-            dosageUnit = "정",
-            dosageValue = 1.0,
-            isNotificationEnabled = true,
-            memo = "아침 식사 후 물과 함께",
-        ),
-        Supplement(
-            id = "omega_3",
-            name = "오메가3",
-            dailyCount = 2,
-            method = IntakeMethod.FixedTime,
-            fixedTimes = listOf(
-                TimeOfDayValue(hour = 9, minute = 30),
-                TimeOfDayValue(hour = 20, minute = 0),
-            ),
-            dosageUnit = "캡슐",
-            dosageValue = 1.0,
-            isNotificationEnabled = true,
-        ),
-        Supplement(
-            id = "magnesium",
-            name = "마그네슘",
-            dailyCount = 1,
-            method = IntakeMethod.MealBased,
-            selectedSlots = listOf(
-                IntakeSlot(mealType = null, condition = IntakeCondition.BeforeSleep),
-            ),
-            dosageUnit = "정",
-            dosageValue = 1.0,
-            isNotificationEnabled = false,
-            memo = "잠들기 전 체크",
-        ),
-    )
-}
-
 private fun weekdayLabel(): String {
     return when (Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) {
         Calendar.MONDAY -> "월"
@@ -462,55 +417,5 @@ private fun weekdayLabel(): String {
         Calendar.SATURDAY -> "토"
         Calendar.SUNDAY -> "일"
         else -> ""
-    }
-}
-
-private fun formatTime(time: TimeOfDayValue): String {
-    return "${if (time.hour < 12) "오전" else "오후"} ${formatHourMinute(time)}"
-}
-
-private fun formatHourMinute(time: TimeOfDayValue): String {
-    val displayHour = when {
-        time.hour == 0 -> 12
-        time.hour > 12 -> time.hour - 12
-        else -> time.hour
-    }
-    return "$displayHour:${time.minute.toString().padStart(2, '0')}"
-}
-
-private fun formatDosage(value: Double): String {
-    return if (value == value.toInt().toDouble()) {
-        value.toInt().toString()
-    } else {
-        value.toString()
-    }
-}
-
-private fun scheduleLabelText(label: ScheduleLabel): String {
-    return when (label) {
-        ScheduleLabel.FixedTime -> "정해진 시간"
-        ScheduleLabel.Interval -> "일정 간격"
-        is ScheduleLabel.RoutineSlot -> slotLabelText(label.slot)
-    }
-}
-
-private fun slotLabelText(slot: IntakeSlot): String {
-    return when (slot.condition) {
-        IntakeCondition.BeforeMeal -> "${mealText(slot.mealType)} 전"
-        IntakeCondition.AfterMeal -> "${mealText(slot.mealType)} 후"
-        IntakeCondition.BetweenMeals -> {
-            if (slot.mealType == MealType.Breakfast) "아침-점심 사이" else "점심-저녁 사이"
-        }
-        IntakeCondition.Fasting -> "공복"
-        IntakeCondition.BeforeSleep -> "취침 전"
-        IntakeCondition.None -> "복용"
-    }
-}
-
-private fun mealText(mealType: MealType?): String {
-    return when (mealType) {
-        MealType.Breakfast -> "아침"
-        MealType.Lunch -> "점심"
-        MealType.Dinner, null -> "저녁"
     }
 }

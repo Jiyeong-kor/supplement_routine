@@ -19,29 +19,45 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.jiyeong.supplementroutine.kmp.android.ui.supplements.SupplementsRoute
 import com.jiyeong.supplementroutine.kmp.android.ui.today.TodayRoute
 import com.jiyeong.supplementroutine.shared.SupplementRoutineInfo
 
 @Composable
 fun SupplementRoutineKmpApp() {
+    var selectedDestinationKey by remember { mutableStateOf("today") }
+
     Surface(color = MaterialTheme.colorScheme.background) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             bottomBar = {
                 NavigationBar {
-                    DestinationItems()
+                    DestinationItems(
+                        selectedDestinationKey = selectedDestinationKey,
+                        onDestinationSelected = { key -> selectedDestinationKey = key },
+                    )
                 }
             },
         ) { paddingValues ->
-            TodayRoute(contentPadding = paddingValues)
+            when (selectedDestinationKey) {
+                "supplements" -> SupplementsRoute(contentPadding = paddingValues)
+                else -> TodayRoute(contentPadding = paddingValues)
+            }
         }
     }
 }
 
 @Composable
-private fun RowScope.DestinationItems() {
+private fun RowScope.DestinationItems(
+    selectedDestinationKey: String,
+    onDestinationSelected: (String) -> Unit,
+) {
     val icons = listOf(
         DestinationIcon(Icons.Filled.CheckCircle, Icons.Outlined.CheckCircle),
         DestinationIcon(Icons.Filled.Spa, Icons.Outlined.Spa),
@@ -50,10 +66,10 @@ private fun RowScope.DestinationItems() {
     )
 
     SupplementRoutineInfo.topLevelDestinations.forEachIndexed { index, destination ->
-        val selected = destination.key == "today"
+        val selected = destination.key == selectedDestinationKey
         NavigationBarItem(
             selected = selected,
-            onClick = {},
+            onClick = { onDestinationSelected(destination.key) },
             icon = {
                 Icon(
                     imageVector = if (selected) icons[index].selected else icons[index].unselected,
