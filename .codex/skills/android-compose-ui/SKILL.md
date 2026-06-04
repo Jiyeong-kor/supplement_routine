@@ -20,7 +20,7 @@ description: Supplement Routine 저장소 안에서만 사용하는 Android Jetp
 ## Compose 디자인 규칙
 
 - Material 3 Compose component와 theme token을 사용한다.
-- 앱은 차분하고, 스캔하기 쉽고, 반복 사용에 적합해야 한다.
+- 앱은 귀엽고 친근하지만 유치하지 않으며, 스캔하기 쉽고, 반복 사용에 적합해야 한다.
 - 최상위 destination 4개를 유지한다: Today, Supplements, History, Settings.
 - phone에서는 compact bottom navigation, expanded width에서는 가능한 경우 navigation rail을 사용한다.
 - 목록에는 `LazyColumn` 또는 `LazyVerticalGrid`를 우선 사용하고, 사용자 데이터에는 stable item key를 둔다.

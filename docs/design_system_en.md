@@ -1,8 +1,10 @@
 # Supplement Routine Design System
 
+`docs/design_system.md` is the source of truth for the refreshed brand direction. This English document keeps a lightweight summary for reference.
+
 ## UI/UX Direction
 
-Supplement Routine is a routine and record management app, not a medical advice app. The UI should feel calm, predictable, and scan-friendly. The primary user flow is:
+Supplement Routine is a routine and record management app, not a medical advice app. The refreshed UI should feel cute, friendly, scan-friendly, and useful for daily repetition without becoming childish or overly decorative. The primary user flow is:
 
 1. Check today's scheduled intakes.
 2. Mark completed intakes.
@@ -12,11 +14,11 @@ Supplement Routine is a routine and record management app, not a medical advice 
 
 ## Material Design 3 Decisions
 
-- Color scheme: White surfaces, a vivid purple accent, and pale lavender containers keep routine information light and easy to distinguish. Success, warning, and error colors are explicit app tokens.
+- Color scheme: Warm white surfaces, berry/coral accents, mint success states, and dark ink text keep routine information friendly and easy to scan. Success, warning, and error colors are explicit app tokens.
 - Typography: Pretendard static font files, weights 400, 500, 600, and 700. The scale follows Material 3, with title roles promoted to 700 weight for scan-friendly daily routine screens.
 - Spacing: 4-point scale with common screen and card padding tokens.
 - Shape: 8px for compact controls, 16px for cards and inputs, pill-shaped primary actions, and 28px for larger containers.
-- Elevation: Mostly zero elevation with white surfaces, light outlines, and lavender capsule states.
+- Elevation: Mostly zero elevation with white surfaces, soft outlines, and sticker-like capsule states.
 - Icons: Material outlined icons by default, filled icons for selected navigation state.
 - Buttons: Filled buttons for primary form actions, text buttons for dialogs.
 - Text fields: Filled M3 fields with clear focused and error borders.
@@ -29,10 +31,11 @@ Supplement Routine is a routine and record management app, not a medical advice 
 
 | Category | Token | Value | Preview |
 | --- | --- | --- | --- |
-| Color | `AppColors.seed` | `#6B36F6` | ![Seed](assets/colors/seed.svg) |
-| Color | `AppColors.success` | `#20B486` | ![Success](assets/colors/success.svg) |
-| Color | `AppColors.warning` | `#FFB020` | ![Warning](assets/colors/warning.svg) |
-| Color | `AppColors.error` | `#E5484D` | ![Error](assets/colors/error.svg) |
+| Color | `AppColors.seed` | `#E95E7B` | ![Seed](assets/colors/seed.svg) |
+| Color | `AppColors.coral` | `#FF9A76` | ![Coral](assets/colors/coral.svg) |
+| Color | `AppColors.success` | `#24B88A` | ![Success](assets/colors/success.svg) |
+| Color | `AppColors.warning` | `#F5A524` | ![Warning](assets/colors/warning.svg) |
+| Color | `AppColors.error` | `#D6455D` | ![Error](assets/colors/error.svg) |
 | Spacing | `xxs / xs / sm / md / lg / xl / xxl / xxxl` | `4 / 6 / 8 / 12 / 16 / 20 / 24 / 32` |
 | Radius | `sm / md / lg / xl / xxl / pill` | `8 / 12 / 16 / 24 / 28 / 999` |
 | Typography | `Pretendard` | `400 / 500 / 600 / 700` |
