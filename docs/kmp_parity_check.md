@@ -56,6 +56,7 @@
 | P1 | #23 `[Android] Notification permission과 exact alarm adapter 구현` | Flutter Android의 알림 기능을 KMP Android로 옮기는 platform gap이다. |
 | P1 | #24 `[iOS] KMP shared module integration과 SwiftUI shell 구현` | KMP 목표인 Android/iOS 사용 가능 상태를 만들기 위한 iOS 최소 통합이다. |
 | P2 | #25 `[QA] KMP Android/iOS parity screenshot과 accessibility 검증` | 화면 구현 이후 실제 기기/해상도/접근성 기준으로 gap을 다시 확인해야 한다. |
+| P2 | #42 `[CI] macOS runner로 KMP iOS framework build 검증` | 무료 macOS runner로 iOS shared framework가 빌드되는지 먼저 확인해 iOS 전환 리스크를 낮춘다. |
 
 ## 권장 진행 순서
 

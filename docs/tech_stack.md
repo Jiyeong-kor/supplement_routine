@@ -48,6 +48,7 @@ KMP shared는 Android/iOS 공통 비즈니스 로직의 중심이다.
 | `commonMain` | `kmp/shared/src/commonMain` | 플랫폼과 무관한 순수 로직을 둔다. |
 | Android target | `androidTarget()` | Android Compose 앱에서 shared domain/logic을 직접 사용한다. |
 | iOS targets | `iosX64`, `iosArm64`, `iosSimulatorArm64` | iOS shell이 같은 shared module을 사용할 준비를 한다. |
+| iOS framework | `SupplementRoutineShared` static framework | SwiftUI shell과 macOS CI가 같은 shared framework 산출물을 기준으로 integration을 검증한다. |
 | Kotlin test | `commonTest.dependencies { kotlin("test") }` | shared scheduling/history/DTO mapping을 플랫폼 독립적으로 검증한다. |
 
 KMP shared에 두는 것:
@@ -154,6 +155,7 @@ iOS에서 Android-only 기능이 없거나 정책이 다르면 UI에 fallback을
 | --- | --- | --- | --- |
 | Flutter CI | `.github/workflows/flutter_ci.yml` | `flutter pub get --enforce-lockfile`, `flutter analyze`, `flutter test`, `flutter build apk --debug` | Flutter 기준 구현이 migration 중 깨지지 않게 한다. |
 | KMP CI | `.github/workflows/kmp_ci.yml` | `gradle -p kmp clean :shared:check :androidApp:assembleDebug --no-daemon` | shared logic과 Android Compose scaffold가 빌드되는지 확인한다. |
+| iOS KMP CI | `.github/workflows/ios_kmp_ci.yml` | macOS runner에서 `:shared:linkDebugFrameworkIosSimulatorArm64` | 무료 GitHub-hosted macOS runner로 iOS shared framework build 가능성을 먼저 확인한다. |
 
 CI toolchain:
 
@@ -182,6 +184,7 @@ CI toolchain:
 | #23 | Android notification scheduler adapter 경계와 exact alarm fallback 결정 |
 | #24 | iOS SwiftUI shell과 shared framework integration 방식 결정 |
 | #25 | screenshot/accessibility QA 방식 결정 |
+| #42 | macOS runner에서 KMP iOS framework build를 무료 범위로 검증 |
 
 ## 공식 참고 기준
 
