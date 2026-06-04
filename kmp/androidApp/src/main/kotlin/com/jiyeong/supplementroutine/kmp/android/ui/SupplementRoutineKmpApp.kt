@@ -69,6 +69,12 @@ fun SupplementRoutineKmpApp() {
         notificationPermissionState = permissionController.currentState()
     }
 
+    LaunchedEffect(selectedDestinationKey) {
+        if (selectedDestinationKey == "settings") {
+            notificationPermissionState = permissionController.currentState()
+        }
+    }
+
     LaunchedEffect(
         uiState.todayItems,
         uiState.notificationEnabled,

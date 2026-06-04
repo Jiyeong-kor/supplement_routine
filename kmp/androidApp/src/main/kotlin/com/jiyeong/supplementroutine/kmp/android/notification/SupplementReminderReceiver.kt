@@ -10,10 +10,15 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.core.app.NotificationManagerCompat
 import com.jiyeong.supplementroutine.kmp.android.MainActivity
 
 class SupplementReminderReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
+        if (!areAppNotificationsEnabled(context)) {
+            return
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
         ) {
@@ -45,6 +50,14 @@ class SupplementReminderReceiver : BroadcastReceiver() {
             NOTIFICATION_ID_BASE + intent.hashCode(),
             notification,
         )
+    }
+
+    private fun areAppNotificationsEnabled(context: Context): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            context.getSystemService(NotificationManager::class.java).areNotificationsEnabled()
+        } else {
+            NotificationManagerCompat.from(context).areNotificationsEnabled()
+        }
     }
 
     private fun openAppPendingIntent(context: Context): PendingIntent {
