@@ -26,6 +26,7 @@ Supplement Routine은 의료 조언 앱이 아니라 영양제 복용 루틴을 
 
 ## 기준 자료
 
+- 제품 기준: `docs/prd.md`
 - 정보 구조: `docs/information_architecture.md`
 - 사용자 흐름: `docs/user_flow.md`
 - 디자인 시스템: `docs/design_system.md`

@@ -1,5 +1,7 @@
 # KMP 마이그레이션 로드맵
 
+이 문서는 `docs/prd.md`의 제품 범위를 바꾸지 않고 Flutter 기준 구현을 KMP shared, Android Compose, iOS shell로 옮기는 순서를 정의합니다.
+
 ## 목적
 
 Supplement Routine의 현재 Flutter 앱을 안정 기준으로 유지하면서, Android는 Kotlin Native Jetpack Compose 앱으로 전환하고 iOS는 Kotlin Multiplatform shared module을 사용하는 앱으로 확장합니다.
@@ -11,6 +13,7 @@ Supplement Routine의 현재 Flutter 앱을 안정 기준으로 유지하면서,
 마이그레이션 중에는 Flutter 앱이 기준 구현입니다.
 
 - 제품 범위: `docs/information_architecture.md`
+- 제품 기준: `docs/prd.md`
 - 디자인 방향: `docs/design_system.md`
 - 사용자 흐름: `docs/user_flow.md`
 - 현재 UI 참고: `docs/assets/screenshots/`

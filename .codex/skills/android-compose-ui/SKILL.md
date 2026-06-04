@@ -9,6 +9,7 @@ description: Supplement Routine 저장소 안에서만 사용하는 Android Jetp
 
 ## 기준 자료
 
+- 제품 기준: `docs/prd.md`
 - 디자인 토큰과 규칙: `docs/design_system.md`
 - 정보 구조: `docs/information_architecture.md`
 - 사용자 흐름: `docs/user_flow.md`

@@ -2,6 +2,8 @@
 
 작성일: 2026-06-03
 
+이 문서는 `docs/prd.md`의 제품 요구사항을 기준으로 Flutter 구현과 KMP shared / Android Compose / iOS 전환 상태를 비교한다.
+
 이 문서는 현재 Flutter 기준 앱과 KMP shared / Android Compose 전환 상태를 비교하고, 남은 gap을 추적 가능한 issue로 정리한다. Flutter 구현은 KMP parity가 검증되기 전까지 기준 구현으로 유지한다.
 
 ## 현재 기준
@@ -9,6 +11,7 @@
 - Flutter 기준 source: `lib/`
 - KMP shared source: `kmp/shared/`
 - KMP Android source: `kmp/androidApp/`
+- 제품 기준: `docs/prd.md`
 - 제품 IA: `docs/information_architecture.md`
 - 디자인 시스템: `docs/design_system.md`
 - 현재 화면 참고: `docs/assets/screenshots/`

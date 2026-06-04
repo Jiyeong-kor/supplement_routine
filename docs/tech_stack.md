@@ -2,6 +2,8 @@
 
 작성일: 2026-06-04
 
+이 문서는 `docs/prd.md`의 제품 목표와 플랫폼 요구사항을 구현하기 위한 기술 선택을 설명한다.
+
 이 문서는 Supplement Routine 프로젝트가 어떤 기술을 어디에, 왜 사용하는지 설명한다. 현재 앱은 Flutter 구현을 기준 구현으로 유지하면서, KMP shared와 Android Jetpack Compose 앱으로 단계적으로 전환 중이다.
 
 ## 한눈에 보는 구조
