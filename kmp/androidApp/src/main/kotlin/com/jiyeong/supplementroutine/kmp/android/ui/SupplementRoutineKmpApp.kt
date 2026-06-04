@@ -1,7 +1,9 @@
 package com.jiyeong.supplementroutine.kmp.android.ui
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.History
@@ -19,12 +21,17 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.jiyeong.supplementroutine.kmp.android.presentation.SupplementRoutineViewModel
 import com.jiyeong.supplementroutine.kmp.android.ui.history.HistoryRoute
 import com.jiyeong.supplementroutine.kmp.android.ui.supplements.SupplementsRoute
 import com.jiyeong.supplementroutine.kmp.android.ui.today.TodayRoute
@@ -33,6 +40,11 @@ import com.jiyeong.supplementroutine.shared.SupplementRoutineInfo
 @Composable
 fun SupplementRoutineKmpApp() {
     var selectedDestinationKey by remember { mutableStateOf("today") }
+    val context = LocalContext.current
+    val viewModel: SupplementRoutineViewModel = viewModel(
+        factory = SupplementRoutineViewModel.factory(context),
+    )
+    val uiState by viewModel.uiState.collectAsState()
 
     Surface(color = MaterialTheme.colorScheme.background) {
         Scaffold(
@@ -46,12 +58,43 @@ fun SupplementRoutineKmpApp() {
                 }
             },
         ) { paddingValues ->
-            when (selectedDestinationKey) {
-                "supplements" -> SupplementsRoute(contentPadding = paddingValues)
-                "history" -> HistoryRoute(contentPadding = paddingValues)
-                else -> TodayRoute(contentPadding = paddingValues)
+            if (uiState.isLoading) {
+                LoadingState(modifier = Modifier.padding(paddingValues))
+            } else {
+                when (selectedDestinationKey) {
+                    "supplements" -> SupplementsRoute(
+                        contentPadding = paddingValues,
+                        supplements = uiState.supplements,
+                    )
+                    "history" -> HistoryRoute(
+                        contentPadding = paddingValues,
+                        today = uiState.today,
+                        historyViewState = uiState.historyViewState,
+                    )
+                    else -> TodayRoute(
+                        contentPadding = paddingValues,
+                        date = uiState.today,
+                        items = uiState.todayItems,
+                        errorMessage = uiState.errorMessage,
+                        onToggleRecord = viewModel::toggleRecord,
+                    )
+                }
             }
         }
+    }
+}
+
+@Composable
+private fun LoadingState(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = "루틴을 불러오는 중입니다.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 

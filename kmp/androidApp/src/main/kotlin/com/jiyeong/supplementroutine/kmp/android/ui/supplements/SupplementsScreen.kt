@@ -34,7 +34,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
@@ -44,12 +43,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.jiyeong.supplementroutine.kmp.android.ui.common.formatDosage
 import com.jiyeong.supplementroutine.kmp.android.ui.common.methodLabelText
-import com.jiyeong.supplementroutine.kmp.android.ui.common.sampleSupplements
 import com.jiyeong.supplementroutine.shared.domain.Supplement
 
 @Composable
-fun SupplementsRoute(contentPadding: PaddingValues) {
-    val supplements = remember { sampleSupplements() }
+fun SupplementsRoute(
+    contentPadding: PaddingValues,
+    supplements: List<Supplement>,
+) {
     SupplementsScreen(
         contentPadding = contentPadding,
         supplements = supplements,

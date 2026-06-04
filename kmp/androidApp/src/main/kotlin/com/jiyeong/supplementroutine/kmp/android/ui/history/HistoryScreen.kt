@@ -33,7 +33,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,30 +43,17 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.jiyeong.supplementroutine.kmp.android.ui.common.sampleSupplements
-import com.jiyeong.supplementroutine.shared.domain.IntakeRecord
 import com.jiyeong.supplementroutine.shared.domain.LocalDateValue
-import com.jiyeong.supplementroutine.shared.domain.MealTimeSettings
 import com.jiyeong.supplementroutine.shared.history.DailyHistorySummary
-import com.jiyeong.supplementroutine.shared.history.HistorySummaryService
-import com.jiyeong.supplementroutine.shared.history.minusDays
-import com.jiyeong.supplementroutine.shared.scheduling.SchedulingService
+import com.jiyeong.supplementroutine.shared.history.HistoryViewState
 import java.util.Calendar
 
 @Composable
-fun HistoryRoute(contentPadding: PaddingValues) {
-    val today = rememberToday()
-    val supplements = remember { sampleSupplements() }
-    val records = remember(today, supplements) { sampleHistoryRecords(today) }
-    val state = remember(today, supplements, records) {
-        HistorySummaryService.createViewState(
-            today = today,
-            supplements = supplements,
-            records = records,
-            mealTimeSettings = MealTimeSettings(),
-        )
-    }
-
+fun HistoryRoute(
+    contentPadding: PaddingValues,
+    today: LocalDateValue,
+    historyViewState: HistoryViewState,
+) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -94,24 +80,24 @@ fun HistoryRoute(contentPadding: PaddingValues) {
                 )
             }
         }
-        item { HistoryOverviewCard(summary = state.todaySummary) }
+        item { HistoryOverviewCard(summary = historyViewState.todaySummary) }
         item {
             SectionHeader(
                 title = "월간 기록",
                 description = "날짜별 복용 완료 상태를 한눈에 봅니다.",
             )
         }
-        item { MonthHistoryCard(summaries = state.monthSummaries, today = today) }
+        item { MonthHistoryCard(summaries = historyViewState.monthSummaries, today = today) }
         item {
             SectionHeader(
                 title = "최근 기록",
                 description = "최근 2주 동안의 완료율을 확인합니다.",
             )
         }
-        if (state.isEmpty) {
+        if (historyViewState.isEmpty) {
             item { HistoryEmptyState() }
         } else {
-            state.recentSummaries.forEach { summary ->
+            historyViewState.recentSummaries.forEach { summary ->
                 item(key = "${summary.date.year}-${summary.date.month}-${summary.date.day}") {
                     HistoryItem(summary = summary)
                 }
@@ -433,40 +419,6 @@ private data class HistoryStatus(
     val foreground: Color,
     val accent: Color,
 )
-
-private fun sampleHistoryRecords(today: LocalDateValue): Map<String, IntakeRecord> {
-    val supplements = sampleSupplements()
-    val records = mutableMapOf<String, IntakeRecord>()
-
-    (0..13).forEach { offset ->
-        val date = today.minusDays(offset)
-        val scheduled = SchedulingService.createDailyIntakeRecords(
-            supplements = supplements,
-            date = date,
-            mealTimeSettings = MealTimeSettings(),
-        )
-        val doneLimit = when (offset % 4) {
-            0 -> scheduled.size
-            1 -> (scheduled.size * 0.6).toInt()
-            2 -> 1
-            else -> 0
-        }
-        scheduled.take(doneLimit).forEach { item ->
-            records[item.record.id] = item.record.copy(isDone = true)
-        }
-    }
-
-    return records
-}
-
-private fun rememberToday(): LocalDateValue {
-    val calendar = Calendar.getInstance()
-    return LocalDateValue(
-        year = calendar.get(Calendar.YEAR),
-        month = calendar.get(Calendar.MONTH) + 1,
-        day = calendar.get(Calendar.DAY_OF_MONTH),
-    )
-}
 
 private fun weekdayIndex(date: LocalDateValue): Int {
     val calendar = Calendar.getInstance().apply {

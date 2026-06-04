@@ -34,8 +34,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,49 +43,30 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.jiyeong.supplementroutine.shared.domain.InstantValue
 import com.jiyeong.supplementroutine.shared.domain.IntakeRecord
 import com.jiyeong.supplementroutine.shared.domain.LocalDateValue
-import com.jiyeong.supplementroutine.shared.domain.MealTimeSettings
 import com.jiyeong.supplementroutine.shared.domain.TimeOfDayValue
 import com.jiyeong.supplementroutine.shared.scheduling.ScheduledIntakeRecord
-import com.jiyeong.supplementroutine.shared.scheduling.SchedulingService
 import com.jiyeong.supplementroutine.kmp.android.ui.common.formatDosage
 import com.jiyeong.supplementroutine.kmp.android.ui.common.formatHourMinute
 import com.jiyeong.supplementroutine.kmp.android.ui.common.formatTime
-import com.jiyeong.supplementroutine.kmp.android.ui.common.sampleSupplements
 import com.jiyeong.supplementroutine.kmp.android.ui.common.scheduleLabelText
 import java.util.Calendar
 
 @Composable
-fun TodayRoute(contentPadding: PaddingValues) {
-    val today = rememberToday()
-    val supplements = remember { sampleSupplements() }
-    val mealTimeSettings = remember { MealTimeSettings() }
-    val scheduledItems = remember(today, supplements, mealTimeSettings) {
-        SchedulingService.createDailyIntakeRecords(
-            supplements = supplements,
-            date = today,
-            mealTimeSettings = mealTimeSettings,
-        )
-    }
-    val records = remember { mutableStateMapOf<String, IntakeRecord>() }
-    val displayItems = scheduledItems.map { item ->
-        val record = records[item.record.id] ?: item.record
-        item.copy(record = record)
-    }
-
+fun TodayRoute(
+    contentPadding: PaddingValues,
+    date: LocalDateValue,
+    items: List<ScheduledIntakeRecord>,
+    errorMessage: String?,
+    onToggleRecord: (IntakeRecord) -> Unit,
+) {
     TodayScreen(
         contentPadding = contentPadding,
-        date = today,
-        items = displayItems,
-        onToggleRecord = { record ->
-            records[record.id] = if (record.isDone) {
-                record.markUndone()
-            } else {
-                record.markDone(InstantValue(System.currentTimeMillis()))
-            }
-        },
+        date = date,
+        items = items,
+        errorMessage = errorMessage,
+        onToggleRecord = onToggleRecord,
     )
 }
 
@@ -96,6 +75,7 @@ private fun TodayScreen(
     contentPadding: PaddingValues,
     date: LocalDateValue,
     items: List<ScheduledIntakeRecord>,
+    errorMessage: String?,
     onToggleRecord: (IntakeRecord) -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -119,6 +99,9 @@ private fun TodayScreen(
                     done = items.count { it.record.isDone },
                     total = items.size,
                 )
+            }
+            errorMessage?.let { message ->
+                item { ErrorCard(message = message) }
             }
             item {
                 Text(
@@ -156,6 +139,23 @@ private fun TodayScreen(
                 contentDescription = "영양제 추가",
             )
         }
+    }
+}
+
+@Composable
+private fun ErrorCard(message: String) {
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.errorContainer,
+        ),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
+    ) {
+        Text(
+            text = message,
+            modifier = Modifier.padding(16.dp),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onErrorContainer,
+        )
     }
 }
 
@@ -392,18 +392,6 @@ private fun TodayEmptyState() {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-    }
-}
-
-@Composable
-private fun rememberToday(): LocalDateValue {
-    val calendar = remember { Calendar.getInstance() }
-    return remember {
-        LocalDateValue(
-            year = calendar.get(Calendar.YEAR),
-            month = calendar.get(Calendar.MONTH) + 1,
-            day = calendar.get(Calendar.DAY_OF_MONTH),
-        )
     }
 }
 
