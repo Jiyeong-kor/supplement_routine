@@ -35,8 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.jiyeong.supplementroutine.kmp.android.notification.AndroidNotificationPermissionController
 import com.jiyeong.supplementroutine.kmp.android.notification.AndroidReminderScheduler
 import com.jiyeong.supplementroutine.kmp.android.notification.NotificationPermissionState
@@ -49,20 +48,14 @@ import com.jiyeong.supplementroutine.kmp.android.ui.today.TodayRoute
 import com.jiyeong.supplementroutine.shared.SupplementRoutineInfo
 
 @Composable
-fun SupplementRoutineKmpApp() {
+fun SupplementRoutineKmpApp(
+    permissionController: AndroidNotificationPermissionController,
+    reminderScheduler: AndroidReminderScheduler,
+    viewModel: SupplementRoutineViewModel = hiltViewModel(),
+) {
     var selectedDestinationKey by remember { mutableStateOf("today") }
-    val context = LocalContext.current
-    val viewModel: SupplementRoutineViewModel = viewModel(
-        factory = SupplementRoutineViewModel.factory(context),
-    )
     val uiState by viewModel.uiState.collectAsState()
     val hapticFeedback = rememberRoutineHapticFeedback()
-    val permissionController = remember(context) {
-        AndroidNotificationPermissionController(context.applicationContext)
-    }
-    val reminderScheduler = remember(context) {
-        AndroidReminderScheduler(context.applicationContext, permissionController)
-    }
     var notificationPermissionState by remember {
         mutableStateOf(permissionController.currentState())
     }

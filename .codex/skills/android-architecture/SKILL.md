@@ -25,6 +25,7 @@ description: Supplement Routine 저장소 안에서만 사용하는 Android/KMP 
 - 근거: Android Developers 문서에서 Compose 화면의 screen UI state 노출 수단으로 `ViewModel`을 권장하고, 현재 제품은 폼/목록/설정 중심의 CRUD 루틴 앱이라 MVI reducer/effect 체계보다 MVVM + unidirectional data flow가 더 단순하고 충분하다.
 - MVI는 복잡한 one-off effect, event sourcing, 강한 action/reducer audit trail이 필요할 때만 별도 issue에서 근거를 남기고 도입한다.
 - ViewModel은 UI state를 만들고 user intent를 application/domain use case로 위임한다. ViewModel에 Android `Context`, persistence detail, notification scheduling detail을 직접 넣지 않는다.
+- Android 의존성 주입은 Hilt를 기준으로 한다. `@HiltAndroidApp`, `@AndroidEntryPoint`, `@HiltViewModel`, `@Module/@InstallIn`을 사용하고, Compose route 안에서 repository/store/scheduler를 직접 생성하지 않는다.
 
 ## SSOT
 
@@ -43,6 +44,7 @@ description: Supplement Routine 저장소 안에서만 사용하는 Android/KMP 
 3. `presentation`: ViewModel, UiState, UI event contract.
 4. `ui`: Compose stateless screen/component.
 5. `platform`: notification, permission, alarm, Android/iOS adapter.
+6. `di`: Hilt module과 binding. concrete implementation 선택은 이 계층에서 한다.
 
 규칙:
 
@@ -51,6 +53,7 @@ description: Supplement Routine 저장소 안에서만 사용하는 Android/KMP 
 - presentation은 use case/repository interface에 의존하고 concrete storage에 의존하지 않는다.
 - UI는 ViewModel 타입 또는 hoisted state/event만 알고, repository를 직접 호출하지 않는다.
 - platform API는 interface 뒤에 숨기고 Android-only 동작은 iOS fallback을 문서화한다.
+- Android DI graph는 Hilt module에 두고, ViewModel은 interface에 의존한다. `Context`가 필요한 구현은 `@ApplicationContext` provider에서만 생성한다.
 
 ## 멀티 모듈 방향
 
@@ -107,6 +110,7 @@ Android/KMP PR 전 확인한다.
 - ViewModel 또는 state holder가 UI state를 만들고, composable은 hoisted state를 렌더링한다.
 - shared pure logic에는 KMP test가 있다.
 - Android UI는 Compose 기반이고 Android Developers 공식 원칙과 어긋나지 않는다.
+- Android dependency graph는 Hilt를 사용하고, manual ViewModel factory나 composable 내부 concrete repository 생성이 없다.
 - Kotlin convention 위반이 없다.
 - 실제 persistence나 platform API를 붙이면 fake/test double도 같은 contract로 검증한다.
 - KMP/Flutter CI를 모두 확인한다.

@@ -60,7 +60,7 @@ Supplement Routine은 다음 기능을 제공하지 않습니다.
 | --- | --- |
 | 기준 구현 | Flutter, Dart, Riverpod |
 | Shared logic | Kotlin Multiplatform |
-| Android native | Kotlin, Jetpack Compose, Material 3, MVVM |
+| Android native | Kotlin, Jetpack Compose, Material 3, Hilt, MVVM |
 | iOS native | SwiftUI, KMP shared framework |
 | Android local storage | DataStore Preferences + JSON mapper |
 | Flutter local storage | SharedPreferencesWithCache |
@@ -86,7 +86,7 @@ flowchart TD
 
 - shared domain model을 제품 상태의 기준으로 둡니다.
 - 저장된 데이터의 진실은 repository implementation에 둡니다.
-- Android Compose 화면은 ViewModel이 만든 `UiState`를 렌더링하고 이벤트만 올립니다.
+- Android Compose 화면은 Hilt가 제공한 ViewModel의 `UiState`를 렌더링하고 이벤트만 올립니다.
 - 플랫폼 API는 Android/iOS adapter 뒤에 둡니다.
 - 건강 관련 조언으로 오해될 수 있는 문구와 기능은 추가하지 않습니다.
 

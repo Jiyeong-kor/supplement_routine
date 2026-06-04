@@ -1,15 +1,7 @@
 package com.jiyeong.supplementroutine.kmp.android.presentation
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.jiyeong.supplementroutine.kmp.android.data.AndroidIntakeRecordRepository
-import com.jiyeong.supplementroutine.kmp.android.data.AndroidRoutineDataStore
-import com.jiyeong.supplementroutine.kmp.android.data.AndroidSettingsRepository
-import com.jiyeong.supplementroutine.kmp.android.data.AndroidSupplementRepository
 import com.jiyeong.supplementroutine.shared.data.IntakeRecordRepository
 import com.jiyeong.supplementroutine.shared.data.SettingsRepository
 import com.jiyeong.supplementroutine.shared.data.SupplementRepository
@@ -26,15 +18,16 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Calendar
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class SupplementRoutineViewModel(
+@HiltViewModel
+class SupplementRoutineViewModel @Inject constructor(
     private val supplementRepository: SupplementRepository,
     private val intakeRecordRepository: IntakeRecordRepository,
     private val settingsRepository: SettingsRepository,
-    private val clock: () -> Long = { System.currentTimeMillis() },
-    private val todayProvider: () -> LocalDateValue = ::currentLocalDateValue,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(SupplementRoutineUiState(today = todayProvider()))
+    private val _uiState = MutableStateFlow(SupplementRoutineUiState(today = currentLocalDateValue()))
     val uiState: StateFlow<SupplementRoutineUiState> = _uiState.asStateFlow()
 
     init {
@@ -56,7 +49,7 @@ class SupplementRoutineViewModel(
                 val nextRecord = if (record.isDone) {
                     record.markUndone()
                 } else {
-                    record.markDone(InstantValue(clock()))
+                    record.markDone(InstantValue(System.currentTimeMillis()))
                 }
                 intakeRecordRepository.upsertRecord(nextRecord)
                 loadState()
@@ -167,28 +160,12 @@ class SupplementRoutineViewModel(
     private fun loadState(): SupplementRoutineUiState {
         return SupplementRoutineUiState(
             isLoading = false,
-            today = todayProvider(),
+            today = currentLocalDateValue(),
             supplements = supplementRepository.getSupplements(),
             intakeRecords = intakeRecordRepository.getRecords(),
             mealTimeSettings = settingsRepository.getMealTimeSettings(),
             notificationEnabled = settingsRepository.getNotificationEnabled(),
         )
-    }
-
-    companion object {
-        fun factory(context: Context): ViewModelProvider.Factory {
-            val applicationContext = context.applicationContext
-            return viewModelFactory {
-                initializer {
-                    val store = AndroidRoutineDataStore(applicationContext)
-                    SupplementRoutineViewModel(
-                        supplementRepository = AndroidSupplementRepository(store),
-                        intakeRecordRepository = AndroidIntakeRecordRepository(store),
-                        settingsRepository = AndroidSettingsRepository(store),
-                    )
-                }
-            }
-        }
     }
 }
 

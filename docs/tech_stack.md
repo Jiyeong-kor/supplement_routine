@@ -17,7 +17,7 @@
 | Flutter notification | `flutter_local_notifications`, `timezone`, `flutter_timezone` | `lib/core/services/intake_notification_service.dart`, `lib/core/services/intake_notification_copy.dart`, Android manifest/config | 사용 중 | 로컬 알림과 시간대 기반 예약 알림을 Flutter 기준 구현에서 처리한다. |
 | Shared logic | Kotlin Multiplatform | `kmp/shared/` | 전환 중 | Android/iOS가 같은 domain, scheduling, history logic을 사용하게 한다. |
 | Android native UI | Jetpack Compose, Material 3 | `kmp/androidApp/` | 전환 중 | Android 공식 UI toolkit 기반으로 네이티브 UX와 state hoisting을 적용한다. |
-| Android app architecture | MVVM, SSOT, Clean Architecture | `.codex/skills/android-architecture/SKILL.md`, 향후 Android feature packages/modules | 기준 확정 | ViewModel + UiState + hoisted state가 이 앱의 CRUD/루틴 흐름에 단순하고 적합하다. |
+| Android app architecture | MVVM, Hilt, SSOT, Clean Architecture | `.codex/skills/android-architecture/SKILL.md`, `kmp/androidApp/src/main/.../di` | 기준 확정 | ViewModel + UiState + hoisted state가 이 앱의 CRUD/루틴 흐름에 단순하고, Hilt가 Android lifecycle에 맞는 dependency graph를 관리한다. |
 | iOS native UI | SwiftUI + KMP shared | `kmp/iosApp/` | 전환 중 | shared module을 iOS에서도 사용해 Android/iOS parity를 만든다. |
 | CI | GitHub Actions | `.github/workflows/` | 사용 중 | Flutter 기준 구현과 KMP scaffold를 PR마다 검증한다. |
 
@@ -79,6 +79,8 @@ Android native 앱은 Jetpack Compose 기반으로 전환 중이다.
 | Activity Compose `1.11.0` | Android entry point | `ComponentActivity`에서 Compose content를 렌더링한다. |
 | Compose Material 3 | `kmp/androidApp/src/main/.../ui` | Android 공식 Material 3 기반 UI를 만든다. |
 | Compose Material Icons Extended | navigation/action/status icons | 버튼과 상태 표현에 familiar icon을 사용한다. |
+| Hilt `2.57.1` + KSP `2.2.20-2.0.4` | Application, Activity, ViewModel, repository/notification binding | Android Developers 공식 DI 기준이고, Kotlin 2.x 프로젝트에 맞춰 kapt 대신 KSP로 codegen을 수행한다. |
+| Hilt Navigation Compose `1.3.0` | Compose route에서 `@HiltViewModel` 획득 | Compose 화면에서 Hilt가 생성한 ViewModel을 공식 패턴으로 받는다. |
 | Java 17 / JVM target 17 | `compileOptions`, `kotlinOptions` | AGP/Kotlin/CI toolchain과 맞춘다. |
 | compileSdk/targetSdk `36`, minSdk `23` | `kmp/androidApp/build.gradle.kts` | 최신 Android API 기준으로 빌드하면서 지원 범위를 minSdk 23으로 유지한다. |
 
@@ -101,6 +103,7 @@ Android UI 구현 원칙:
 | Clean Architecture | domain -> data -> presentation -> ui/platform 방향으로 의존성 관리 | 플랫폼 API와 UI가 domain 로직을 오염시키지 않게 한다. |
 | SOLID | repository, use case, mapper, ViewModel, UI 책임 분리 | 기능 추가와 테스트 double 교체가 쉬워진다. |
 | MVVM | ViewModel이 UiState를 만들고 Compose가 렌더링 | 이 앱은 목록/폼/설정 중심이라 MVI보다 단순하고 Android 공식 권장 흐름과 잘 맞는다. |
+| Hilt DI | Application/Activity/ViewModel/Repository/Notification adapter binding | Android framework lifecycle이 만드는 객체와 앱 의존성 graph를 표준 방식으로 연결한다. |
 | State hoisting | composable 내부 business state 금지, UI-only state만 `remember` | 상태 추적과 테스트를 쉽게 한다. |
 | Multi-module | shared와 Android app을 분리하고, 향후 feature/core/platform 모듈로 확장 | migration 중 큰 PR을 피하면서 의존 방향을 관리한다. |
 
@@ -196,6 +199,7 @@ CI toolchain:
 - Android app architecture: `https://developer.android.com/topic/architecture`
 - UI layer state holders: `https://developer.android.com/topic/architecture/ui-layer/stateholders`
 - ViewModel: `https://developer.android.com/topic/libraries/architecture/viewmodel`
+- Hilt dependency injection: `https://developer.android.com/training/dependency-injection/hilt-android`
 - Compose architecture: `https://developer.android.com/develop/ui/compose/architecture`
 - Compose state: `https://developer.android.com/develop/ui/compose/state`
 - Compose state hoisting: `https://developer.android.com/develop/ui/compose/state-hoisting`
