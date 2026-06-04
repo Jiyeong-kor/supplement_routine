@@ -132,13 +132,13 @@ Android persistence는 #21에서 DataStore를 먼저 선택했다.
 | Flutter 기준 | `flutter_local_notifications`, `timezone`, `flutter_timezone` | 사용 중 | 기존 앱의 복용 알림 기준 구현이다. |
 | KMP shared | 알림 대상 schedule 계산 contract | 구현됨 | 알림 스케줄 자체는 shared schedule logic에서 파생한다. |
 | Android native | Notification permission, exact alarm, scheduler adapter | 구현됨, QA 필요 | Android 13+ notification permission과 exact alarm permission을 분리하고 Settings에서 다음 행동을 안내한다. 실제 dialog/발화 QA는 #25와 별도 notification QA에서 확인한다. |
-| iOS native | iOS notification adapter | 미구현 | iOS 권한/스케줄링 정책에 맞는 별도 adapter가 필요하다. |
+| iOS native | UserNotifications adapter | 구현됨, QA 필요 | iOS 권한 요청과 daily reminder 예약/취소를 `UNUserNotificationCenter` 뒤에 둔다. 실제 simulator/device 발화 QA는 #25에서 확인한다. |
 
 Notification은 platform API 차이가 크므로 shared domain에 직접 넣지 않는다. shared는 “언제 알림이 필요하다”까지만 계산하고, 실제 권한/예약은 platform adapter가 담당한다.
 
 ## iOS 계획
 
-현재 iOS KMP 쪽은 SwiftUI shell, shared import/call smoke path, UserDefaults local snapshot adapter 수준이다.
+현재 iOS KMP 쪽은 SwiftUI shell, shared import/call smoke path, UserDefaults local snapshot adapter, UserNotifications adapter 수준이다.
 
 목표 stack:
 
@@ -189,7 +189,7 @@ CI toolchain:
 | #48 | Android History 화면 release polish 범위 결정 |
 | #49 | Flutter 기준 구현 cutover/removal 결정 |
 | #51 | 완료: iOS UserDefaults local snapshot adapter 구현 |
-| #52 | iOS notification permission과 scheduler adapter 구현 |
+| #52 | 완료: iOS notification permission과 scheduler adapter 구현 |
 
 ## 공식 참고 기준
 
@@ -200,3 +200,5 @@ CI toolchain:
 - Compose state: `https://developer.android.com/develop/ui/compose/state`
 - Compose state hoisting: `https://developer.android.com/develop/ui/compose/state-hoisting`
 - Kotlin coding conventions: `https://kotlinlang.org/docs/coding-conventions.html`
+- Apple UserNotifications authorization: `https://developer.apple.com/documentation/usernotifications/unusernotificationcenter/requestauthorization(options:completionhandler:)`
+- Apple calendar notification trigger: `https://developer.apple.com/documentation/usernotifications/uncalendarnotificationtrigger`

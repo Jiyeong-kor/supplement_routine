@@ -2,13 +2,17 @@ import Combine
 import Foundation
 import SupplementRoutineShared
 
+@MainActor
 final class SharedRoutineViewModel: ObservableObject {
     let appName: String
     let destinationLabelText: String
     let iosFallbackMessage: String
     @Published private(set) var snapshot: RoutineSnapshot
+    @Published private(set) var notificationPermissionState: IosNotificationPermissionState = .unknown
+    @Published private(set) var notificationStatusText: String = "알림 상태를 확인해 주세요."
 
     private let store: RoutineLocalStore
+    private let reminderScheduler: IosReminderScheduler
     private let todayKey: String
 
     var supplements: [StoredSupplement] {
@@ -32,12 +36,14 @@ final class SharedRoutineViewModel: ObservableObject {
     init(
         summary: SharedAppSummary = SharedAppSummary(),
         store: RoutineLocalStore = UserDefaultsRoutineStore(),
+        reminderScheduler: IosReminderScheduler = UserNotificationReminderScheduler(),
         today: Date = Date()
     ) {
         self.appName = summary.appName()
         self.destinationLabelText = summary.destinationLabelText()
         self.iosFallbackMessage = summary.iosFallbackMessage()
         self.store = store
+        self.reminderScheduler = reminderScheduler
         self.todayKey = Self.dateKey(for: today)
         self.snapshot = store.loadSnapshot()
     }
@@ -82,6 +88,31 @@ final class SharedRoutineViewModel: ObservableObject {
     func resetLocalData() {
         snapshot = .empty
         store.clearSnapshot()
+    }
+
+    func refreshNotificationPermissionState() async {
+        notificationPermissionState = await reminderScheduler.currentPermissionState()
+        notificationStatusText = "알림 권한: \(notificationPermissionState.statusText)"
+    }
+
+    func requestNotificationAuthorization() async {
+        notificationPermissionState = await reminderScheduler.requestAuthorization()
+        notificationStatusText = "알림 권한: \(notificationPermissionState.statusText)"
+    }
+
+    func syncNotificationReminders() async {
+        do {
+            let count = try await reminderScheduler.syncDailyReminders(for: snapshot.supplements)
+            notificationPermissionState = await reminderScheduler.currentPermissionState()
+            notificationStatusText = count > 0 ? "\(count)개 알림을 예약했습니다." : "예약된 알림이 없습니다."
+        } catch {
+            notificationStatusText = "알림 예약에 실패했습니다."
+        }
+    }
+
+    func cancelNotificationReminders() async {
+        await reminderScheduler.cancelRoutineReminders()
+        notificationStatusText = "예약된 iOS 알림을 취소했습니다."
     }
 
     func record(for supplementId: String) -> StoredIntakeRecord? {

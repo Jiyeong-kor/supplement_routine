@@ -32,9 +32,10 @@ struct RootView: View {
 
             PlaceholderShellView(
                 title: "설정",
-                message: viewModel.iosFallbackMessage,
+                message: viewModel.notificationStatusText,
                 systemImage: "gearshape",
-                supplements: []
+                supplements: [],
+                actionContent: AnyView(SettingsNotificationActions(viewModel: viewModel))
             )
             .tabItem {
                 Label("설정", systemImage: "gearshape")
@@ -119,6 +120,9 @@ private struct TodayShellView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
             .background(Color(red: 1.00, green: 0.99, blue: 0.98))
             .navigationTitle("오늘")
+            .task {
+                await viewModel.refreshNotificationPermissionState()
+            }
         }
     }
 }
@@ -128,6 +132,21 @@ private struct PlaceholderShellView: View {
     let message: String
     let systemImage: String
     let supplements: [StoredSupplement]
+    let actionContent: AnyView
+
+    init(
+        title: String,
+        message: String,
+        systemImage: String,
+        supplements: [StoredSupplement],
+        actionContent: AnyView = AnyView(EmptyView())
+    ) {
+        self.title = title
+        self.message = message
+        self.systemImage = systemImage
+        self.supplements = supplements
+        self.actionContent = actionContent
+    }
 
     var body: some View {
         NavigationStack {
@@ -159,10 +178,46 @@ private struct PlaceholderShellView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                     .padding(.horizontal, 24)
                 }
+
+                actionContent
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color(red: 1.00, green: 0.99, blue: 0.98))
             .navigationTitle(title)
+        }
+    }
+}
+
+private struct SettingsNotificationActions: View {
+    let viewModel: SharedRoutineViewModel
+
+    var body: some View {
+        VStack(spacing: 12) {
+            Button("알림 권한 요청") {
+                Task {
+                    await viewModel.requestNotificationAuthorization()
+                }
+            }
+            .buttonStyle(.borderedProminent)
+
+            Button("복용 알림 예약") {
+                Task {
+                    await viewModel.syncNotificationReminders()
+                }
+            }
+            .buttonStyle(.bordered)
+            .disabled(!viewModel.notificationPermissionState.canScheduleReminders || viewModel.supplements.isEmpty)
+
+            Button("예약 알림 취소", role: .destructive) {
+                Task {
+                    await viewModel.cancelNotificationReminders()
+                }
+            }
+            .buttonStyle(.borderless)
+        }
+        .padding(.horizontal, 24)
+        .task {
+            await viewModel.refreshNotificationPermissionState()
         }
     }
 }

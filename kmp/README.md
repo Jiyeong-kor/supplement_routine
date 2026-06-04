@@ -43,4 +43,4 @@ $env:ANDROID_SDK_ROOT=$env:ANDROID_HOME
 1. `kmp/shared-domain`에서 Flutter model을 Kotlin domain model로 옮깁니다.
 2. `kmp/shared-scheduling`에서 일정 계산과 기록 요약 로직을 옮깁니다.
 3. `android/compose-today`부터 실제 화면을 이식합니다.
-4. iOS는 local persistence adapter와 notification adapter를 후속 PR에서 연결합니다.
+4. iOS는 local persistence adapter와 notification adapter 이후 screenshot/accessibility QA를 진행합니다.

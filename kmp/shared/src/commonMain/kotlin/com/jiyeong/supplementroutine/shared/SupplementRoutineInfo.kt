@@ -27,6 +27,6 @@ class SharedAppSummary {
     }
 
     fun iosFallbackMessage(): String {
-        return "iOS 알림과 로컬 저장소는 다음 단계에서 플랫폼 방식으로 연결됩니다."
+        return "iOS 알림과 로컬 저장소는 SwiftUI shell에서 플랫폼 방식으로 연결됩니다."
     }
 }

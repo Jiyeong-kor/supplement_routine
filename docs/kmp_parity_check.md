@@ -38,6 +38,7 @@
 | iOS shared framework CI | 완료 | #42, `.github/workflows/ios_kmp_ci.yml`, `SupplementRoutineShared` framework build |
 | iOS SwiftUI shell | 완료 | #24, `kmp/iosApp/SupplementRoutineIos.xcodeproj`, shared import/call smoke path |
 | iOS local persistence | 완료에 가까움 | #51, `UserDefaultsRoutineStore`, SwiftUI shell snapshot 저장/복원 path |
+| iOS notification adapter | 완료에 가까움 | #52, `UserNotificationReminderScheduler`, 권한 요청, daily reminder 예약/취소 path |
 
 ## Flutter 대비 기능별 상태
 
@@ -52,7 +53,7 @@
 | 알림 | Android 부분 구현 | Android 13+ notification runtime permission dialog, Android 12+/14 exact alarm 설정 이동, 실제 발화 QA |
 | 로컬 저장 | Android 구현됨 | migration 호환성은 Flutter cutover 전 별도 판단 필요 |
 | 디자인 시스템 | Android theme 적용됨 | 화면별 세부 polish와 expanded-width QA |
-| iOS | 부분 구현 | SwiftUI shell, shared import/call smoke path, UserDefaults local snapshot. notification adapter와 screenshot QA는 남음 |
+| iOS | 부분 구현 | SwiftUI shell, shared import/call smoke path, UserDefaults local snapshot, UserNotifications adapter. screenshot QA는 남음 |
 | 접근성/스크린샷 QA | 미완료 | #25 device/emulator screenshot, expanded-width, semantic label 점검 |
 
 ## 남은 Gap Issue
@@ -60,7 +61,6 @@
 | 우선순위 | Issue | 이유 |
 | --- | --- | --- |
 | P0 | #25 `[QA] KMP Android/iOS parity screenshot과 accessibility 검증` | Android 구현이 진척된 만큼 실제 기기/해상도/접근성 기준으로 남은 UI gap을 확정해야 한다. |
-| P0 | #52 `[iOS] notification permission과 scheduler adapter 구현` | iOS에서도 알림 권한/예약 정책에 맞는 platform adapter가 필요하다. |
 | P1 | #47 `[QA] Android notification permission/exact alarm 실기기 검증` | Android 13+ permission dialog와 Android 12+/14 exact alarm 설정/발화는 기기 또는 emulator별 확인이 필요하다. |
 | P1 | #48 `[Android] History 화면 release polish 범위 결정` | 월 이동/상세 기록 확인이 release 전에 필요한지 PRD 기준으로 확정해야 한다. |
 | P2 | #49 `[Release] Flutter 기준 구현 cutover/removal 결정` | KMP parity 후 Flutter를 유지할지 제거할지 결정해야 한다. |
@@ -75,21 +75,21 @@
 | #23 Notification/exact alarm adapter | `AndroidNotificationPermissionController.kt`, `AndroidReminderScheduler.kt`, `SupplementReminderReceiver.kt` |
 | #24 iOS SwiftUI shell | `kmp/iosApp/SupplementRoutineIos.xcodeproj`, `RootView.swift`, `SharedRoutineViewModel.swift` |
 | #51 iOS local persistence adapter | `IosRoutineStore.swift`, `SharedRoutineViewModel.swift`, `RootView.swift` |
+| #52 iOS notification adapter | `IosNotificationScheduler.swift`, `SharedRoutineViewModel.swift`, `RootView.swift` |
 | #42 iOS KMP framework CI | `.github/workflows/ios_kmp_ci.yml`, `SupplementRoutineShared` framework |
 | #44 Android Compose design token | `SupplementRoutineTheme.kt`, `MainActivity.kt`, `SupplementRoutineKmpApp.kt` |
 
 ## 권장 진행 순서
 
 1. #25 Android/iOS screenshot/accessibility QA를 수행한다.
-2. #52 iOS notification adapter를 구현한다.
-3. #47에서 Android 13+ emulator와 연결된 Android 실기기로 notification permission/exact alarm/실제 알림 발화를 검증한다.
-4. #48에서 History 화면 release polish 범위를 확정한다.
-5. Flutter 기준 구현과 KMP 구현의 cutover 조건을 정리한다.
-6. 릴리즈 서명, store asset, privacy/disclaimer, 버전 정책을 마지막 release readiness 문서로 묶는다.
+2. #47에서 Android 13+ emulator와 연결된 Android 실기기로 notification permission/exact alarm/실제 알림 발화를 검증한다.
+3. #48에서 History 화면 release polish 범위를 확정한다.
+4. Flutter 기준 구현과 KMP 구현의 cutover 조건을 정리한다.
+5. 릴리즈 서명, store asset, privacy/disclaimer, 버전 정책을 마지막 release readiness 문서로 묶는다.
 
 ## 현재 제한 사항
 
-- iOS는 SwiftUI shell, shared import/call smoke path, local snapshot persistence 수준이다. notification adapter와 simulator screenshot QA는 남아 있다.
+- iOS는 SwiftUI shell, shared import/call smoke path, local snapshot persistence, notification adapter 수준이다. simulator screenshot QA는 남아 있다.
 - Windows에서는 Xcode/iOS simulator를 직접 실행할 수 없다. 무료 검증은 GitHub-hosted macOS runner의 framework와 SwiftUI shell simulator build까지이며, 실기기 iOS QA는 Mac/Xcode 또는 signing/provisioning 가능한 macOS runner가 필요하다.
 - Android 12 실기기에서는 Android 13+ notification permission dialog를 검증할 수 없다. Android 13+ emulator가 필요하다.
 - Flutter 구현은 아직 삭제 대상이 아니다. KMP parity와 QA가 끝날 때까지 기준 구현으로 유지한다.
@@ -102,7 +102,7 @@ Parity에 도달했다고 판단하려면 다음을 만족해야 한다.
 - 앱 재시작 후 영양제, 기록, 식사 시간, 알림 기본값이 유지된다.
 - Android notification runtime permission과 exact alarm permission이 분리되어 안내된다.
 - iOS는 shared module을 import하고 최소 Today/Supplements/History/Settings shell을 제공한다.
-- iOS는 Android-only 기능에 대해 명확한 fallback을 제공한다.
+- iOS는 플랫폼별 저장소와 알림 adapter를 제공하고, 아직 parity가 아닌 화면에는 명확한 fallback을 제공한다.
 - Today checklist item과 History calendar tile은 상태를 색상만으로 전달하지 않는다.
 - phone과 expanded-width 화면에서 navigation과 주요 목록이 겹치지 않는다.
 - CI는 Flutter, KMP Android/shared, iOS shared framework를 모두 검증한다.
