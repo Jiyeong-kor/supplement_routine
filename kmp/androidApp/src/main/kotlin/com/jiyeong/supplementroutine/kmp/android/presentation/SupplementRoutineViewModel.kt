@@ -16,6 +16,7 @@ import com.jiyeong.supplementroutine.shared.data.SupplementRepository
 import com.jiyeong.supplementroutine.shared.domain.InstantValue
 import com.jiyeong.supplementroutine.shared.domain.IntakeRecord
 import com.jiyeong.supplementroutine.shared.domain.LocalDateValue
+import com.jiyeong.supplementroutine.shared.domain.Supplement
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -60,6 +61,40 @@ class SupplementRoutineViewModel(
                 loadState()
             }
         }
+    }
+
+    fun addSupplement(supplement: Supplement) {
+        viewModelScope.launch {
+            runRepositoryAction {
+                supplementRepository.addSupplement(supplement)
+                loadState()
+            }
+        }
+    }
+
+    fun updateSupplement(supplement: Supplement) {
+        viewModelScope.launch {
+            runRepositoryAction {
+                supplementRepository.updateSupplement(supplement)
+                loadState()
+            }
+        }
+    }
+
+    fun removeSupplement(supplement: Supplement) {
+        viewModelScope.launch {
+            runRepositoryAction {
+                supplementRepository.removeSupplement(supplement.id)
+                intakeRecordRepository.clearRecordsForSupplement(supplement.id)
+                loadState()
+            }
+        }
+    }
+
+    fun toggleSupplementNotification(supplement: Supplement) {
+        updateSupplement(
+            supplement.copy(isNotificationEnabled = !supplement.isNotificationEnabled),
+        )
     }
 
     private suspend fun runRepositoryAction(action: suspend () -> SupplementRoutineUiState) {

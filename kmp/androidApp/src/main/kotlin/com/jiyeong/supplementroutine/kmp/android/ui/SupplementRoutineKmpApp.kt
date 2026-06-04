@@ -65,6 +65,11 @@ fun SupplementRoutineKmpApp() {
                     "supplements" -> SupplementsRoute(
                         contentPadding = paddingValues,
                         supplements = uiState.supplements,
+                        defaultNotificationEnabled = uiState.notificationEnabled,
+                        onAddSupplement = viewModel::addSupplement,
+                        onUpdateSupplement = viewModel::updateSupplement,
+                        onRemoveSupplement = viewModel::removeSupplement,
+                        onToggleNotification = viewModel::toggleSupplementNotification,
                     )
                     "history" -> HistoryRoute(
                         contentPadding = paddingValues,
@@ -76,6 +81,7 @@ fun SupplementRoutineKmpApp() {
                         date = uiState.today,
                         items = uiState.todayItems,
                         errorMessage = uiState.errorMessage,
+                        onAddSupplementClick = { selectedDestinationKey = "supplements" },
                         onToggleRecord = viewModel::toggleRecord,
                     )
                 }

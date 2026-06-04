@@ -59,6 +59,7 @@ fun TodayRoute(
     date: LocalDateValue,
     items: List<ScheduledIntakeRecord>,
     errorMessage: String?,
+    onAddSupplementClick: () -> Unit,
     onToggleRecord: (IntakeRecord) -> Unit,
 ) {
     TodayScreen(
@@ -66,6 +67,7 @@ fun TodayRoute(
         date = date,
         items = items,
         errorMessage = errorMessage,
+        onAddSupplementClick = onAddSupplementClick,
         onToggleRecord = onToggleRecord,
     )
 }
@@ -76,6 +78,7 @@ private fun TodayScreen(
     date: LocalDateValue,
     items: List<ScheduledIntakeRecord>,
     errorMessage: String?,
+    onAddSupplementClick: () -> Unit,
     onToggleRecord: (IntakeRecord) -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -126,7 +129,7 @@ private fun TodayScreen(
         }
 
         FloatingActionButton(
-            onClick = {},
+            onClick = onAddSupplementClick,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(
@@ -136,7 +139,7 @@ private fun TodayScreen(
         ) {
             Icon(
                 imageVector = Icons.Filled.Add,
-                contentDescription = "영양제 추가",
+                contentDescription = "영양제 추가 화면으로 이동",
             )
         }
     }
@@ -386,7 +389,7 @@ private fun TodayEmptyState() {
                 fontWeight = FontWeight.SemiBold,
             )
             Text(
-                text = "오른쪽 아래 + 버튼으로 영양제를 등록해보세요.",
+                text = "오른쪽 아래 + 버튼으로 영양제 화면으로 이동해 등록해보세요.",
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
