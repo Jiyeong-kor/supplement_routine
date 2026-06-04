@@ -116,23 +116,22 @@ MVI를 기본으로 선택하지 않은 이유:
 | --- | --- | --- | --- |
 | Flutter 기준 | SharedPreferences + JSON mapper | 사용 중 | 작은 로컬 데이터에는 단순하고 테스트하기 쉽다. |
 | KMP shared | Repository interface + DTO mapper | 구현됨 | Android/iOS storage 구현이 같은 domain contract를 따르게 한다. |
-| Android KMP | 아직 미구현 | 남은 gap | sample state를 제거하고 앱 재시작 후 데이터를 복원하려면 Android local adapter가 필요하다. |
+| Android KMP | DataStore Preferences + JSON mapper | 구현됨 | 현재 데이터 규모가 작고 영양제/기록/설정 local-first 저장에 충분하다. shared DTO/domain mapper를 유지해 iOS adapter와 같은 contract를 따른다. |
 | iOS KMP | 아직 미구현 | 남은 gap | iOS에서도 같은 repository contract를 구현해야 한다. |
 
-다음 Android persistence 구현에서 선택할 후보:
+Android persistence는 #21에서 DataStore를 먼저 선택했다.
 
-- DataStore: key-value/protobuf 기반 설정과 작은 데이터 저장에 적합하다.
-- Room: 관계형 query, 복잡한 history query, migration이 커질 때 적합하다.
-
-현재 데이터 규모만 보면 DataStore가 먼저 검토할 만하지만, history query와 장기 migration 요구가 커지면 Room이 더 적합할 수 있다. 이 선택은 #21 구현 시 공식 Android storage guidance와 실제 query 요구를 기준으로 결정한다.
+- DataStore: key-value 기반 설정과 작은 JSON aggregate 저장에 적합하다.
+- Room: 관계형 query, 복잡한 history query, migration이 커질 때 재검토한다.
+- 현재 Android production route는 sample state가 아니라 `AndroidRoutineDataStore`와 shared repository contract를 사용한다.
 
 ## Notification
 
 | 단계 | 기술 | 상태 | 이유 |
 | --- | --- | --- | --- |
 | Flutter 기준 | `flutter_local_notifications`, `timezone`, `flutter_timezone` | 사용 중 | 기존 앱의 복용 알림 기준 구현이다. |
-| KMP shared | 알림 대상 schedule 계산 contract | 부분 준비 | 알림 스케줄 자체는 shared schedule logic에서 파생할 수 있다. |
-| Android native | Notification permission, exact alarm, scheduler adapter | 미구현 | Android 13+ notification permission과 exact alarm permission을 분리해야 한다. |
+| KMP shared | 알림 대상 schedule 계산 contract | 구현됨 | 알림 스케줄 자체는 shared schedule logic에서 파생한다. |
+| Android native | Notification permission, exact alarm, scheduler adapter | 구현됨, QA 필요 | Android 13+ notification permission과 exact alarm permission을 분리하고 Settings에서 다음 행동을 안내한다. 실제 dialog/발화 QA는 #25와 별도 notification QA에서 확인한다. |
 | iOS native | iOS notification adapter | 미구현 | iOS 권한/스케줄링 정책에 맞는 별도 adapter가 필요하다. |
 
 Notification은 platform API 차이가 크므로 shared domain에 직접 넣지 않는다. shared는 “언제 알림이 필요하다”까지만 계산하고, 실제 권한/예약은 platform adapter가 담당한다.
@@ -179,12 +178,16 @@ CI toolchain:
 
 | Issue | 결정할 것 |
 | --- | --- |
-| #21 | Android local persistence를 DataStore로 할지 Room으로 할지 결정 |
-| #22 | form validation을 shared use case로 올릴지 Android presentation에 둘지 결정 |
-| #23 | Android notification scheduler adapter 경계와 exact alarm fallback 결정 |
+| #21 | 완료: Android local persistence는 DataStore Preferences + JSON mapper로 시작 |
+| #22 | 완료: form validation은 shared `SupplementFormPolicy`를 기준으로 적용 |
+| #23 | 완료: Android notification scheduler adapter와 exact alarm fallback 경계 구현 |
 | #24 | iOS SwiftUI shell과 shared framework integration 방식 결정 |
 | #25 | screenshot/accessibility QA 방식 결정 |
-| #42 | macOS runner에서 KMP iOS framework build를 무료 범위로 검증 |
+| #42 | 완료: macOS runner에서 KMP iOS framework build를 무료 범위로 검증 |
+| #44 | 완료: Android Compose theme token을 새 디자인 시스템으로 갱신 |
+| #47 | Android notification permission/exact alarm 실기기 QA 결과에 따른 release gap 결정 |
+| #48 | Android History 화면 release polish 범위 결정 |
+| #49 | Flutter 기준 구현 cutover/removal 결정 |
 
 ## 공식 참고 기준
 
