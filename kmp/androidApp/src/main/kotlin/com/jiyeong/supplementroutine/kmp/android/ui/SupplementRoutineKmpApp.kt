@@ -40,6 +40,7 @@ import com.jiyeong.supplementroutine.kmp.android.notification.AndroidNotificatio
 import com.jiyeong.supplementroutine.kmp.android.notification.AndroidReminderScheduler
 import com.jiyeong.supplementroutine.kmp.android.notification.NotificationPermissionState
 import com.jiyeong.supplementroutine.kmp.android.presentation.SupplementRoutineViewModel
+import com.jiyeong.supplementroutine.kmp.android.ui.haptic.rememberRoutineHapticFeedback
 import com.jiyeong.supplementroutine.kmp.android.ui.history.HistoryRoute
 import com.jiyeong.supplementroutine.kmp.android.ui.settings.SettingsRoute
 import com.jiyeong.supplementroutine.kmp.android.ui.supplements.SupplementsRoute
@@ -54,6 +55,7 @@ fun SupplementRoutineKmpApp() {
         factory = SupplementRoutineViewModel.factory(context),
     )
     val uiState by viewModel.uiState.collectAsState()
+    val hapticFeedback = rememberRoutineHapticFeedback()
     val permissionController = remember(context) {
         AndroidNotificationPermissionController(context.applicationContext)
     }
@@ -140,7 +142,10 @@ fun SupplementRoutineKmpApp() {
                         onRefreshNotificationPermissions = {
                             notificationPermissionState = permissionController.currentState()
                         },
-                        onResetRoutineData = viewModel::resetRoutineData,
+                        onResetRoutineData = {
+                            hapticFeedback.destructiveConfirmed()
+                            viewModel.resetRoutineData()
+                        },
                     )
                     else -> TodayRoute(
                         contentPadding = paddingValues,
@@ -148,7 +153,12 @@ fun SupplementRoutineKmpApp() {
                         items = uiState.todayItems,
                         errorMessage = uiState.errorMessage,
                         onAddSupplementClick = { selectedDestinationKey = "supplements" },
-                        onToggleRecord = viewModel::toggleRecord,
+                        onToggleRecord = { record ->
+                            if (!record.isDone) {
+                                hapticFeedback.intakeCompleted()
+                            }
+                            viewModel.toggleRecord(record)
+                        },
                     )
                 }
             }

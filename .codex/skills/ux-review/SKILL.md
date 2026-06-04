@@ -44,6 +44,7 @@ Supplement Routine은 의료 조언 앱이 아니라 영양제 복용 루틴을 
 - empty state는 사용자가 다음 행동을 알 수 있어야 한다.
 - loading/error/disabled/success 상태를 실제 흐름에 맞게 제공한다.
 - 한국어 문구는 짧고 직접적으로 쓴다. 과장된 마케팅 문구를 넣지 않는다.
+- 햅틱은 매일 반복 사용 피로도를 낮추기 위해 중요한 상태 변화에만 짧고 일관되게 사용한다.
 
 ## 화면별 UX 체크
 
@@ -101,6 +102,8 @@ Supplement Routine은 의료 조언 앱이 아니라 영양제 복용 루틴을 
 - snackbar/toast는 transient feedback에만 사용하고, 중요한 오류는 화면 안에 남긴다.
 - 네트워크 의존이 없는 local-first 앱이라도 persistence failure/error path는 UI state로 고려한다.
 - placeholder action은 disabled, “준비 중”, 또는 별도 issue 링크로 명확히 표현한다.
+- 복용 체크 완료, 저장 완료, destructive confirm, validation error에만 햅틱 intent를 부여한다. 체크 해제와 단순 탭/탭 전환은 기본적으로 햅틱을 생략한다.
+- Android는 `View.performHapticFeedback` 또는 Compose의 view 기반 feedback을 우선하고, iOS는 같은 intent를 SwiftUI/UIKit 햅틱으로 매핑한다.
 
 ## Accessibility
 

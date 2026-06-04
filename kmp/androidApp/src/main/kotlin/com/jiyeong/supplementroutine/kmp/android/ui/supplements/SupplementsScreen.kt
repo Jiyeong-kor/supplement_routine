@@ -63,6 +63,7 @@ import com.jiyeong.supplementroutine.kmp.android.ui.common.formatDosage
 import com.jiyeong.supplementroutine.kmp.android.ui.common.formatTime
 import com.jiyeong.supplementroutine.kmp.android.ui.common.methodLabelText
 import com.jiyeong.supplementroutine.kmp.android.ui.common.slotLabelText
+import com.jiyeong.supplementroutine.kmp.android.ui.haptic.rememberRoutineHapticFeedback
 import com.jiyeong.supplementroutine.shared.domain.IntakeMethod
 import com.jiyeong.supplementroutine.shared.domain.IntakeSlot
 import com.jiyeong.supplementroutine.shared.domain.Supplement
@@ -85,6 +86,7 @@ fun SupplementsRoute(
     var formInitialSupplement by remember { mutableStateOf<Supplement?>(null) }
     var isAdding by remember { mutableStateOf(false) }
     var deleteTarget by remember { mutableStateOf<Supplement?>(null) }
+    val hapticFeedback = rememberRoutineHapticFeedback()
 
     if (isAdding || formInitialSupplement != null) {
         SupplementFormScreen(
@@ -101,9 +103,11 @@ fun SupplementsRoute(
                 } else {
                     onUpdateSupplement(supplement)
                 }
+                hapticFeedback.saved()
                 isAdding = false
                 formInitialSupplement = null
             },
+            onValidationError = hapticFeedback::validationWarning,
         )
     } else {
         SupplementsScreen(
@@ -121,6 +125,7 @@ fun SupplementsRoute(
             supplement = supplement,
             onDismiss = { deleteTarget = null },
             onConfirm = {
+                hapticFeedback.destructiveConfirmed()
                 onRemoveSupplement(supplement)
                 deleteTarget = null
             },
@@ -205,6 +210,7 @@ private fun SupplementFormScreen(
     defaultNotificationEnabled: Boolean,
     onDismiss: () -> Unit,
     onSubmit: (Supplement) -> Unit,
+    onValidationError: () -> Unit,
 ) {
     val isEditMode = initialSupplement != null
     var name by remember(initialSupplement) { mutableStateOf(initialSupplement?.name.orEmpty()) }
@@ -266,12 +272,14 @@ private fun SupplementFormScreen(
         val nameError = SupplementFormPolicy.validateName(trimmedName)
         if (nameError != null) {
             errorMessage = validationMessage(nameError)
+            onValidationError()
             return
         }
 
         val dosageValue = SupplementFormPolicy.parseDosage(dosageText)
         if (dosageValue == null) {
             errorMessage = validationMessage(SupplementFormValidationError.InvalidDosage)
+            onValidationError()
             return
         }
 
@@ -279,6 +287,7 @@ private fun SupplementFormScreen(
             val routineError = SupplementFormPolicy.validateRoutineSlots(selectedSlots)
             if (routineError != null) {
                 errorMessage = validationMessage(routineError)
+                onValidationError()
                 return
             }
         }
