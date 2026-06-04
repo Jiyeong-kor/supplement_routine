@@ -7,7 +7,8 @@
 - `SupplementRoutineIos.xcodeproj`는 signing 없이 iOS simulator debug build를 검증하기 위한 최소 Xcode project입니다.
 - SwiftUI shell은 Today, Supplements, History, Settings tab 구조를 제공합니다.
 - `SharedRoutineViewModel`은 `SupplementRoutineShared` framework의 `SharedAppSummary`를 import/call 해서 shared module integration을 smoke-test합니다.
-- Android-only 알림/저장소 기능은 iOS fallback 문구로 표시합니다.
+- `UserDefaultsRoutineStore`는 iOS shell의 supplement/record/settings snapshot을 local-first로 저장하고 복원합니다.
+- Android-only 알림 기능은 iOS fallback 문구로 표시합니다.
 
 ## 로컬 macOS 검증
 
@@ -29,7 +30,6 @@ GitHub Actions에서는 `.github/workflows/ios_kmp_ci.yml`이 같은 순서로 s
 
 ## 남은 범위
 
-- iOS local persistence adapter
 - iOS notification permission/scheduler adapter
 - 실제 iOS simulator screenshot QA
 - iPhone 실기기 실행, signing, provisioning

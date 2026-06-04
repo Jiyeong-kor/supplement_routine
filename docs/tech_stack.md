@@ -117,7 +117,7 @@ MVI를 기본으로 선택하지 않은 이유:
 | Flutter 기준 | SharedPreferences + JSON mapper | 사용 중 | 작은 로컬 데이터에는 단순하고 테스트하기 쉽다. |
 | KMP shared | Repository interface + DTO mapper | 구현됨 | Android/iOS storage 구현이 같은 domain contract를 따르게 한다. |
 | Android KMP | DataStore Preferences + JSON mapper | 구현됨 | 현재 데이터 규모가 작고 영양제/기록/설정 local-first 저장에 충분하다. shared DTO/domain mapper를 유지해 iOS adapter와 같은 contract를 따른다. |
-| iOS KMP | 아직 미구현 | 남은 gap | iOS에서도 같은 repository contract를 구현해야 한다. |
+| iOS KMP | UserDefaults local snapshot adapter | 구현됨, QA 필요 | SwiftUI shell에서 supplement/record/settings snapshot을 저장/복원한다. shared repository parity 확대는 iOS feature 확장과 함께 이어간다. |
 
 Android persistence는 #21에서 DataStore를 먼저 선택했다.
 
@@ -138,7 +138,7 @@ Notification은 platform API 차이가 크므로 shared domain에 직접 넣지 
 
 ## iOS 계획
 
-현재 iOS KMP 쪽은 SwiftUI shell과 shared import/call smoke path 수준이다.
+현재 iOS KMP 쪽은 SwiftUI shell, shared import/call smoke path, UserDefaults local snapshot adapter 수준이다.
 
 목표 stack:
 
@@ -188,7 +188,7 @@ CI toolchain:
 | #47 | Android notification permission/exact alarm 실기기 QA 결과에 따른 release gap 결정 |
 | #48 | Android History 화면 release polish 범위 결정 |
 | #49 | Flutter 기준 구현 cutover/removal 결정 |
-| #51 | iOS shared repository 기반 local persistence adapter 구현 |
+| #51 | 완료: iOS UserDefaults local snapshot adapter 구현 |
 | #52 | iOS notification permission과 scheduler adapter 구현 |
 
 ## 공식 참고 기준

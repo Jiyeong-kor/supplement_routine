@@ -11,6 +11,7 @@
 		A10000000000000000000002 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000012 /* RootView.swift */; };
 		A10000000000000000000003 /* SharedRoutineViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000013 /* SharedRoutineViewModel.swift */; };
 		A10000000000000000000004 /* SupplementRoutineShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A10000000000000000000014 /* SupplementRoutineShared.framework */; };
+		A10000000000000000000005 /* IosRoutineStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000015 /* IosRoutineStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +20,7 @@
 		A10000000000000000000012 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		A10000000000000000000013 /* SharedRoutineViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedRoutineViewModel.swift; sourceTree = "<group>"; };
 		A10000000000000000000014 /* SupplementRoutineShared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SupplementRoutineShared.framework; path = ../shared/build/bin/iosSimulatorArm64/debugFramework/SupplementRoutineShared.framework; sourceTree = SOURCE_ROOT; };
+		A10000000000000000000015 /* IosRoutineStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IosRoutineStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,6 +50,7 @@
 				A10000000000000000000011 /* SupplementRoutineIosApp.swift */,
 				A10000000000000000000012 /* RootView.swift */,
 				A10000000000000000000013 /* SharedRoutineViewModel.swift */,
+				A10000000000000000000015 /* IosRoutineStore.swift */,
 			);
 			path = SupplementRoutineIos;
 			sourceTree = "<group>";
@@ -129,6 +132,7 @@
 				A10000000000000000000001 /* SupplementRoutineIosApp.swift in Sources */,
 				A10000000000000000000002 /* RootView.swift in Sources */,
 				A10000000000000000000003 /* SharedRoutineViewModel.swift in Sources */,
+				A10000000000000000000005 /* IosRoutineStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
