@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jiyeong.supplementroutine.kmp.android.presentation.SupplementRoutineViewModel
 import com.jiyeong.supplementroutine.kmp.android.ui.history.HistoryRoute
+import com.jiyeong.supplementroutine.kmp.android.ui.settings.SettingsRoute
 import com.jiyeong.supplementroutine.kmp.android.ui.supplements.SupplementsRoute
 import com.jiyeong.supplementroutine.kmp.android.ui.today.TodayRoute
 import com.jiyeong.supplementroutine.shared.SupplementRoutineInfo
@@ -75,6 +76,16 @@ fun SupplementRoutineKmpApp() {
                         contentPadding = paddingValues,
                         today = uiState.today,
                         historyViewState = uiState.historyViewState,
+                    )
+                    "settings" -> SettingsRoute(
+                        contentPadding = paddingValues,
+                        mealTimeSettings = uiState.mealTimeSettings,
+                        notificationEnabled = uiState.notificationEnabled,
+                        onBreakfastTimeChanged = viewModel::updateBreakfastTime,
+                        onLunchTimeChanged = viewModel::updateLunchTime,
+                        onDinnerTimeChanged = viewModel::updateDinnerTime,
+                        onNotificationEnabledChanged = viewModel::updateNotificationEnabled,
+                        onResetRoutineData = viewModel::resetRoutineData,
                     )
                     else -> TodayRoute(
                         contentPadding = paddingValues,

@@ -17,6 +17,7 @@ import com.jiyeong.supplementroutine.shared.domain.InstantValue
 import com.jiyeong.supplementroutine.shared.domain.IntakeRecord
 import com.jiyeong.supplementroutine.shared.domain.LocalDateValue
 import com.jiyeong.supplementroutine.shared.domain.Supplement
+import com.jiyeong.supplementroutine.shared.domain.TimeOfDayValue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -95,6 +96,52 @@ class SupplementRoutineViewModel(
         updateSupplement(
             supplement.copy(isNotificationEnabled = !supplement.isNotificationEnabled),
         )
+    }
+
+    fun updateBreakfastTime(time: TimeOfDayValue) {
+        viewModelScope.launch {
+            runRepositoryAction {
+                settingsRepository.updateBreakfastTime(time)
+                loadState()
+            }
+        }
+    }
+
+    fun updateLunchTime(time: TimeOfDayValue) {
+        viewModelScope.launch {
+            runRepositoryAction {
+                settingsRepository.updateLunchTime(time)
+                loadState()
+            }
+        }
+    }
+
+    fun updateDinnerTime(time: TimeOfDayValue) {
+        viewModelScope.launch {
+            runRepositoryAction {
+                settingsRepository.updateDinnerTime(time)
+                loadState()
+            }
+        }
+    }
+
+    fun updateNotificationEnabled(isEnabled: Boolean) {
+        viewModelScope.launch {
+            runRepositoryAction {
+                settingsRepository.updateNotificationEnabled(isEnabled)
+                loadState()
+            }
+        }
+    }
+
+    fun resetRoutineData() {
+        viewModelScope.launch {
+            runRepositoryAction {
+                supplementRepository.clearSupplements()
+                intakeRecordRepository.clearAll()
+                loadState()
+            }
+        }
     }
 
     private suspend fun runRepositoryAction(action: suspend () -> SupplementRoutineUiState) {
