@@ -7,6 +7,21 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - "lib/**"
+      - "test/**"
+      - "android/**"
+      - "ios/**"
+      - "linux/**"
+      - "macos/**"
+      - "windows/**"
+      - "web/**"
+      - "assets/**"
+      - "pubspec.yaml"
+      - "pubspec.lock"
+      - "analysis_options.yaml"
+      - "l10n.yaml"
+      - ".github/workflows/flutter_ci.yml"
   workflow_dispatch:
 
 concurrency:
@@ -14,20 +29,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  validate:
-    name: Analyze, test, and build
+  analyze-and-test:
+    name: Analyze and test
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 12
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
-
-      - name: Set up Java
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: '17'
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -40,10 +49,40 @@ jobs:
         run: flutter pub get --enforce-lockfile
 
       - name: Analyze
-        run: flutter analyze
+        run: flutter analyze --no-pub
 
       - name: Run tests
-        run: flutter test
+        run: flutter test --no-pub
+
+  android-debug-build:
+    name: Build Android debug APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+          cache-dependency-path: |
+            android/**/*.gradle
+            android/**/*.gradle.kts
+            android/gradle/wrapper/gradle-wrapper.properties
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.9'
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get --enforce-lockfile
 
       - name: Build Android debug APK
-        run: flutter build apk --debug
+        run: flutter build apk --debug --no-pub
