@@ -1,16 +1,35 @@
-# iOS Shell 준비
+# iOS Shell
 
-이 폴더는 KMP shared module을 iOS 앱에 연결하기 위한 자리입니다.
+이 폴더는 KMP shared module을 사용하는 SwiftUI iOS shell입니다.
 
-현재 scaffold PR에서는 Xcode project를 추가하지 않습니다. 이유는 다음과 같습니다.
+## 현재 범위
 
-- 첫 PR의 목표는 Android와 shared KMP build가 동작하는 최소 골격입니다.
-- iOS build는 macOS runner, signing, Xcode project 설정이 필요하므로 별도 PR에서 다룹니다.
-- shared module은 이미 `iosX64`, `iosArm64`, `iosSimulatorArm64` target을 선언해 iOS 연결을 준비합니다.
+- `SupplementRoutineIos.xcodeproj`는 signing 없이 iOS simulator debug build를 검증하기 위한 최소 Xcode project입니다.
+- SwiftUI shell은 Today, Supplements, History, Settings tab 구조를 제공합니다.
+- `SharedRoutineViewModel`은 `SupplementRoutineShared` framework의 `SharedAppSummary`를 import/call 해서 shared module integration을 smoke-test합니다.
+- Android-only 알림/저장소 기능은 iOS fallback 문구로 표시합니다.
 
-후속 `ios/shared-integration` 작업에서 추가할 항목:
+## 로컬 macOS 검증
 
-- Xcode project 또는 Swift Package 연결 방식 결정
-- shared framework export task 확인
-- SwiftUI app shell 추가
-- iOS CI 또는 수동 검증 절차 추가
+Windows에서는 Xcode/iOS simulator를 실행할 수 없습니다. macOS에서는 저장소 루트에서 다음 순서로 확인합니다.
+
+```bash
+gradle -p kmp :shared:linkDebugFrameworkIosSimulatorArm64 --build-cache --no-daemon
+xcodebuild \
+  -project kmp/iosApp/SupplementRoutineIos.xcodeproj \
+  -scheme SupplementRoutineIos \
+  -configuration Debug \
+  -sdk iphonesimulator \
+  -destination "generic/platform=iOS Simulator" \
+  CODE_SIGNING_ALLOWED=NO \
+  build
+```
+
+GitHub Actions에서는 `.github/workflows/ios_kmp_ci.yml`이 같은 순서로 shared framework와 SwiftUI shell을 빌드합니다.
+
+## 남은 범위
+
+- iOS local persistence adapter
+- iOS notification permission/scheduler adapter
+- 실제 iOS simulator screenshot QA
+- iPhone 실기기 실행, signing, provisioning

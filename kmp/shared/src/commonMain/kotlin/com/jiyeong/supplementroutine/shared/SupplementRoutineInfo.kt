@@ -16,3 +16,17 @@ object SupplementRoutineInfo {
         AppDestination(key = "settings", koreanLabel = "설정"),
     )
 }
+
+class SharedAppSummary {
+    fun appName(): String = SupplementRoutineInfo.koreanAppName
+
+    fun destinationLabelText(): String {
+        return SupplementRoutineInfo.topLevelDestinations.joinToString(" · ") { destination ->
+            destination.koreanLabel
+        }
+    }
+
+    fun iosFallbackMessage(): String {
+        return "iOS 알림과 로컬 저장소는 다음 단계에서 플랫폼 방식으로 연결됩니다."
+    }
+}

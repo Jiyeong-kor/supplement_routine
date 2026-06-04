@@ -14,10 +14,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  shared-ios-framework:
-    name: Shared iOS simulator framework build
+  ios-shell:
+    name: Shared framework and SwiftUI shell build
     runs-on: macos-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
 
     steps:
       - name: Check out repository
@@ -37,3 +37,16 @@ jobs:
 
       - name: Build shared iOS simulator framework
         run: gradle -p kmp :shared:linkDebugFrameworkIosSimulatorArm64 --build-cache --no-daemon
+
+      - name: Build SwiftUI iOS shell
+        run: >
+          xcodebuild
+          -project kmp/iosApp/SupplementRoutineIos.xcodeproj
+          -scheme SupplementRoutineIos
+          -configuration Debug
+          -sdk iphonesimulator
+          -destination "generic/platform=iOS Simulator"
+          ARCHS=arm64
+          ONLY_ACTIVE_ARCH=YES
+          CODE_SIGNING_ALLOWED=NO
+          build

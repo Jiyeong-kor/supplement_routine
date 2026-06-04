@@ -18,7 +18,7 @@
 | Shared logic | Kotlin Multiplatform | `kmp/shared/` | 전환 중 | Android/iOS가 같은 domain, scheduling, history logic을 사용하게 한다. |
 | Android native UI | Jetpack Compose, Material 3 | `kmp/androidApp/` | 전환 중 | Android 공식 UI toolkit 기반으로 네이티브 UX와 state hoisting을 적용한다. |
 | Android app architecture | MVVM, SSOT, Clean Architecture | `.codex/skills/android-architecture/SKILL.md`, 향후 Android feature packages/modules | 기준 확정 | ViewModel + UiState + hoisted state가 이 앱의 CRUD/루틴 흐름에 단순하고 적합하다. |
-| iOS native UI | SwiftUI + KMP shared | `kmp/iosApp/README.md` | 계획 | shared module을 iOS에서도 사용해 Android/iOS parity를 만든다. |
+| iOS native UI | SwiftUI + KMP shared | `kmp/iosApp/` | 전환 중 | shared module을 iOS에서도 사용해 Android/iOS parity를 만든다. |
 | CI | GitHub Actions | `.github/workflows/` | 사용 중 | Flutter 기준 구현과 KMP scaffold를 PR마다 검증한다. |
 
 ## 현재 기준 구현: Flutter
@@ -138,7 +138,7 @@ Notification은 platform API 차이가 크므로 shared domain에 직접 넣지 
 
 ## iOS 계획
 
-현재 iOS KMP 쪽은 `kmp/iosApp/README.md` 수준이다.
+현재 iOS KMP 쪽은 SwiftUI shell과 shared import/call smoke path 수준이다.
 
 목표 stack:
 
@@ -154,7 +154,7 @@ iOS에서 Android-only 기능이 없거나 정책이 다르면 UI에 fallback을
 | --- | --- | --- | --- |
 | Flutter CI | `.github/workflows/flutter_ci.yml` | `flutter pub get --enforce-lockfile`, `flutter analyze`, `flutter test`, `flutter build apk --debug` | Flutter 기준 구현이 migration 중 깨지지 않게 한다. |
 | KMP CI | `.github/workflows/kmp_ci.yml` | `gradle -p kmp clean :shared:check :androidApp:assembleDebug --no-daemon` | shared logic과 Android Compose scaffold가 빌드되는지 확인한다. |
-| iOS KMP CI | `.github/workflows/ios_kmp_ci.yml` | macOS runner에서 `:shared:linkDebugFrameworkIosSimulatorArm64` | 무료 GitHub-hosted macOS runner로 iOS shared framework build 가능성을 먼저 확인한다. |
+| iOS KMP CI | `.github/workflows/ios_kmp_ci.yml` | macOS runner에서 `:shared:linkDebugFrameworkIosSimulatorArm64`, `xcodebuild` SwiftUI shell build | 무료 GitHub-hosted macOS runner로 iOS shared framework와 shell integration을 확인한다. |
 
 CI toolchain:
 
@@ -181,13 +181,15 @@ CI toolchain:
 | #21 | 완료: Android local persistence는 DataStore Preferences + JSON mapper로 시작 |
 | #22 | 완료: form validation은 shared `SupplementFormPolicy`를 기준으로 적용 |
 | #23 | 완료: Android notification scheduler adapter와 exact alarm fallback 경계 구현 |
-| #24 | iOS SwiftUI shell과 shared framework integration 방식 결정 |
+| #24 | 완료: iOS SwiftUI shell과 shared framework import/call smoke path 추가 |
 | #25 | screenshot/accessibility QA 방식 결정 |
 | #42 | 완료: macOS runner에서 KMP iOS framework build를 무료 범위로 검증 |
 | #44 | 완료: Android Compose theme token을 새 디자인 시스템으로 갱신 |
 | #47 | Android notification permission/exact alarm 실기기 QA 결과에 따른 release gap 결정 |
 | #48 | Android History 화면 release polish 범위 결정 |
 | #49 | Flutter 기준 구현 cutover/removal 결정 |
+| #51 | iOS shared repository 기반 local persistence adapter 구현 |
+| #52 | iOS notification permission과 scheduler adapter 구현 |
 
 ## 공식 참고 기준
 

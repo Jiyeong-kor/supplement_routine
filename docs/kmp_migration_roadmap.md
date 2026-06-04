@@ -194,7 +194,7 @@ KMP 전환 중 함께 반영할 개선:
 - 문서만 변경하는 PR에서도 Flutter CI가 계속 동작하도록 둔다.
 - `kmp/scaffold` PR에서 KMP/Gradle 전용 workflow를 별도로 추가한다.
 - KMP CI는 처음에는 Android와 shared JVM test를 우선 검증한다.
-- iOS CI는 무료 GitHub-hosted macOS runner에서 KMP shared iOS simulator framework build를 먼저 검증하고, iOS shell build는 이후 별도 PR에서 확장한다.
+- iOS CI는 무료 GitHub-hosted macOS runner에서 KMP shared iOS simulator framework build와 SwiftUI shell build를 검증한다.
 - Flutter와 KMP가 병렬로 존재하는 동안 CI도 Flutter job과 KMP job을 분리한다.
 - Flutter 제거 또는 유지 결정 전까지 Flutter CI를 삭제하지 않는다.
 
@@ -205,4 +205,5 @@ KMP CI가 생긴 뒤 기본 job 후보:
 - Android lint 또는 compile check
 - Android debug build
 - iOS simulator framework build
-- iOS app build는 SwiftUI shell과 signing 정책이 정리된 뒤 추가
+- iOS SwiftUI shell simulator build
+- iOS signing/provisioning이 필요한 실기기 build는 release 준비 단계에서 별도 추가
