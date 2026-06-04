@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.jiyeong.supplementroutine.kmp.android.ui.common.formatTime
+import com.jiyeong.supplementroutine.kmp.android.notification.NotificationPermissionState
 import com.jiyeong.supplementroutine.shared.domain.MealTimeSettings
 import com.jiyeong.supplementroutine.shared.domain.TimeOfDayValue
 
@@ -49,10 +50,14 @@ fun SettingsRoute(
     contentPadding: PaddingValues,
     mealTimeSettings: MealTimeSettings,
     notificationEnabled: Boolean,
+    notificationPermissionState: NotificationPermissionState,
     onBreakfastTimeChanged: (TimeOfDayValue) -> Unit,
     onLunchTimeChanged: (TimeOfDayValue) -> Unit,
     onDinnerTimeChanged: (TimeOfDayValue) -> Unit,
     onNotificationEnabledChanged: (Boolean) -> Unit,
+    onRequestNotificationPermission: () -> Unit,
+    onRequestExactAlarmPermission: () -> Unit,
+    onRefreshNotificationPermissions: () -> Unit,
     onResetRoutineData: () -> Unit,
 ) {
     var dialog by remember { mutableStateOf<SettingsDialog?>(null) }
@@ -110,10 +115,35 @@ fun SettingsRoute(
                         enabled = notificationEnabled,
                         onEnabledChanged = onNotificationEnabledChanged,
                     )
-                    SettingsRow(
+                    PermissionActionRow(
+                        icon = Icons.Outlined.Notifications,
+                        title = "알림 표시 권한",
+                        description = if (notificationPermissionState.canPostNotifications) {
+                            "허용됨. 복용 알림을 표시할 수 있습니다."
+                        } else {
+                            "Android 13 이상에서는 알림 표시 권한이 필요합니다."
+                        },
+                        actionLabel = if (notificationPermissionState.canPostNotifications) "새로고침" else "권한 요청",
+                        onClick = if (notificationPermissionState.canPostNotifications) {
+                            onRefreshNotificationPermissions
+                        } else {
+                            onRequestNotificationPermission
+                        },
+                    )
+                    PermissionActionRow(
                         icon = Icons.Outlined.Alarm,
                         title = "정확한 알림 권한",
-                        description = "Android 권한 확인과 알림 예약 adapter는 #23에서 연결합니다.",
+                        description = if (notificationPermissionState.canScheduleExactAlarms) {
+                            "허용됨. 정해진 시간에 복용 알림을 예약할 수 있습니다."
+                        } else {
+                            "Android 알람 및 리마인더 설정에서 정확한 알림 권한을 허용해야 합니다."
+                        },
+                        actionLabel = if (notificationPermissionState.canScheduleExactAlarms) "새로고침" else "설정 열기",
+                        onClick = if (notificationPermissionState.canScheduleExactAlarms) {
+                            onRefreshNotificationPermissions
+                        } else {
+                            onRequestExactAlarmPermission
+                        },
                     )
                 }
             }
@@ -167,6 +197,47 @@ fun SettingsRoute(
             onDismiss = { dialog = null },
         )
         null -> Unit
+    }
+}
+
+@Composable
+private fun PermissionActionRow(
+    icon: ImageVector,
+    title: String,
+    description: String,
+    actionLabel: String,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+        )
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        TextButton(onClick = onClick) {
+            Text(actionLabel)
+        }
     }
 }
 

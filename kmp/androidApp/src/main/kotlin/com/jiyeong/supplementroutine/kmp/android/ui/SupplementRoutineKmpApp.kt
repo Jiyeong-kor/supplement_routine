@@ -1,5 +1,9 @@
 package com.jiyeong.supplementroutine.kmp.android.ui
 
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,6 +36,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.jiyeong.supplementroutine.kmp.android.notification.AndroidNotificationPermissionController
+import com.jiyeong.supplementroutine.kmp.android.notification.AndroidReminderScheduler
+import com.jiyeong.supplementroutine.kmp.android.notification.NotificationPermissionState
 import com.jiyeong.supplementroutine.kmp.android.presentation.SupplementRoutineViewModel
 import com.jiyeong.supplementroutine.kmp.android.ui.history.HistoryRoute
 import com.jiyeong.supplementroutine.kmp.android.ui.settings.SettingsRoute
@@ -46,6 +54,32 @@ fun SupplementRoutineKmpApp() {
         factory = SupplementRoutineViewModel.factory(context),
     )
     val uiState by viewModel.uiState.collectAsState()
+    val permissionController = remember(context) {
+        AndroidNotificationPermissionController(context.applicationContext)
+    }
+    val reminderScheduler = remember(context) {
+        AndroidReminderScheduler(context.applicationContext, permissionController)
+    }
+    var notificationPermissionState by remember {
+        mutableStateOf(permissionController.currentState())
+    }
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+    ) {
+        notificationPermissionState = permissionController.currentState()
+    }
+
+    LaunchedEffect(
+        uiState.todayItems,
+        uiState.notificationEnabled,
+        notificationPermissionState,
+    ) {
+        if (uiState.isLoading || !uiState.notificationEnabled) {
+            reminderScheduler.cancelStoredReminders()
+        } else {
+            reminderScheduler.syncTodayReminders(uiState.todayItems)
+        }
+    }
 
     Surface(color = MaterialTheme.colorScheme.background) {
         Scaffold(
@@ -81,10 +115,25 @@ fun SupplementRoutineKmpApp() {
                         contentPadding = paddingValues,
                         mealTimeSettings = uiState.mealTimeSettings,
                         notificationEnabled = uiState.notificationEnabled,
+                        notificationPermissionState = notificationPermissionState,
                         onBreakfastTimeChanged = viewModel::updateBreakfastTime,
                         onLunchTimeChanged = viewModel::updateLunchTime,
                         onDinnerTimeChanged = viewModel::updateDinnerTime,
                         onNotificationEnabledChanged = viewModel::updateNotificationEnabled,
+                        onRequestNotificationPermission = {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            } else {
+                                notificationPermissionState = permissionController.currentState()
+                            }
+                        },
+                        onRequestExactAlarmPermission = {
+                            permissionController.openExactAlarmSettings()
+                            notificationPermissionState = permissionController.currentState()
+                        },
+                        onRefreshNotificationPermissions = {
+                            notificationPermissionState = permissionController.currentState()
+                        },
                         onResetRoutineData = viewModel::resetRoutineData,
                     )
                     else -> TodayRoute(
