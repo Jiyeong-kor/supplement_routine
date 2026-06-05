@@ -30,7 +30,7 @@
 | Android Compose app shell | 완료 | `SupplementRoutineKmpApp`, Bottom Navigation, Today/Supplements/History/Settings route |
 | Android Compose Today | 완료에 가까움 | stored supplements/records 기반 목록, 진행률, 복용 체크/해제, empty/error state |
 | Android Compose Supplements | 완료에 가까움 | add/edit form, shared validation, notification toggle, delete confirmation |
-| Android Compose History | 부분 완료 | 실제 기록 기반 요약/month/recent UI. 월 이동/상세 drill-down은 남은 polish |
+| Android Compose History | 릴리스 범위 충족 | PRD P1 범위인 오늘 완료율, 월간 완료 상태, 최근 기록 표시를 구현. 월 이동/상세 drill-down은 릴리스 필수에서 제외 |
 | Android Compose Settings | 완료에 가까움 | 식사 시간 편집, 알림 기본값, 권한 안내, 초기화, 가이드/면책 고지 |
 | Android notification/exact alarm | 부분 완료 | #23, permission controller, scheduler adapter, receiver. Android 13+/14 실기기 QA 필요 |
 | Android haptics | 완료 | routine haptic intent adapter, 복용 완료/저장/destructive/validation intent |
@@ -48,7 +48,7 @@
 | 복용 체크/해제 | Android 구현됨 | 앱 재시작 후 유지 QA와 접근성 label 점검 필요 |
 | 영양제 목록 | Android 구현됨 | 삭제/알림 toggle/empty state screenshot QA 필요 |
 | 영양제 추가/수정 | Android 구현됨 | validation error, 저장 완료 햅틱, 시간 선택 UX QA 필요 |
-| 기록 요약 | Android 부분 구현 | 월 이동, 상세 기록 확인, empty/partial completion 상태 QA |
+| 기록 요약 | Android 구현됨 | 오늘 완료율, 월간 완료 상태, 최근 기록 표시 제공. 월 이동/상세 기록 drill-down은 릴리스 필수에서 제외 |
 | 설정 | Android 구현됨 | 권한 상태별 문구와 초기화 flow 실기기 QA |
 | 알림 | Android 부분 구현 | Android 13+ notification runtime permission dialog, Android 12+/14 exact alarm 설정 이동, 실제 발화 QA |
 | 로컬 저장 | Android 구현됨 | migration 호환성은 Flutter cutover 전 별도 판단 필요 |
@@ -62,8 +62,7 @@
 | --- | --- | --- |
 | P0 | #25 `[QA] KMP Android/iOS parity screenshot과 accessibility 검증` | Android 구현이 진척된 만큼 실제 기기/해상도/접근성 기준으로 남은 UI gap을 확정해야 한다. |
 | P1 | #47 `[QA] Android notification permission/exact alarm 실기기 검증` | Android 13+ permission dialog와 Android 12+/14 exact alarm 설정/발화는 기기 또는 emulator별 확인이 필요하다. |
-| P1 | #48 `[Android] History 화면 release polish 범위 결정` | 월 이동/상세 기록 확인이 release 전에 필요한지 PRD 기준으로 확정해야 한다. |
-| P2 | #49 `[Release] Flutter 기준 구현 cutover/removal 결정` | KMP parity 후 Flutter를 유지할지 제거할지 결정해야 한다. |
+| P1 | #47 `[QA] Android notification permission/exact alarm 실기기 검증` | Android 13+ permission dialog와 Android 12+/14 exact alarm 설정/발화는 기기 또는 emulator별 확인이 필요하다. |
 
 ## 닫힌 Gap Issue
 
@@ -78,21 +77,22 @@
 | #52 iOS notification adapter | `IosNotificationScheduler.swift`, `SharedRoutineViewModel.swift`, `RootView.swift` |
 | #42 iOS KMP framework CI | `.github/workflows/ios_kmp_ci.yml`, `SupplementRoutineShared` framework |
 | #44 Android Compose design token | `SupplementRoutineTheme.kt`, `MainActivity.kt`, `SupplementRoutineKmpApp.kt` |
+| #48 Android History release polish 범위 결정 | PRD P1 기준에서 오늘 완료율, 월간 완료 상태, 최근 기록 표시를 릴리스 필수 범위로 확정. 월 이동/상세 drill-down은 후속 개선으로 보류 |
+| #49 Flutter 기준 구현 cutover/removal 결정 | KMP parity, iOS signing, store cutover 전까지 Flutter 기준 구현 유지. 즉시 제거하지 않음 |
 
 ## 권장 진행 순서
 
 1. #25 Android/iOS screenshot/accessibility QA를 수행한다.
 2. #47에서 Android 13+ emulator와 연결된 Android 실기기로 notification permission/exact alarm/실제 알림 발화를 검증한다.
-3. #48에서 History 화면 release polish 범위를 확정한다.
-4. Flutter 기준 구현과 KMP 구현의 cutover 조건을 정리한다.
-5. 릴리즈 서명, store asset, privacy/disclaimer, 버전 정책을 마지막 release readiness 문서로 묶는다.
+3. #67에서 iOS signing/provisioning secret을 등록하고 signed archive/IPA artifact를 검증한다.
+4. store asset, privacy/disclaimer, 버전 정책을 마지막 release readiness 문서로 묶는다.
 
 ## 현재 제한 사항
 
 - iOS는 SwiftUI shell, shared import/call smoke path, local snapshot persistence, notification adapter 수준이다. simulator screenshot QA는 남아 있다.
 - Windows에서는 Xcode/iOS simulator를 직접 실행할 수 없다. 무료 검증은 GitHub-hosted macOS runner의 framework와 SwiftUI shell simulator build까지이며, 실기기 iOS QA는 Mac/Xcode 또는 signing/provisioning 가능한 macOS runner가 필요하다.
 - Android 12 실기기에서는 Android 13+ notification permission dialog를 검증할 수 없다. Android 13+ emulator가 필요하다.
-- Flutter 구현은 아직 삭제 대상이 아니다. KMP parity와 QA가 끝날 때까지 기준 구현으로 유지한다.
+- Flutter 구현은 아직 삭제 대상이 아니다. KMP parity, iOS signing, store cutover가 끝날 때까지 기준 구현과 rollback reference로 유지한다.
 
 ## 검증 기준
 
