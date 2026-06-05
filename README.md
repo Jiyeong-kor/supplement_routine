@@ -1,6 +1,6 @@
 # Supplement Routine
 
-> 사용자가 직접 입력한 영양제 복용 규칙을 기반으로 오늘의 복용 일정, 체크, 기록, 알림을 관리하는 local-first 루틴 앱입니다. 현재 Flutter 기준 구현을 유지하면서 KMP shared, Android Jetpack Compose, iOS SwiftUI로 전환했고, Android는 signed release artifact 검증까지 완료했습니다.
+> 사용자가 직접 입력한 영양제 복용 규칙을 기반으로 오늘의 복용 일정, 체크, 기록, 알림을 관리하는 local-first 루틴 앱입니다. 현재 Flutter 기준 구현을 유지하면서 KMP shared와 Android Jetpack Compose로 Android 우선 출시를 진행하고, iOS 출시는 후속으로 보류했습니다.
 
 [English README](README_en.md)
 
@@ -8,11 +8,11 @@
 
 | 영역 | 상태 |
 | --- | --- |
-| Android KMP | 릴리스 직전 QA 통과. signed APK/AAB 생성과 서명 검증 완료 |
-| iOS KMP | SwiftUI shell, shared framework, UserDefaults persistence, UserNotifications adapter 구현. signing/provisioning 자산 필요 |
-| Flutter | 기존 기준 구현과 rollback reference로 유지 |
+| Android KMP | Android 우선 출시 범위. 최신 `KMP Release` run `27008729353`에서 signed APK/AAB 생성과 서명 검증 완료 |
+| iOS KMP | SwiftUI shell, shared framework, UserDefaults persistence, UserNotifications adapter 구현. 출시는 후속으로 보류 |
+| Flutter | Android store cutover와 iOS 출시 재개 결정 전까지 기준 구현과 rollback reference로 유지 |
 | CI | Flutter CI, KMP Android/shared CI, iOS framework + SwiftUI shell build CI 구성 |
-| 남은 차단 조건 | iOS distribution certificate/provisioning profile, Apple Team/Bundle 설정, App Store/TestFlight 제출 전 계정 작업 |
+| 남은 차단 조건 | Play Console 앱 등록, 콘텐츠 등급, 데이터 보안, 스토어 등록정보, 심사 제출 |
 
 최신 릴리스 준비 상태는 [릴리스 준비 문서](docs/release_readiness.md)를 기준으로 관리합니다.
 
@@ -165,9 +165,13 @@ xcodebuild \
 
 ## 릴리스와 서명
 
-Android signing은 GitHub Secrets 기반 `KMP Release` workflow로 signed APK/AAB artifact 생성과 검증까지 완료했습니다.
+Android signing은 GitHub Secrets 기반 `KMP Release` workflow로 signed APK/AAB artifact 생성과 검증까지 완료했습니다. 최신 Android 제출 후보는 run `27008729353`의 `kmp-android-release` artifact이며, 로컬 다운로드 위치는 `<local-path><release-run-artifact-dir>`입니다.
 
-iOS signed archive/IPA는 workflow가 준비되어 있지만 다음 자산이 필요합니다.
+iOS signed archive/IPA workflow는 준비되어 있지만, 이번 출시는 Android 우선으로 진행하므로 iOS signing/provisioning은 후속 출시 재개 시 처리합니다.
+
+Play Console 자동 제출은 아직 구성하지 않았습니다. 현재 repository에는 Play Console service account secret이 없으므로, 계정 소유자가 최신 AAB를 Play Console에 업로드하고 심사 제출해야 합니다.
+
+iOS 출시를 재개할 때 필요한 자산은 다음과 같습니다.
 
 - Apple distribution certificate `.p12`
 - provisioning profile `.mobileprovision`
@@ -215,10 +219,10 @@ android\gradlew.bat -p kmp :shared:check :androidApp:assembleDebug --no-daemon
 
 남은 외부 의존:
 
-- iOS signing/provisioning secret 등록
-- iOS signed archive/IPA artifact 검증
-- iOS simulator 또는 실기기 screenshot/accessibility QA
-- Play Console/App Store Connect 등록과 제출 전 계정 설정
+- 실제 사용자 루틴 시간대 장시간 알림 QA
+- Play Console 앱 등록, 콘텐츠 등급, 데이터 보안, 스토어 등록정보, 심사 제출
+- Play Console 자동 제출용 service account secret 등록
+- iOS signing/provisioning, signed archive/IPA, screenshot/accessibility QA는 후속 출시로 보류
 
 ## 문서
 

@@ -1,6 +1,6 @@
 # Supplement Routine
 
-> A local-first supplement routine app for user-entered intake rules, today schedules, check-ins, history, and notifications. The project keeps the original Flutter implementation as the reference while moving product logic to KMP shared, Android Jetpack Compose, and an iOS SwiftUI shell.
+> A local-first supplement routine app for user-entered intake rules, today schedules, check-ins, history, and notifications. The project keeps the original Flutter implementation as the reference while moving the Android-first release to KMP shared and Android Jetpack Compose. The iOS release is deferred.
 
 [한국어 README](README.md)
 
@@ -8,11 +8,11 @@
 
 | Area | Status |
 | --- | --- |
-| Android KMP | Release-readiness QA passed. Signed APK/AAB artifacts have been generated and verified. |
-| iOS KMP | SwiftUI shell, shared framework integration, UserDefaults persistence, and UserNotifications adapter are implemented. Signing/provisioning assets are still required. |
-| Flutter | Kept as the reference implementation and rollback source until store cutover. |
+| Android KMP | Android-first release scope. The latest `KMP Release` run `27008729353` generated and verified signed APK/AAB artifacts. |
+| iOS KMP | SwiftUI shell, shared framework integration, UserDefaults persistence, and UserNotifications adapter are implemented. Release is deferred. |
+| Flutter | Kept as the reference implementation and rollback source until Android store cutover and the iOS release restart decision. |
 | CI | Flutter CI, KMP Android/shared CI, iOS framework + SwiftUI shell build CI are configured. |
-| Remaining blocker | iOS distribution certificate/provisioning profile, Apple Team/Bundle setup, and App Store/TestFlight account work. |
+| Remaining blocker | Play Console app setup, content rating, data safety, store listing, and review submission. |
 
 The latest release-readiness state is tracked in [Release Readiness](docs/release_readiness.md).
 
@@ -156,9 +156,13 @@ xcodebuild \
 
 ## Release And Signing
 
-Android signing is configured through GitHub Secrets, and the `KMP Release` workflow has generated and verified signed APK/AAB artifacts.
+Android signing is configured through GitHub Secrets, and the `KMP Release` workflow has generated and verified signed APK/AAB artifacts. The latest Android submission candidate is the `kmp-android-release` artifact from run `27008729353`, downloaded locally to `<local-path><release-run-artifact-dir>`.
 
-iOS signed archive/IPA generation is configured, but the following assets are still required:
+iOS signed archive/IPA generation is configured, but the current release is Android-first. iOS signing/provisioning will be handled when the iOS release resumes.
+
+Play Console automatic submission is not configured yet. The repository does not currently have a Play Console service account secret, so the account owner needs to upload the latest AAB to Play Console and submit it for review.
+
+When the iOS release resumes, these assets are required:
 
 - Apple distribution certificate `.p12`
 - provisioning profile `.mobileprovision`
@@ -206,10 +210,10 @@ Completed checks include:
 
 Remaining external dependencies:
 
-- iOS signing/provisioning secret registration
-- iOS signed archive/IPA artifact verification
-- iOS simulator or device screenshot/accessibility QA
-- Play Console/App Store Connect account setup and submission work
+- long-running notification QA at real user routine times
+- Play Console app setup, content rating, data safety, store listing, and review submission
+- Play Console service account secret registration for automatic submission
+- iOS signing/provisioning, signed archive/IPA, and screenshot/accessibility QA are deferred to the follow-up iOS release
 
 ## Docs
 
