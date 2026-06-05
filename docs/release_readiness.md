@@ -25,6 +25,9 @@
 | KMP Android release APK install | 통과 | Galaxy A31 `SM-A315N`, Android 12(API 31)에 기존 Flutter 앱 승계 package `com.jiyeong.supplement_routine`으로 `androidApp-release.apk` 설치 성공 |
 | KMP Android release launch smoke | 통과 | Galaxy A31에서 `com.jiyeong.supplement_routine/com.jiyeong.supplementroutine.kmp.android.MainActivity` foreground 실행 확인 |
 | KMP Android glass UI screenshot QA | 통과 | API 36 emulator에서 재조정된 glass surface screenshot 확인: `<local-path>` |
+| KMP Android phone screenshot QA | 통과 | API 36 emulator phone size에서 Today/Supplements/History/Settings 캡처 확인. Today empty state, FAB, bottom navigation 겹침 없음. 화면: `<local-path>`, `<local-path>`, `<local-path>`, `<local-path>` |
+| KMP Android expanded-width screenshot QA | 통과 | API 36 emulator `wm size 1920x1280`, density `320`에서 Today/History/Settings 캡처 확인. History 월간 기록과 bottom navigation 겹침을 발견해 bottom navigation background를 불투명 surface로 보강. 수정 후 화면: `<local-path>` |
+| KMP Android accessibility label QA | 통과 | Today checklist row는 코드상 `${supplement.name}, ${formatTime(record.scheduledTime)}, 완료됨/미완료` semantics 제공. 현재 QA 데이터는 empty state라 row 미노출. History calendar tile은 UI dump에서 `1일, 일정 없음`, `5일, 일정 없음`처럼 날짜와 상태를 content description으로 제공 |
 | KMP Android physical install | 통과 | Galaxy A31 `SM-A315N`, Android 12(API 31)에 `com.jiyeong.supplement_routine` release APK 설치 성공 |
 | KMP Android physical launch smoke | 통과 | Galaxy A31에서 `com.jiyeong.supplement_routine/com.jiyeong.supplementroutine.kmp.android.MainActivity` foreground 실행 확인 |
 | KMP Android package/version/permission declaration | 확인됨 | Galaxy A31 설치 package에서 `versionCode=1`, `versionName=1.0.0`, `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALARM` 확인 |
@@ -69,7 +72,7 @@ android\gradlew.bat -p kmp :shared:check :androidApp:assembleDebug :androidApp:a
 
 | 항목 | 현재 상태 | 릴리스 전 필요 증거 |
 | --- | --- | --- |
-| Today/Supplements/History/Settings 핵심 flow | 구현됨 | API 36 emulator에서 glass UI 기준 주요 tab screenshot 확인 |
+| Today/Supplements/History/Settings 핵심 flow | 통과 | API 36 emulator phone/expanded-width screenshot 확인. expanded History bottom navigation overlap은 수정 후 재캡처 |
 | Local persistence | 구현됨 | 앱 재시작 후 영양제, 기록, 식사 시간, 알림 기본값 유지 확인 |
 | Notification runtime permission | 통과 | API 36 emulator에서 Android 13+ runtime permission dialog, 거부/허용 결과, app-op/package permission 상태 확인 |
 | Exact alarm permission | 통과 | Galaxy A31 Android 12 권한 granted 확인. API 36 emulator에서 `Alarms & reminders` 설정 이동과 권한 off 상태 fallback 예약/발화 확인 |
@@ -84,7 +87,7 @@ android\gradlew.bat -p kmp :shared:check :androidApp:assembleDebug :androidApp:a
 | Launcher/notification icon | 구성됨 | 기존 Flutter 제품 아이콘 톤을 KMP Android launcher icon과 reminder notification small icon에 반영 |
 | Upload signing | 통과 | 새 Android upload keystore로 로컬 `:shared:check :androidApp:assembleRelease :androidApp:bundleRelease` 성공. GitHub Secrets 기반 `KMP Release` Android job 성공 |
 | Manual release artifact workflow | 통과 | `.github/workflows/kmp_release.yml` `platform=android` run `27004890398` 성공 및 signed APK/AAB artifact 생성 |
-| Store screenshots | 기존 Flutter asset 있음 | KMP Android 화면 기준 phone/expanded screenshot 갱신 여부 결정 |
+| Store screenshots | Android KMP QA 캡처 있음 | 릴리스 QA용 phone/expanded screenshot은 수집됨. Play Store 제출용 최종 마케팅 screenshot은 스토어 등록 시 별도 선별 |
 
 ## iOS 릴리스 직전 체크
 
@@ -92,7 +95,7 @@ android\gradlew.bat -p kmp :shared:check :androidApp:assembleDebug :androidApp:a
 | --- | --- | --- |
 | KMP shared import/call | 구현됨 | macOS CI 또는 Xcode build log |
 | SwiftUI product shell | 구현됨 | Today/Supplements/History/Settings simulator screenshot |
-| SwiftUI glass material UI | 구현됨 | Windows에서는 simulator screenshot 미검증. macOS/Xcode에서 material surface와 tab별 layout 확인 필요 |
+| SwiftUI glass material UI | 구현됨 | Windows에서는 iOS simulator screenshot 캡처 불가. macOS/Xcode에서 material surface와 tab별 layout 확인 필요 |
 | Supplement form validation | 구현됨 | 이름/복용량 empty state와 00:00-23:59 시간 입력 오류 표시 |
 | Meal time validation | 구현됨 | 식사 시간 저장 전 00:00-23:59 입력 오류 표시 |
 | Local persistence | 구현됨 | simulator 재실행 후 UserDefaults snapshot 복원 확인 |

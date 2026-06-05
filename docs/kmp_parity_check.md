@@ -44,23 +44,23 @@
 
 | Flutter 기능 | KMP/Android 상태 | 남은 gap |
 | --- | --- | --- |
-| 오늘 복용 목록 | Android 구현됨 | 여러 데이터 상태에서 device screenshot QA 필요 |
-| 복용 체크/해제 | Android 구현됨 | 앱 재시작 후 유지 QA와 접근성 label 점검 필요 |
-| 영양제 목록 | Android 구현됨 | 삭제/알림 toggle/empty state screenshot QA 필요 |
-| 영양제 추가/수정 | Android 구현됨 | validation error, 저장 완료 햅틱, 시간 선택 UX QA 필요 |
+| 오늘 복용 목록 | Android 구현됨 | API 36 emulator phone/expanded-width screenshot QA 완료. 현재 QA 데이터는 empty state 기준 |
+| 복용 체크/해제 | Android 구현됨 | Today row는 완료됨/미완료 semantics 제공. 현재 QA 데이터는 empty state라 실데이터 row screenshot은 후속 polish에서 확대 가능 |
+| 영양제 목록 | Android 구현됨 | API 36 emulator phone screenshot QA 완료. 삭제/알림 toggle 세부 상태는 후속 polish에서 확대 가능 |
+| 영양제 추가/수정 | Android 구현됨 | shared validation과 저장 햅틱 구현. validation error 세부 screenshot은 후속 polish에서 확대 가능 |
 | 기록 요약 | Android 구현됨 | 오늘 완료율, 월간 완료 상태, 최근 기록 표시 제공. 월 이동/상세 기록 drill-down은 릴리스 필수에서 제외 |
-| 설정 | Android 구현됨 | 권한 상태별 문구와 초기화 flow 실기기 QA |
+| 설정 | Android 구현됨 | 권한 상태별 문구와 알림 테스트 flow QA 완료. 초기화 flow 세부 screenshot은 후속 polish에서 확대 가능 |
 | 알림 | Android 구현됨 | Android 13+ notification runtime permission dialog, 정확 알림 설정 이동, 권한 off fallback, 즉시/예약 알림 발화 QA 완료 |
 | 로컬 저장 | Android 구현됨 | migration 호환성은 Flutter cutover 전 별도 판단 필요 |
-| 디자인 시스템 | Android theme 적용됨 | 화면별 세부 polish와 expanded-width QA |
+| 디자인 시스템 | Android theme 적용됨 | phone/expanded-width QA 중 History bottom navigation overlap을 발견해 하단 bar background를 불투명하게 보강 |
 | iOS | 부분 구현 | SwiftUI shell, shared import/call smoke path, UserDefaults local snapshot, UserNotifications adapter. screenshot QA는 남음 |
-| 접근성/스크린샷 QA | 미완료 | #25 device/emulator screenshot, expanded-width, semantic label 점검 |
+| 접근성/스크린샷 QA | 완료 | #25 Android phone/expanded-width screenshot, Today/History semantics 점검 완료. iOS screenshot은 Windows/Xcode 제약으로 캡처 불가 사유 문서화 |
 
 ## 남은 Gap Issue
 
 | 우선순위 | Issue | 이유 |
 | --- | --- | --- |
-| P0 | #25 `[QA] KMP Android/iOS parity screenshot과 accessibility 검증` | Android 구현이 진척된 만큼 실제 기기/해상도/접근성 기준으로 남은 UI gap을 확정해야 한다. |
+| P0 | #67 `[release] Android/iOS 서명 secret 등록과 signed artifact 검증` | Android signed artifact는 통과했지만, iOS distribution certificate/provisioning profile secret이 아직 없어 iOS signed archive/IPA 검증이 막혀 있다. |
 
 ## 닫힌 Gap Issue
 
@@ -75,15 +75,15 @@
 | #52 iOS notification adapter | `IosNotificationScheduler.swift`, `SharedRoutineViewModel.swift`, `RootView.swift` |
 | #42 iOS KMP framework CI | `.github/workflows/ios_kmp_ci.yml`, `SupplementRoutineShared` framework |
 | #44 Android Compose design token | `SupplementRoutineTheme.kt`, `MainActivity.kt`, `SupplementRoutineKmpApp.kt` |
+| #25 KMP Android/iOS parity screenshot과 accessibility 검증 | Android phone/expanded-width screenshot과 Today/History semantics 확인. iOS screenshot은 Windows/Xcode 제약으로 캡처 불가 사유를 release readiness에 기록 |
 | #47 Android notification permission/exact alarm 실기기 검증 | API 36 emulator에서 runtime permission dialog 거부/허용, `POST_NOTIFICATION` app-op, 정확 알림 설정 화면, 즉시/예약 알림 발화 확인 |
 | #48 Android History release polish 범위 결정 | PRD P1 기준에서 오늘 완료율, 월간 완료 상태, 최근 기록 표시를 릴리스 필수 범위로 확정. 월 이동/상세 drill-down은 후속 개선으로 보류 |
 | #49 Flutter 기준 구현 cutover/removal 결정 | KMP parity, iOS signing, store cutover 전까지 Flutter 기준 구현 유지. 즉시 제거하지 않음 |
 
 ## 권장 진행 순서
 
-1. #25 Android/iOS screenshot/accessibility QA를 수행한다.
-2. #67에서 iOS signing/provisioning secret을 등록하고 signed archive/IPA artifact를 검증한다.
-3. store asset, privacy/disclaimer, 버전 정책을 마지막 release readiness 문서로 묶는다.
+1. #67에서 iOS signing/provisioning secret을 등록하고 signed archive/IPA artifact를 검증한다.
+2. store asset, privacy/disclaimer, 버전 정책을 마지막 release readiness 문서로 묶는다.
 
 ## 현재 제한 사항
 

@@ -123,15 +123,17 @@ fun SupplementRoutineKmpApp(
             containerColor = Color.Transparent,
             bottomBar = {
                 NavigationBar(
-                    modifier = Modifier.drawBehind {
-                        drawLine(
-                            color = navigationTopLine,
-                            start = Offset.Zero,
-                            end = Offset(size.width, 0f),
-                            strokeWidth = 1.dp.toPx(),
-                        )
-                    },
-                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.58f),
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.background)
+                        .drawBehind {
+                            drawLine(
+                                color = navigationTopLine,
+                                start = Offset.Zero,
+                                end = Offset(size.width, 0f),
+                                strokeWidth = 1.dp.toPx(),
+                            )
+                        },
+                    containerColor = MaterialTheme.colorScheme.background,
                     tonalElevation = NavigationBarDefaults.Elevation / 2,
                 ) {
                     DestinationItems(
