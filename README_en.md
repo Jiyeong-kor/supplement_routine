@@ -1,32 +1,44 @@
 # Supplement Routine
 
-> A Flutter Android app for managing supplement schedules, check-ins, history, notifications, and a home widget based only on rules entered by the user.
+> A local-first supplement routine app for user-entered intake rules, today schedules, check-ins, history, and notifications. The project keeps the original Flutter implementation as the reference while moving product logic to KMP shared, Android Jetpack Compose, and an iOS SwiftUI shell.
 
 [한국어 README](README.md)
 
+## Current Status
+
+| Area | Status |
+| --- | --- |
+| Android KMP | Release-readiness QA passed. Signed APK/AAB artifacts have been generated and verified. |
+| iOS KMP | SwiftUI shell, shared framework integration, UserDefaults persistence, and UserNotifications adapter are implemented. Signing/provisioning assets are still required. |
+| Flutter | Kept as the reference implementation and rollback source until store cutover. |
+| CI | Flutter CI, KMP Android/shared CI, iOS framework + SwiftUI shell build CI are configured. |
+| Remaining blocker | iOS distribution certificate/provisioning profile, Apple Team/Bundle setup, and App Store/TestFlight account work. |
+
+The latest release-readiness state is tracked in [Release Readiness](docs/release_readiness.md).
+
 ## Overview
 
-Supplement Routine is not a supplement recommendation app or a medical advice app. It is a small routine management app that helps users register supplements they already decided to take and manage schedules and records based on their own rules.
+Supplement Routine is not a supplement recommendation app or a medical advice app. It helps users register supplements they already decided to take and manage schedules and records based on their own rules.
 
 The app focuses on a few clear goals.
 
 - Check what to take today at a glance.
 - Mark an intake as done right after taking it.
 - Review recent history and completion rates.
-- Receive notifications that include the registered supplement name.
+- Receive notifications for registered supplements.
 
 ## Features
 
 | Feature | Description |
 | --- | --- |
-| Today | Shows today's date, daily message, progress, intake list, and check action. |
-| Supplement Add/Edit | Supports name, intake method, intake condition, dosage, notification option, and memo. |
+| Today | Shows today's date, progress, intake list, and check action. |
+| Supplement Add/Edit | Supports name, intake method, condition, dosage, notification option, and memo. |
 | Schedule Calculation | Generates today's schedule from meal-based, fixed-time, or interval rules. |
-| History | Shows daily completion rates and recent two-week records. |
-| Local Storage | Stores supplements, intake records, and settings on device. |
-| Notifications | Reminds users which registered supplement is due. |
-| Android Home Widget | Shows today's progress and next intake from the home screen. |
-| Settings | Provides meal time settings, default notification setting, data reset, usage guide, and disclaimer. |
+| History | Shows today's completion, monthly status, and recent records. |
+| Local Storage | Stores supplements, intake records, meal times, and notification defaults on device. |
+| Notifications | Supports Android runtime notification permission, exact-alarm fallback, and test notifications. |
+| iOS Shell | Provides a SwiftUI Today/Supplements/History/Settings shell connected to the shared module. |
+| Settings | Provides meal time settings, default notification setting, permission states, data reset, guide, and disclaimer. |
 
 ## App Policy
 
@@ -45,162 +57,172 @@ The app is only a schedule and record management tool based on user-entered info
 
 | Area | Technology |
 | --- | --- |
-| Framework | Flutter |
-| Language | Dart |
-| State Management | Riverpod Notifier |
-| Architecture | Feature-based MVVM, incremental Clean Architecture |
-| Local Storage | SharedPreferencesWithCache |
-| Localization | flutter_localizations, intl, ARB |
-| Notification | flutter_local_notifications, timezone, flutter_timezone |
-| Android Widget | Native Android AppWidgetProvider |
-| Design System | Material Design 3, ThemeData, ColorScheme, TextTheme |
-| Font | Pretendard |
-| Test | flutter_test |
+| Reference implementation | Flutter, Dart, Riverpod |
+| Shared logic | Kotlin Multiplatform |
+| Android native | Kotlin, Jetpack Compose, Material 3, Hilt, MVVM, DataStore |
+| iOS native | SwiftUI, KMP shared framework, UserDefaults, UserNotifications |
+| Notification | Android native notification/exact alarm adapter, iOS UserNotifications adapter, Flutter local notifications |
+| Design System | Material 3, Pretendard, warm white/berry/coral/mint/ink tokens |
+| CI/CD | GitHub Actions: Flutter CI, KMP CI, iOS KMP CI, KMP Release |
 
 ## Architecture
 
-This project keeps the MVP scope small while aiming for a production-ready structure. Instead of splitting everything into many layers upfront, it introduces `data`, `application`, and `presentation` layers only where they are useful.
+This project follows SSOT, Clean Architecture, SOLID, MVVM, and state hoisting principles for a maintainable local-first Android/iOS routine app. The Flutter implementation remains as the product reference, while the new native apps use KMP shared domain/data contracts and platform-specific UI.
 
 ```mermaid
 flowchart TD
-    UI["Presentation\nScreens / Widgets"] --> VM["ViewModel / Provider\nRiverpod Notifier"]
-    VM --> APP["Application\nPolicies / Mappers"]
-    VM --> REPO["Repository Interface"]
-    REPO --> DATA["Data Source\nMemory / Local Storage"]
-    VM --> CORE["Core Models / Services"]
+    SHARED["KMP shared\nDomain / Policy / Repository contract"] --> ANDROID["Android\nJetpack Compose / ViewModel / DataStore"]
+    SHARED --> IOS["iOS\nSwiftUI shell / Shared framework"]
+    FLUTTER["Flutter reference"] --> DOCS["Parity / QA criteria"]
+    DOCS --> SHARED
 ```
-
-### Principles
-
-- UI reads state and sends user events.
-- State changes go through Riverpod Notifiers and repositories.
-- User-facing strings are managed through ARB localization.
-- Colors, typography, spacing, and radius are managed through ThemeData and design tokens.
-- Mock data is injected explicitly through app configuration, not hidden inside local repositories.
-- The app avoids features or copy that could be mistaken for medical advice.
 
 ## Project Structure
 
 ```text
-lib/
-├── app/
-│   ├── app_config.dart
-│   ├── app_theme.dart
-│   ├── app_colors.dart
-│   ├── app_typography.dart
-│   ├── app_spacing.dart
-│   ├── app_radius.dart
-│   └── supplement_routine_app.dart
-├── core/
-│   ├── models/
-│   ├── services/
-│   └── utils/
-├── features/
-│   ├── today/
-│   ├── supplement/
-│   │   ├── application/
-│   │   ├── data/
-│   │   └── presentation/
-│   ├── history/
-│   │   └── data/
-│   └── settings/
-│       └── data/
-└── l10n/
-    ├── app_ko.arb
-    └── generated/
+lib/                         Flutter reference implementation
+android/                     Flutter Android wrapper and native Android configuration
+ios/                         Flutter iOS wrapper
+kmp/
+├── shared/                  KMP shared domain, data contract, pure logic
+├── androidApp/              Jetpack Compose Android native app
+└── iosApp/                  SwiftUI iOS shell, Xcode project
+docs/                        PRD, design system, tech stack, parity, release docs
+.codex/skills/               Project-specific workflow rules
 ```
-
-Android home widget and native resources are managed under `android/app/src/main`.
 
 ## Getting Started
 
-### Requirements
-
-- Flutter SDK
-- Android Studio
-- Android Emulator or Android device
-
-### Install Dependencies
+### Flutter Reference App
 
 ```bash
 flutter pub get
-```
-
-### Run
-
-```bash
 flutter run
 ```
 
-### Debug Mock Data
-
-Debug builds use mock data by default so the UI can be checked quickly.
+Debug mock data:
 
 ```bash
 flutter run --dart-define=MOCK_DATA=true
 ```
 
-To verify empty states without mock data:
+Empty state without mock data:
 
 ```bash
 flutter run --dart-define=MOCK_DATA=false
 ```
 
-## Configuration
+### KMP Android App
 
-`AppConfig` uses `--dart-define` values.
+On Windows/Android development machines:
 
-| Key | Default | Description |
-| --- | --- | --- |
-| `APP_NAME` | `Supplement Routine` | App name |
-| `APP_FLAVOR` | `dev` | App flavor |
-| `APP_VERSION` | `1.0.0` | Display version |
-| `LOG_LEVEL` | `debug` | Log level |
-| `MOCK_DATA` | debug: true, release: false | Whether to inject development mock data |
-| `NOTIFICATION_PREVIEW` | `false` | Whether to show an immediate notification for documentation capture |
+```powershell
+$env:ANDROID_HOME="$env:LOCALAPPDATA\Android\Sdk"
+$env:ANDROID_SDK_ROOT=$env:ANDROID_HOME
+android\gradlew.bat -p kmp :shared:check :androidApp:assembleDebug --no-daemon
+```
 
-Secrets such as signing passwords, keystore paths, and sensitive API keys should not be committed to code or Git.
+Debug APK:
+
+```text
+kmp/androidApp/build/outputs/apk/debug/androidApp-debug.apk
+```
+
+Release APK/AAB:
+
+```powershell
+$env:ANDROID_HOME="$env:LOCALAPPDATA\Android\Sdk"
+$env:ANDROID_SDK_ROOT=$env:ANDROID_HOME
+android\gradlew.bat -p kmp :shared:check :androidApp:assembleRelease :androidApp:bundleRelease --no-daemon
+```
+
+### KMP iOS App
+
+The iOS SwiftUI shell requires macOS/Xcode. On Windows it is verified through GitHub-hosted macOS runners.
+
+```bash
+gradle -p kmp :shared:linkDebugFrameworkIosSimulatorArm64 --no-daemon
+xcodebuild \
+  -project kmp/iosApp/SupplementRoutineIos.xcodeproj \
+  -scheme SupplementRoutineIos \
+  -configuration Debug \
+  -sdk iphonesimulator \
+  -destination "generic/platform=iOS Simulator" \
+  ARCHS=arm64 \
+  ONLY_ACTIVE_ARCH=YES \
+  CODE_SIGNING_ALLOWED=NO \
+  build
+```
+
+## Release And Signing
+
+Android signing is configured through GitHub Secrets, and the `KMP Release` workflow has generated and verified signed APK/AAB artifacts.
+
+iOS signed archive/IPA generation is configured, but the following assets are still required:
+
+- Apple distribution certificate `.p12`
+- provisioning profile `.mobileprovision`
+- certificate password
+- Apple Team ID
+- iOS Bundle ID
+
+Secrets such as signing passwords, certificates, provisioning profiles, keystore files, and sensitive API keys must not be committed to code or Git. See [Release Signing](docs/release_signing.md).
 
 ## Verification
 
-### Analyze
+### Flutter
 
 ```bash
 flutter analyze
-```
-
-### Test
-
-```bash
 flutter test
-```
-
-### Android Debug Build
-
-```bash
 flutter build apk --debug
 ```
 
-## Design System
+### KMP Android/shared
 
-Supplement Routine targets Android first and follows Material Design 3.
+```powershell
+$env:ANDROID_HOME="$env:LOCALAPPDATA\Android\Sdk"
+$env:ANDROID_SDK_ROOT=$env:ANDROID_HOME
+android\gradlew.bat -p kmp :shared:check :androidApp:assembleDebug --no-daemon
+```
 
-- `ThemeData(useMaterial3: true)`
-- Color management through `ColorScheme`
-- Pretendard static font files
-- Shared tokens through `AppSpacing`, `AppRadius`, and `AppComponents`
-- Light/Dark Theme support
-- Clear information structure over decorative UI
+### KMP iOS
 
-See also:
+`.github/workflows/ios_kmp_ci.yml` verifies the `SupplementRoutineShared` framework and SwiftUI shell build on a macOS runner.
 
-- [Information Architecture](docs/information_architecture_en.md)
-- [User Flow](docs/user_flow_en.md)
-- [Design System](docs/design_system_en.md)
-- [CI/CD](docs/ci_cd_en.md)
-- [Store Assets](docs/store_assets_en.md)
-- [Android Release Signing](docs/release_signing_en.md)
-- [Windows Support](docs/windows_support_en.md)
+## QA Status
+
+Completed checks include:
+
+- Android release APK/AAB assemble, bundle, and lint
+- Android signed APK/AAB artifact generation and signature verification
+- Android release APK install/launch smoke
+- Android phone/expanded-width screenshot QA
+- Android notification runtime permission allow/deny
+- Android exact-alarm settings/fallback
+- Android immediate/scheduled notification smoke
+- iOS shared release XCFramework build
+- iOS SwiftUI shell simulator build CI
+
+Remaining external dependencies:
+
+- iOS signing/provisioning secret registration
+- iOS signed archive/IPA artifact verification
+- iOS simulator or device screenshot/accessibility QA
+- Play Console/App Store Connect account setup and submission work
+
+## Docs
+
+- [PRD](docs/prd.md)
+- [Information Architecture](docs/information_architecture.md)
+- [User Flow](docs/user_flow.md)
+- [Design System](docs/design_system.md)
+- [Tech Stack](docs/tech_stack.md)
+- [KMP Parity](docs/kmp_parity_check.md)
+- [Release Readiness](docs/release_readiness.md)
+- [Release Signing](docs/release_signing.md)
+- [CI/CD](docs/ci_cd.md)
+- [Windows Support](docs/windows_support.md)
 
 ## Screenshots
 
@@ -212,12 +234,6 @@ See also:
 | --- | --- |
 | ![History screen](docs/assets/screenshots/history.png) | ![Settings screen](docs/assets/screenshots/settings.png) |
 
-### Light / Dark Mode
-
-| Light mode | Dark mode |
-| --- | --- |
-| ![Light mode today screen](docs/assets/screenshots/today.png) | ![Dark mode today screen](docs/assets/screenshots/today_dark.png) |
-
 ### Android Home Widget
 
 ![Home widget](docs/assets/screenshots/widget.png)
@@ -225,37 +241,6 @@ See also:
 ### Intake Notification
 
 ![Intake notification](docs/assets/screenshots/notification.png)
-
-### Usage Flow
-
-![Usage flow](docs/assets/demos/usage_flow.gif)
-
-## Test Coverage
-
-Current tests cover:
-
-- app launch and main tabs
-- supplement add, edit, and delete flows
-- dosage validation
-- default notification setting and per-supplement notification toggle
-- today's schedule generation and intake check
-- intake record persistence and completion rate calculation
-- recent two-week history ViewModel
-- local storage serialization
-- home widget summary calculation
-- notification body including the supplement name
-
-## Current Status
-
-The project currently has an MVP scope with a release-oriented structure.
-
-- feature-based structure
-- Riverpod Notifier state management
-- local storage integration
-- localization structure
-- Material Design 3 design system
-- basic Android notifications and home widget
-- passing tests and debug APK build
 
 ## License
 
