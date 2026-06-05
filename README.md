@@ -234,6 +234,8 @@ android\gradlew.bat -p kmp :shared:check :androidApp:assembleDebug --no-daemon
 - [KMP parity](docs/kmp_parity_check.md)
 - [릴리스 준비 상태](docs/release_readiness.md)
 - [릴리스 서명](docs/release_signing.md)
+- [Android Play Console 제출 준비](docs/play_console_android_submission.md)
+- [개인정보처리방침](docs/privacy_policy.md)
 - [CI/CD](docs/ci_cd.md)
 - [Windows 지원](docs/windows_support.md)
 

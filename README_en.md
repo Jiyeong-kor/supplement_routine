@@ -225,6 +225,8 @@ Remaining external dependencies:
 - [KMP Parity](docs/kmp_parity_check.md)
 - [Release Readiness](docs/release_readiness.md)
 - [Release Signing](docs/release_signing.md)
+- [Android Play Console Submission](docs/play_console_android_submission.md)
+- [Privacy Policy](docs/privacy_policy.md)
 - [CI/CD](docs/ci_cd.md)
 - [Windows Support](docs/windows_support.md)
 
