@@ -134,7 +134,7 @@ Android persistence는 #21에서 DataStore를 먼저 선택했다.
 | --- | --- | --- | --- |
 | Flutter 기준 | `flutter_local_notifications`, `timezone`, `flutter_timezone` | 사용 중 | 기존 앱의 복용 알림 기준 구현이다. |
 | KMP shared | 알림 대상 schedule 계산 contract | 구현됨 | 알림 스케줄 자체는 shared schedule logic에서 파생한다. |
-| Android native | Notification permission, exact alarm, scheduler adapter | 구현됨, QA 필요 | Android 13+ notification permission과 exact alarm permission을 분리하고 Settings에서 다음 행동을 안내한다. 실제 dialog/발화 QA는 #25와 별도 notification QA에서 확인한다. |
+| Android native | Notification permission, exact alarm, scheduler adapter | 구현됨, QA 통과 | Android 13+ notification permission과 exact alarm permission을 분리하고 Settings에서 다음 행동을 안내한다. #47에서 runtime permission dialog, exact alarm settings, 즉시/예약 알림 발화를 확인했다. |
 | iOS native | UserNotifications adapter | 구현됨, QA 필요 | iOS 권한 요청과 daily reminder 예약/취소를 `UNUserNotificationCenter` 뒤에 둔다. 실제 simulator/device 발화 QA는 #25에서 확인한다. |
 
 Notification은 platform API 차이가 크므로 shared domain에 직접 넣지 않는다. shared는 “언제 알림이 필요하다”까지만 계산하고, 실제 권한/예약은 platform adapter가 담당한다.
@@ -188,9 +188,9 @@ CI toolchain:
 | #25 | screenshot/accessibility QA 방식 결정 |
 | #42 | 완료: macOS runner에서 KMP iOS framework build를 무료 범위로 검증 |
 | #44 | 완료: Android Compose theme token을 새 디자인 시스템으로 갱신 |
-| #47 | Android notification permission/exact alarm 실기기 QA 결과에 따른 release gap 결정 |
-| #48 | Android History 화면 release polish 범위 결정 |
-| #49 | Flutter 기준 구현 cutover/removal 결정 |
+| #47 | 완료: Android notification permission/exact alarm QA 결과를 release readiness에 반영 |
+| #48 | 완료: Android History 화면 release polish 범위 결정 |
+| #49 | 완료: Flutter 기준 구현 cutover/removal 결정 |
 | #51 | 완료: iOS UserDefaults local snapshot adapter 구현 |
 | #52 | 완료: iOS notification permission과 scheduler adapter 구현 |
 
