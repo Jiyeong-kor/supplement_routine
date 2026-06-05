@@ -102,7 +102,7 @@ macOS/Linux:
 
 ```bash
 repo="Jiyeong-kor/supplement_routine"
-base64 -i /secure/android/upload-keystore.jks | gh secret set ANDROID_KEYSTORE_BASE64 --repo "$repo"
+base64 < /secure/android/upload-keystore.jks | tr -d '\n' | gh secret set ANDROID_KEYSTORE_BASE64 --repo "$repo"
 gh secret set ANDROID_KEYSTORE_PASSWORD --repo "$repo"
 gh secret set ANDROID_KEY_PASSWORD --repo "$repo"
 gh secret set ANDROID_KEY_ALIAS --repo "$repo"
@@ -127,8 +127,8 @@ macOS/Linux:
 
 ```bash
 repo="Jiyeong-kor/supplement_routine"
-base64 -i /secure/ios/distribution.p12 | gh secret set IOS_CERTIFICATE_BASE64 --repo "$repo"
-base64 -i /secure/ios/profile.mobileprovision | gh secret set IOS_PROVISIONING_PROFILE_BASE64 --repo "$repo"
+base64 < /secure/ios/distribution.p12 | tr -d '\n' | gh secret set IOS_CERTIFICATE_BASE64 --repo "$repo"
+base64 < /secure/ios/profile.mobileprovision | tr -d '\n' | gh secret set IOS_PROVISIONING_PROFILE_BASE64 --repo "$repo"
 gh secret set IOS_CERTIFICATE_PASSWORD --repo "$repo"
 gh secret set IOS_TEAM_ID --repo "$repo"
 gh secret set IOS_BUNDLE_IDENTIFIER --repo "$repo"
@@ -151,10 +151,21 @@ gh run list --repo Jiyeong-kor/supplement_routine --workflow "KMP Release" --lim
 
 성공한 run id를 확인한 뒤 artifact를 내려받습니다.
 
-```bash
+Windows PowerShell:
+
+```powershell
 gh run download RUN_ID --repo Jiyeong-kor/supplement_routine --name kmp-android-release --dir <local-path>
 gh run download RUN_ID --repo Jiyeong-kor/supplement_routine --name kmp-ios-xcarchive-tar --dir <local-path>
 gh run download RUN_ID --repo Jiyeong-kor/supplement_routine --name kmp-ios-ipa --dir <local-path>
+```
+
+macOS/Linux:
+
+```bash
+mkdir -p /tmp/release-artifacts
+gh run download RUN_ID --repo Jiyeong-kor/supplement_routine --name kmp-android-release --dir /tmp/release-artifacts
+gh run download RUN_ID --repo Jiyeong-kor/supplement_routine --name kmp-ios-xcarchive-tar --dir /tmp/release-artifacts
+gh run download RUN_ID --repo Jiyeong-kor/supplement_routine --name kmp-ios-ipa --dir /tmp/release-artifacts
 ```
 
 artifact 확인 결과는 #67에 comment로 남깁니다.
