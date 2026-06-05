@@ -1,7 +1,11 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
+
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.multiplatform")
 }
+
+val supplementRoutineSharedXcFramework = XCFramework("SupplementRoutineShared")
 
 kotlin {
     androidTarget()
@@ -14,6 +18,7 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "SupplementRoutineShared"
             isStatic = true
+            supplementRoutineSharedXcFramework.add(this)
         }
     }
 

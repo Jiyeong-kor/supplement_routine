@@ -15,6 +15,8 @@ protocol IosReminderScheduler {
     func currentPermissionState() async -> IosNotificationPermissionState
     func requestAuthorization() async -> IosNotificationPermissionState
     func syncDailyReminders(for supplements: [StoredSupplement]) async throws -> Int
+    func sendTestReminder() async throws
+    func scheduleTestReminder(after seconds: TimeInterval) async throws
     func cancelRoutineReminders() async
 }
 
@@ -85,6 +87,34 @@ final class UserNotificationReminderScheduler: IosReminderScheduler {
         return scheduledCount
     }
 
+    func sendTestReminder() async throws {
+        let permissionState = await currentPermissionState()
+        guard permissionState.canScheduleReminders else {
+            return
+        }
+
+        try await add(testReminderRequest(
+            identifier: "\(identifierPrefix)test_now",
+            trigger: nil
+        ))
+    }
+
+    func scheduleTestReminder(after seconds: TimeInterval = 15) async throws {
+        let permissionState = await currentPermissionState()
+        guard permissionState.canScheduleReminders else {
+            return
+        }
+
+        let trigger = UNTimeIntervalNotificationTrigger(
+            timeInterval: max(seconds, 1),
+            repeats: false
+        )
+        try await add(testReminderRequest(
+            identifier: "\(identifierPrefix)test_scheduled",
+            trigger: trigger
+        ))
+    }
+
     func cancelRoutineReminders() async {
         let identifiers = await pendingRoutineReminderIdentifiers()
         center.removePendingNotificationRequests(withIdentifiers: identifiers)
@@ -121,6 +151,22 @@ final class UserNotificationReminderScheduler: IosReminderScheduler {
                 }
             }
         }
+    }
+
+    private func testReminderRequest(
+        identifier: String,
+        trigger: UNNotificationTrigger?
+    ) -> UNNotificationRequest {
+        let content = UNMutableNotificationContent()
+        content.title = "테스트 알림 복용 시간"
+        content.body = "오늘 복용 항목을 확인하고 체크해보세요."
+        content.sound = .default
+
+        return UNNotificationRequest(
+            identifier: identifier,
+            content: content,
+            trigger: trigger
+        )
     }
 
     private func permissionState(from status: UNAuthorizationStatus) -> IosNotificationPermissionState {

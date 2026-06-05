@@ -38,6 +38,9 @@ jobs:
       - name: Build shared iOS simulator framework
         run: gradle -p kmp :shared:linkDebugFrameworkIosSimulatorArm64 --build-cache --no-daemon
 
+      - name: Build shared iOS release XCFramework
+        run: gradle -p kmp :shared:assembleSupplementRoutineSharedReleaseXCFramework --build-cache --no-daemon
+
       - name: Build SwiftUI iOS shell
         run: >
           xcodebuild

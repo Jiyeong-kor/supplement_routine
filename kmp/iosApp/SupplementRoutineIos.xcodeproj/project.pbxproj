@@ -10,9 +10,11 @@
 		A10000000000000000000001 /* SupplementRoutineIosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000011 /* SupplementRoutineIosApp.swift */; };
 		A10000000000000000000002 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000012 /* RootView.swift */; };
 		A10000000000000000000003 /* SharedRoutineViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000013 /* SharedRoutineViewModel.swift */; };
-		A10000000000000000000004 /* SupplementRoutineShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A10000000000000000000014 /* SupplementRoutineShared.framework */; };
+		A10000000000000000000004 /* SupplementRoutineShared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A10000000000000000000014 /* SupplementRoutineShared.xcframework */; };
 		A10000000000000000000005 /* IosRoutineStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000015 /* IosRoutineStore.swift */; };
 		A10000000000000000000006 /* IosNotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000016 /* IosNotificationScheduler.swift */; };
+		A10000000000000000000007 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000017 /* PrivacyInfo.xcprivacy */; };
+		A10000000000000000000008 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000018 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,9 +22,11 @@
 		A10000000000000000000011 /* SupplementRoutineIosApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupplementRoutineIosApp.swift; sourceTree = "<group>"; };
 		A10000000000000000000012 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		A10000000000000000000013 /* SharedRoutineViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedRoutineViewModel.swift; sourceTree = "<group>"; };
-		A10000000000000000000014 /* SupplementRoutineShared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SupplementRoutineShared.framework; path = ../shared/build/bin/iosSimulatorArm64/debugFramework/SupplementRoutineShared.framework; sourceTree = SOURCE_ROOT; };
+		A10000000000000000000014 /* SupplementRoutineShared.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SupplementRoutineShared.xcframework; path = ../shared/build/XCFrameworks/release/SupplementRoutineShared.xcframework; sourceTree = SOURCE_ROOT; };
 		A10000000000000000000015 /* IosRoutineStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IosRoutineStore.swift; sourceTree = "<group>"; };
 		A10000000000000000000016 /* IosNotificationScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IosNotificationScheduler.swift; sourceTree = "<group>"; };
+		A10000000000000000000017 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		A10000000000000000000018 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -30,7 +34,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A10000000000000000000004 /* SupplementRoutineShared.framework in Frameworks */,
+				A10000000000000000000004 /* SupplementRoutineShared.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -54,6 +58,8 @@
 				A10000000000000000000013 /* SharedRoutineViewModel.swift */,
 				A10000000000000000000015 /* IosRoutineStore.swift */,
 				A10000000000000000000016 /* IosNotificationScheduler.swift */,
+				A10000000000000000000018 /* Assets.xcassets */,
+				A10000000000000000000017 /* PrivacyInfo.xcprivacy */,
 			);
 			path = SupplementRoutineIos;
 			sourceTree = "<group>";
@@ -61,7 +67,7 @@
 		A10000000000000000000032 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				A10000000000000000000014 /* SupplementRoutineShared.framework */,
+				A10000000000000000000014 /* SupplementRoutineShared.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -82,6 +88,7 @@
 			buildConfigurationList = A10000000000000000000070 /* Build configuration list for PBXNativeTarget "SupplementRoutineIos" */;
 			buildPhases = (
 				A10000000000000000000050 /* Sources */,
+				A10000000000000000000051 /* Resources */,
 				A10000000000000000000020 /* Frameworks */,
 			);
 			buildRules = (
@@ -126,6 +133,18 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A10000000000000000000051 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000008 /* Assets.xcassets in Resources */,
+				A10000000000000000000007 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		A10000000000000000000050 /* Sources */ = {
@@ -261,28 +280,34 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
+					"$(PROJECT_DIR)/../shared/build/XCFrameworks/release",
 					"$(PROJECT_DIR)/../shared/build/bin/iosSimulatorArm64/debugFramework",
+					"$(PROJECT_DIR)/../shared/build/bin/iosArm64/releaseFramework",
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "영양제 루틴";
+				INFOPLIST_KEY_CFBundleShortVersionString = "$(MARKETING_VERSION)";
+				INFOPLIST_KEY_CFBundleVersion = "$(CURRENT_PROJECT_VERSION)";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 1.0.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-framework",
 					SupplementRoutineShared,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.jiyeong.supplementroutine.kmp.ios;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jiyeong.supplementroutine.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -294,28 +319,34 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
+					"$(PROJECT_DIR)/../shared/build/XCFrameworks/release",
 					"$(PROJECT_DIR)/../shared/build/bin/iosSimulatorArm64/debugFramework",
+					"$(PROJECT_DIR)/../shared/build/bin/iosArm64/releaseFramework",
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "영양제 루틴";
+				INFOPLIST_KEY_CFBundleShortVersionString = "$(MARKETING_VERSION)";
+				INFOPLIST_KEY_CFBundleVersion = "$(CURRENT_PROJECT_VERSION)";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 1.0.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-framework",
 					SupplementRoutineShared,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.jiyeong.supplementroutine.kmp.ios;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jiyeong.supplementroutine.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
