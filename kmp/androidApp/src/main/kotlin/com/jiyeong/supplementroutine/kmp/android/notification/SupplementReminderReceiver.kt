@@ -12,71 +12,16 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.NotificationManagerCompat
 import com.jiyeong.supplementroutine.kmp.android.MainActivity
+import com.jiyeong.supplementroutine.kmp.android.R
 
 class SupplementReminderReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        if (!areAppNotificationsEnabled(context)) {
-            return
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-            context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
-        ) {
-            return
-        }
-
-        ensureNotificationChannel(context)
-
-        val supplementName = intent.getStringExtra(EXTRA_SUPPLEMENT_NAME).orEmpty()
-        val scheduledTime = intent.getStringExtra(EXTRA_SCHEDULED_TIME).orEmpty()
-        val title = if (supplementName.isBlank()) "영양제 복용 시간" else "$supplementName 복용 시간"
-        val body = if (scheduledTime.isBlank()) {
-            "오늘 복용 항목을 확인하고 체크해보세요."
-        } else {
-            "$scheduledTime 복용 항목을 확인하고 체크해보세요."
-        }
-
-        val builder = notificationBuilder(context)
-        val notification = builder
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
-            .setContentTitle(title)
-            .setContentText(body)
-            .setContentIntent(openAppPendingIntent(context))
-            .setAutoCancel(true)
-            .setCategory(Notification.CATEGORY_REMINDER)
-            .build()
-
-        context.getSystemService(NotificationManager::class.java).notify(
-            NOTIFICATION_ID_BASE + intent.hashCode(),
-            notification,
+        showReminder(
+            context = context,
+            supplementName = intent.getStringExtra(EXTRA_SUPPLEMENT_NAME).orEmpty(),
+            scheduledTime = intent.getStringExtra(EXTRA_SCHEDULED_TIME).orEmpty(),
+            notificationId = NOTIFICATION_ID_BASE + intent.hashCode(),
         )
-    }
-
-    private fun areAppNotificationsEnabled(context: Context): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            context.getSystemService(NotificationManager::class.java).areNotificationsEnabled()
-        } else {
-            NotificationManagerCompat.from(context).areNotificationsEnabled()
-        }
-    }
-
-    private fun openAppPendingIntent(context: Context): PendingIntent {
-        val intent = Intent(context, MainActivity::class.java)
-        return PendingIntent.getActivity(
-            context,
-            OPEN_APP_REQUEST_CODE,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-        )
-    }
-
-    @Suppress("DEPRECATION")
-    private fun notificationBuilder(context: Context): Notification.Builder {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Notification.Builder(context, CHANNEL_ID)
-        } else {
-            Notification.Builder(context)
-        }
     }
 
     companion object {
@@ -86,6 +31,71 @@ class SupplementReminderReceiver : BroadcastReceiver() {
         private const val CHANNEL_NAME = "복용 알림"
         private const val OPEN_APP_REQUEST_CODE = 1001
         private const val NOTIFICATION_ID_BASE = 5000
+
+        fun showReminder(
+            context: Context,
+            supplementName: String,
+            scheduledTime: String,
+            notificationId: Int = NOTIFICATION_ID_BASE,
+        ): Boolean {
+            if (!areAppNotificationsEnabled(context)) {
+                return false
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+            ) {
+                return false
+            }
+
+            ensureNotificationChannel(context)
+
+            val title = if (supplementName.isBlank()) "영양제 복용 시간" else "$supplementName 복용 시간"
+            val body = if (scheduledTime.isBlank()) {
+                "오늘 복용 항목을 확인하고 체크해보세요."
+            } else {
+                "$scheduledTime 복용 항목을 확인하고 체크해보세요."
+            }
+
+            val notification = notificationBuilder(context)
+                .setSmallIcon(R.drawable.ic_stat_notification)
+                .setContentTitle(title)
+                .setContentText(body)
+                .setContentIntent(openAppPendingIntent(context))
+                .setAutoCancel(true)
+                .setCategory(Notification.CATEGORY_REMINDER)
+                .build()
+
+            context.getSystemService(NotificationManager::class.java).notify(notificationId, notification)
+            return true
+        }
+
+        private fun areAppNotificationsEnabled(context: Context): Boolean {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                context.getSystemService(NotificationManager::class.java).areNotificationsEnabled()
+            } else {
+                NotificationManagerCompat.from(context).areNotificationsEnabled()
+            }
+        }
+
+        private fun openAppPendingIntent(context: Context): PendingIntent {
+            val intent = Intent(context, MainActivity::class.java)
+            return PendingIntent.getActivity(
+                context,
+                OPEN_APP_REQUEST_CODE,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+        }
+
+        @Suppress("DEPRECATION")
+        private fun notificationBuilder(context: Context): Notification.Builder {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                Notification.Builder(context, CHANNEL_ID)
+            } else {
+                Notification.Builder(context)
+            }
+        }
 
         fun ensureNotificationChannel(context: Context) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {

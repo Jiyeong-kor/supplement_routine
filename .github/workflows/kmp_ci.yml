@@ -39,4 +39,4 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Validate KMP scaffold
-        run: gradle -p kmp :shared:check :androidApp:assembleDebug --build-cache --no-daemon
+        run: gradle -p kmp :shared:check :androidApp:assembleDebug :androidApp:assembleRelease :androidApp:bundleRelease --build-cache --no-daemon

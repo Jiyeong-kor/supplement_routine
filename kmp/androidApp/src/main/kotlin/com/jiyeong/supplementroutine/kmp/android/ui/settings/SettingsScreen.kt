@@ -41,6 +41,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.jiyeong.supplementroutine.kmp.android.ui.common.formatTime
+import com.jiyeong.supplementroutine.kmp.android.ui.common.routineGlassBorder
+import com.jiyeong.supplementroutine.kmp.android.ui.common.routineGlassCardColors
+import com.jiyeong.supplementroutine.kmp.android.ui.common.routineGlassCardElevation
+import com.jiyeong.supplementroutine.kmp.android.ui.common.routineGlassSheen
 import com.jiyeong.supplementroutine.kmp.android.notification.NotificationPermissionState
 import com.jiyeong.supplementroutine.shared.domain.MealTimeSettings
 import com.jiyeong.supplementroutine.shared.domain.TimeOfDayValue
@@ -58,6 +62,8 @@ fun SettingsRoute(
     onRequestNotificationPermission: () -> Unit,
     onRequestExactAlarmPermission: () -> Unit,
     onRefreshNotificationPermissions: () -> Unit,
+    onSendTestNotification: () -> Boolean,
+    onScheduleTestNotification: () -> Boolean,
     onResetRoutineData: () -> Unit,
 ) {
     var dialog by remember { mutableStateOf<SettingsDialog?>(null) }
@@ -136,13 +142,39 @@ fun SettingsRoute(
                         description = if (notificationPermissionState.canScheduleExactAlarms) {
                             "허용됨. 정해진 시간에 복용 알림을 예약할 수 있습니다."
                         } else {
-                            "Android 알람 및 리마인더 설정에서 정확한 알림 권한을 허용해야 합니다."
+                            "권한이 없어도 근처 시간에 알림을 예약합니다. 더 정확한 알림은 설정에서 허용하세요."
                         },
-                        actionLabel = if (notificationPermissionState.canScheduleExactAlarms) "새로고침" else "설정 열기",
+                        actionLabel = if (notificationPermissionState.canScheduleExactAlarms) "새로고침" else "정확 알림 설정",
                         onClick = if (notificationPermissionState.canScheduleExactAlarms) {
                             onRefreshNotificationPermissions
                         } else {
                             onRequestExactAlarmPermission
+                        },
+                    )
+                    PermissionActionRow(
+                        icon = Icons.Outlined.Notifications,
+                        title = "테스트 알림",
+                        description = "복용 알림이 실제로 표시되는지 바로 확인합니다.",
+                        actionLabel = "보내기",
+                        onClick = {
+                            dialog = if (onSendTestNotification()) {
+                                SettingsDialog.TestNotificationSent
+                            } else {
+                                SettingsDialog.TestNotificationBlocked
+                            }
+                        },
+                    )
+                    PermissionActionRow(
+                        icon = Icons.Outlined.Alarm,
+                        title = "예약 테스트 알림",
+                        description = "15초 뒤 알림을 예약해 실제 발화 경로를 확인합니다.",
+                        actionLabel = "예약",
+                        onClick = {
+                            dialog = if (onScheduleTestNotification()) {
+                                SettingsDialog.TestNotificationScheduled
+                            } else {
+                                SettingsDialog.TestNotificationBlocked
+                            }
                         },
                     )
                 }
@@ -171,7 +203,7 @@ fun SettingsRoute(
                     SettingsRow(
                         icon = Icons.Outlined.Info,
                         title = "버전",
-                        description = "0.1.0",
+                        description = "1.0.0",
                     )
                 }
             }
@@ -194,6 +226,21 @@ fun SettingsRoute(
         SettingsDialog.Disclaimer -> InfoDialog(
             title = "면책 고지",
             body = "Supplement Routine은 영양제 복용 루틴을 관리하기 위한 기록 도구입니다. 특정 제품, 성분, 복용량, 치료 효과를 추천하지 않습니다. 건강 상태나 복용량에 관한 결정은 의료 전문가와 상의하세요.",
+            onDismiss = { dialog = null },
+        )
+        SettingsDialog.TestNotificationSent -> InfoDialog(
+            title = "테스트 알림 전송",
+            body = "알림이 표시되었는지 알림 패널에서 확인해보세요.",
+            onDismiss = { dialog = null },
+        )
+        SettingsDialog.TestNotificationBlocked -> InfoDialog(
+            title = "알림 권한 필요",
+            body = "테스트 알림을 보내려면 알림 표시 권한을 먼저 허용해야 합니다.",
+            onDismiss = { dialog = null },
+        )
+        SettingsDialog.TestNotificationScheduled -> InfoDialog(
+            title = "테스트 알림 예약",
+            body = "15초 뒤 알림이 표시되는지 확인해보세요.",
             onDismiss = { dialog = null },
         )
         null -> Unit
@@ -247,8 +294,10 @@ private fun SettingsCard(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        colors = routineGlassCardColors(),
+        elevation = routineGlassCardElevation(),
+        border = routineGlassBorder(),
+        modifier = Modifier.routineGlassSheen(),
     ) {
         Column(
             modifier = Modifier.padding(vertical = 12.dp),
@@ -492,6 +541,9 @@ private enum class SettingsDialog {
     Reset,
     Guide,
     Disclaimer,
+    TestNotificationSent,
+    TestNotificationBlocked,
+    TestNotificationScheduled,
 }
 
 private fun TimeOfDayValue.plusMinutes(minutes: Int): TimeOfDayValue {

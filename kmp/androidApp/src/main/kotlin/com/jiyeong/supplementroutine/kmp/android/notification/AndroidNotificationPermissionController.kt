@@ -16,6 +16,9 @@ data class NotificationPermissionState(
     val canScheduleExactAlarms: Boolean,
 ) {
     val canScheduleReminders: Boolean
+        get() = canPostNotifications
+
+    val canScheduleExactReminders: Boolean
         get() = canPostNotifications && canScheduleExactAlarms
 }
 

@@ -18,7 +18,8 @@ class AndroidReminderScheduler(
     fun syncTodayReminders(items: List<ScheduledIntakeRecord>) {
         cancelStoredReminders()
 
-        if (!permissionController.currentState().canScheduleReminders) {
+        val permissionState = permissionController.currentState()
+        if (!permissionState.canScheduleReminders) {
             saveReminderIds(emptySet())
             return
         }
@@ -35,7 +36,11 @@ class AndroidReminderScheduler(
                         supplementName = item.supplement.name,
                         scheduledTimeText = "${item.record.scheduledTime.hour.toString().padStart(2, '0')}:${item.record.scheduledTime.minute.toString().padStart(2, '0')}",
                     )
-                    scheduleExact(triggerAtMillis, pendingIntent)
+                    scheduleReminder(
+                        triggerAtMillis = triggerAtMillis,
+                        pendingIntent = pendingIntent,
+                        useExactAlarm = permissionState.canScheduleExactReminders,
+                    )
                     scheduledIds.add(requestCode)
                 }
             }
@@ -50,12 +55,52 @@ class AndroidReminderScheduler(
         saveReminderIds(emptySet())
     }
 
-    private fun scheduleExact(triggerAtMillis: Long, pendingIntent: PendingIntent) {
+    fun sendTestReminder(): Boolean {
+        if (!permissionController.currentState().canPostNotifications) {
+            return false
+        }
+
+        return SupplementReminderReceiver.showReminder(
+            context = context,
+            supplementName = "테스트 알림",
+            scheduledTime = "",
+            notificationId = TEST_NOTIFICATION_ID,
+        )
+    }
+
+    fun scheduleTestReminder(delayMillis: Long = TEST_REMINDER_DELAY_MILLIS): Boolean {
+        val permissionState = permissionController.currentState()
+        if (!permissionState.canScheduleReminders) {
+            return false
+        }
+
+        val pendingIntent = pendingIntentFor(
+            requestCode = TEST_REMINDER_REQUEST_CODE,
+            supplementName = "예약 테스트 알림",
+            scheduledTimeText = "",
+        )
+        scheduleReminder(
+            triggerAtMillis = System.currentTimeMillis() + delayMillis,
+            pendingIntent = pendingIntent,
+            useExactAlarm = permissionState.canScheduleExactReminders,
+        )
+        return true
+    }
+
+    private fun scheduleReminder(
+        triggerAtMillis: Long,
+        pendingIntent: PendingIntent,
+        useExactAlarm: Boolean,
+    ) {
         runCatching {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (useExactAlarm && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
-            } else {
+            } else if (useExactAlarm) {
                 alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+            } else {
+                alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
             }
         }
     }
@@ -97,5 +142,8 @@ class AndroidReminderScheduler(
     private companion object {
         const val PREFERENCES_NAME = "supplement_reminder_scheduler"
         const val KEY_REMINDER_IDS = "scheduled_reminder_ids"
+        const val TEST_NOTIFICATION_ID = 4901
+        const val TEST_REMINDER_REQUEST_CODE = 4902
+        const val TEST_REMINDER_DELAY_MILLIS = 15_000L
     }
 }

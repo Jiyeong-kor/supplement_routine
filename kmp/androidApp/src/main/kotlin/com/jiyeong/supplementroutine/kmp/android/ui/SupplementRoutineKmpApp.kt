@@ -4,6 +4,7 @@ import android.Manifest
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,8 +23,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,8 +35,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.jiyeong.supplementroutine.kmp.android.notification.AndroidNotificationPermissionController
 import com.jiyeong.supplementroutine.kmp.android.notification.AndroidReminderScheduler
 import com.jiyeong.supplementroutine.kmp.android.notification.NotificationPermissionState
@@ -82,14 +88,52 @@ fun SupplementRoutineKmpApp(
             reminderScheduler.syncTodayReminders(uiState.todayItems)
         }
     }
+    val colorScheme = MaterialTheme.colorScheme
+    val glassHighlight = colorScheme.surface.copy(alpha = 0.72f)
+    val glassWarmTint = colorScheme.secondaryContainer.copy(alpha = 0.54f)
+    val glassCoolTint = colorScheme.tertiaryContainer.copy(alpha = 0.42f)
+    val navigationTopLine = colorScheme.outline.copy(alpha = 0.82f)
 
-    Surface(color = MaterialTheme.colorScheme.background) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(routineGlassBackground())
+            .drawBehind {
+                drawCircle(
+                    color = glassHighlight,
+                    radius = size.minDimension * 0.72f,
+                    center = Offset(size.width * 0.12f, size.height * 0.08f),
+                )
+                drawCircle(
+                    color = glassWarmTint,
+                    radius = size.minDimension * 0.64f,
+                    center = Offset(size.width * 0.92f, size.height * 0.28f),
+                )
+                drawCircle(
+                    color = glassCoolTint,
+                    radius = size.minDimension * 0.82f,
+                    center = Offset(size.width * 0.28f, size.height * 0.86f),
+                )
+            },
+    ) {
         Scaffold(
             modifier = Modifier
                 .fillMaxSize()
                 .safeDrawingPadding(),
+            containerColor = Color.Transparent,
             bottomBar = {
-                NavigationBar {
+                NavigationBar(
+                    modifier = Modifier.drawBehind {
+                        drawLine(
+                            color = navigationTopLine,
+                            start = Offset.Zero,
+                            end = Offset(size.width, 0f),
+                            strokeWidth = 1.dp.toPx(),
+                        )
+                    },
+                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.58f),
+                    tonalElevation = NavigationBarDefaults.Elevation / 2,
+                ) {
                     DestinationItems(
                         selectedDestinationKey = selectedDestinationKey,
                         onDestinationSelected = { key -> selectedDestinationKey = key },
@@ -138,6 +182,14 @@ fun SupplementRoutineKmpApp(
                         onRefreshNotificationPermissions = {
                             notificationPermissionState = permissionController.currentState()
                         },
+                        onSendTestNotification = {
+                            notificationPermissionState = permissionController.currentState()
+                            reminderScheduler.sendTestReminder()
+                        },
+                        onScheduleTestNotification = {
+                            notificationPermissionState = permissionController.currentState()
+                            reminderScheduler.scheduleTestReminder()
+                        },
                         onResetRoutineData = {
                             hapticFeedback.destructiveConfirmed()
                             viewModel.resetRoutineData()
@@ -160,6 +212,20 @@ fun SupplementRoutineKmpApp(
             }
         }
     }
+}
+
+@Composable
+private fun routineGlassBackground(): Brush {
+    val colorScheme = MaterialTheme.colorScheme
+    return Brush.verticalGradient(
+        colors = listOf(
+            colorScheme.background,
+            colorScheme.primaryContainer.copy(alpha = 0.82f),
+            colorScheme.tertiaryContainer.copy(alpha = 0.58f),
+            colorScheme.secondaryContainer.copy(alpha = 0.64f),
+            colorScheme.surfaceVariant.copy(alpha = 0.72f),
+        ),
+    )
 }
 
 @Composable

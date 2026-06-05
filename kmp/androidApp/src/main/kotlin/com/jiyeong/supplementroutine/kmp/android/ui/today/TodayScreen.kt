@@ -50,6 +50,10 @@ import com.jiyeong.supplementroutine.shared.scheduling.ScheduledIntakeRecord
 import com.jiyeong.supplementroutine.kmp.android.ui.common.formatDosage
 import com.jiyeong.supplementroutine.kmp.android.ui.common.formatHourMinute
 import com.jiyeong.supplementroutine.kmp.android.ui.common.formatTime
+import com.jiyeong.supplementroutine.kmp.android.ui.common.routineGlassBorder
+import com.jiyeong.supplementroutine.kmp.android.ui.common.routineGlassCardColors
+import com.jiyeong.supplementroutine.kmp.android.ui.common.routineGlassCardElevation
+import com.jiyeong.supplementroutine.kmp.android.ui.common.routineGlassSheen
 import com.jiyeong.supplementroutine.kmp.android.ui.common.scheduleLabelText
 import java.util.Calendar
 
@@ -198,10 +202,10 @@ private fun TodayProgressCard(done: Int, total: Int) {
     val percent = if (total == 0) 0f else done.toFloat() / total.toFloat()
 
     Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        colors = routineGlassCardColors(),
+        elevation = routineGlassCardElevation(),
+        border = routineGlassBorder(),
+        modifier = Modifier.routineGlassSheen(),
     ) {
         Column(
             modifier = Modifier.padding(20.dp),
@@ -254,14 +258,16 @@ private fun TodaySupplementItem(
     val statusText = if (record.isDone) "완료됨" else "미완료"
 
     Card(
-        colors = CardDefaults.cardColors(
+        colors = routineGlassCardColors(
             containerColor = if (record.isDone) {
                 MaterialTheme.colorScheme.surfaceContainerHighest
             } else {
                 MaterialTheme.colorScheme.surface
             },
         ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        elevation = routineGlassCardElevation(),
+        border = routineGlassBorder(),
+        modifier = Modifier.routineGlassSheen(),
     ) {
         Row(
             modifier = Modifier
@@ -365,10 +371,10 @@ private fun MetaChip(text: String) {
 @Composable
 private fun TodayEmptyState() {
     Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        colors = routineGlassCardColors(),
+        elevation = routineGlassCardElevation(),
+        border = routineGlassBorder(),
+        modifier = Modifier.routineGlassSheen(),
     ) {
         Column(
             modifier = Modifier

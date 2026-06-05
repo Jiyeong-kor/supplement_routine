@@ -62,6 +62,10 @@ import androidx.compose.ui.unit.dp
 import com.jiyeong.supplementroutine.kmp.android.ui.common.formatDosage
 import com.jiyeong.supplementroutine.kmp.android.ui.common.formatTime
 import com.jiyeong.supplementroutine.kmp.android.ui.common.methodLabelText
+import com.jiyeong.supplementroutine.kmp.android.ui.common.routineGlassBorder
+import com.jiyeong.supplementroutine.kmp.android.ui.common.routineGlassCardColors
+import com.jiyeong.supplementroutine.kmp.android.ui.common.routineGlassCardElevation
+import com.jiyeong.supplementroutine.kmp.android.ui.common.routineGlassSheen
 import com.jiyeong.supplementroutine.kmp.android.ui.common.slotLabelText
 import com.jiyeong.supplementroutine.kmp.android.ui.haptic.rememberRoutineHapticFeedback
 import com.jiyeong.supplementroutine.shared.domain.IntakeMethod
@@ -531,8 +535,10 @@ private fun FormSection(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        colors = routineGlassCardColors(),
+        elevation = routineGlassCardElevation(),
+        border = routineGlassBorder(),
+        modifier = Modifier.routineGlassSheen(),
     ) {
         Column(
             modifier = Modifier
@@ -662,8 +668,12 @@ private fun TimeStepperRow(
     onTimeChanged: (TimeOfDayValue) -> Unit,
 ) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        colors = routineGlassCardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.58f),
+        ),
+        elevation = routineGlassCardElevation(),
+        border = routineGlassBorder(alpha = 0.8f),
+        modifier = Modifier.routineGlassSheen(),
     ) {
         Column(
             modifier = Modifier.padding(14.dp),
@@ -718,13 +728,14 @@ private fun SupplementCard(
     }
 
     Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-        modifier = Modifier.semantics {
-            contentDescription = "${supplement.name}, ${methodLabelText(supplement.method)}, 하루 ${supplement.dailyCount}회, $notificationText"
-        },
+        colors = routineGlassCardColors(),
+        elevation = routineGlassCardElevation(),
+        border = routineGlassBorder(),
+        modifier = Modifier
+            .routineGlassSheen()
+            .semantics {
+                contentDescription = "${supplement.name}, ${methodLabelText(supplement.method)}, 하루 ${supplement.dailyCount}회, $notificationText"
+            },
     ) {
         Row(
             modifier = Modifier
@@ -862,10 +873,10 @@ private fun MetaChip(text: String) {
 @Composable
 private fun SupplementEmptyState() {
     Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        colors = routineGlassCardColors(),
+        elevation = routineGlassCardElevation(),
+        border = routineGlassBorder(),
+        modifier = Modifier.routineGlassSheen(),
     ) {
         Column(
             modifier = Modifier

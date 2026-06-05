@@ -43,6 +43,10 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.jiyeong.supplementroutine.kmp.android.ui.common.routineGlassBorder
+import com.jiyeong.supplementroutine.kmp.android.ui.common.routineGlassCardColors
+import com.jiyeong.supplementroutine.kmp.android.ui.common.routineGlassCardElevation
+import com.jiyeong.supplementroutine.kmp.android.ui.common.routineGlassSheen
 import com.jiyeong.supplementroutine.shared.domain.LocalDateValue
 import com.jiyeong.supplementroutine.shared.history.DailyHistorySummary
 import com.jiyeong.supplementroutine.shared.history.HistoryViewState
@@ -127,10 +131,10 @@ private fun HistoryOverviewCard(summary: DailyHistorySummary) {
     val percent = (summary.completionRate * 100).toInt()
 
     Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        colors = routineGlassCardColors(),
+        elevation = routineGlassCardElevation(),
+        border = routineGlassBorder(),
+        modifier = Modifier.routineGlassSheen(),
     ) {
         Column(
             modifier = Modifier.padding(20.dp),
@@ -179,10 +183,10 @@ private fun MonthHistoryCard(
     val tiles = List<DailyHistorySummary?>(firstWeekdayOffset) { null } + summaries
 
     Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        colors = routineGlassCardColors(),
+        elevation = routineGlassCardElevation(),
+        border = routineGlassBorder(),
+        modifier = Modifier.routineGlassSheen(),
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -295,10 +299,10 @@ private fun HistoryItem(summary: DailyHistorySummary) {
     val percent = (summary.completionRate * 100).toInt()
 
     Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        colors = routineGlassCardColors(),
+        elevation = routineGlassCardElevation(),
+        border = routineGlassBorder(),
+        modifier = Modifier.routineGlassSheen(),
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -349,10 +353,10 @@ private fun HistoryItem(summary: DailyHistorySummary) {
 @Composable
 private fun HistoryEmptyState() {
     Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        colors = routineGlassCardColors(),
+        elevation = routineGlassCardElevation(),
+        border = routineGlassBorder(),
+        modifier = Modifier.routineGlassSheen(),
     ) {
         Column(
             modifier = Modifier
