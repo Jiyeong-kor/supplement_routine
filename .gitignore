@@ -47,8 +47,15 @@ app.*.map.json
 # Signing and environment secrets
 *.jks
 *.keystore
+*.p12
+*.mobileprovision
+*.provisionprofile
 key.properties
 **/key.properties
 .env
 .env.*
 !.env.example
+google-services.json
+**/google-services.json
+GoogleService-Info.plist
+**/GoogleService-Info.plist
