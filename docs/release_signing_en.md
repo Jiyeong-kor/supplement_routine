@@ -80,3 +80,81 @@ The iOS release job requires these secrets:
 - `IOS_CERTIFICATE_PASSWORD`
 
 If the secrets are missing, the workflow fails instead of creating release artifacts. Track the remaining signed artifact verification in [#67](https://github.com/Jiyeong-kor/supplement_routine/issues/67).
+
+## Secret Setup Runbook
+
+The commands below prefer input methods that do not leave secret values in terminal history. Replace paths and values with the local secure storage paths for the release assets.
+
+### Android Upload Keystore
+
+Windows PowerShell:
+
+```powershell
+$repo="Jiyeong-kor/supplement_routine"
+$keystore="<local-secure-path>"
+[Convert]::ToBase64String([IO.File]::ReadAllBytes($keystore)) | gh secret set ANDROID_KEYSTORE_BASE64 --repo $repo
+gh secret set ANDROID_KEYSTORE_PASSWORD --repo $repo
+gh secret set ANDROID_KEY_PASSWORD --repo $repo
+gh secret set ANDROID_KEY_ALIAS --repo $repo
+```
+
+macOS/Linux:
+
+```bash
+repo="Jiyeong-kor/supplement_routine"
+base64 -i /secure/android/upload-keystore.jks | gh secret set ANDROID_KEYSTORE_BASE64 --repo "$repo"
+gh secret set ANDROID_KEYSTORE_PASSWORD --repo "$repo"
+gh secret set ANDROID_KEY_PASSWORD --repo "$repo"
+gh secret set ANDROID_KEY_ALIAS --repo "$repo"
+```
+
+### iOS Distribution Signing
+
+Windows PowerShell:
+
+```powershell
+$repo="Jiyeong-kor/supplement_routine"
+$certificate="<local-secure-path>"
+$profile="<local-secure-path>"
+[Convert]::ToBase64String([IO.File]::ReadAllBytes($certificate)) | gh secret set IOS_CERTIFICATE_BASE64 --repo $repo
+[Convert]::ToBase64String([IO.File]::ReadAllBytes($profile)) | gh secret set IOS_PROVISIONING_PROFILE_BASE64 --repo $repo
+gh secret set IOS_CERTIFICATE_PASSWORD --repo $repo
+gh secret set IOS_TEAM_ID --repo $repo
+gh secret set IOS_BUNDLE_IDENTIFIER --repo $repo
+```
+
+macOS/Linux:
+
+```bash
+repo="Jiyeong-kor/supplement_routine"
+base64 -i /secure/ios/distribution.p12 | gh secret set IOS_CERTIFICATE_BASE64 --repo "$repo"
+base64 -i /secure/ios/profile.mobileprovision | gh secret set IOS_PROVISIONING_PROFILE_BASE64 --repo "$repo"
+gh secret set IOS_CERTIFICATE_PASSWORD --repo "$repo"
+gh secret set IOS_TEAM_ID --repo "$repo"
+gh secret set IOS_BUNDLE_IDENTIFIER --repo "$repo"
+```
+
+### Verify Registration
+
+```bash
+gh secret list --repo Jiyeong-kor/supplement_routine
+```
+
+The list should show secret names only and must not print secret values.
+
+### Run the Release Workflow
+
+```bash
+gh workflow run kmp_release.yml --repo Jiyeong-kor/supplement_routine --ref main -f platform=all
+gh run list --repo Jiyeong-kor/supplement_routine --workflow "KMP Release" --limit 5
+```
+
+After finding the successful run id, download the artifacts.
+
+```bash
+gh run download RUN_ID --repo Jiyeong-kor/supplement_routine --name kmp-android-release --dir <local-path>
+gh run download RUN_ID --repo Jiyeong-kor/supplement_routine --name kmp-ios-xcarchive-tar --dir <local-path>
+gh run download RUN_ID --repo Jiyeong-kor/supplement_routine --name kmp-ios-ipa --dir <local-path>
+```
+
+Record the artifact verification result as a comment on #67.

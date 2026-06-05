@@ -80,3 +80,81 @@ iOS release job은 다음 Secrets를 요구합니다.
 - `IOS_CERTIFICATE_PASSWORD`
 
 Secrets가 없으면 workflow는 릴리즈 artifact를 만들지 않고 실패합니다. 남은 signed artifact 검증은 [#67](https://github.com/Jiyeong-kor/supplement_routine/issues/67)에서 추적합니다.
+
+## Secret 등록 runbook
+
+아래 명령은 secret 값을 터미널 history에 남기지 않는 방식을 우선합니다. 실제 파일 경로와 값은 로컬 보안 저장소 기준으로 바꿉니다.
+
+### Android upload keystore
+
+Windows PowerShell:
+
+```powershell
+$repo="Jiyeong-kor/supplement_routine"
+$keystore="<local-secure-path>"
+[Convert]::ToBase64String([IO.File]::ReadAllBytes($keystore)) | gh secret set ANDROID_KEYSTORE_BASE64 --repo $repo
+gh secret set ANDROID_KEYSTORE_PASSWORD --repo $repo
+gh secret set ANDROID_KEY_PASSWORD --repo $repo
+gh secret set ANDROID_KEY_ALIAS --repo $repo
+```
+
+macOS/Linux:
+
+```bash
+repo="Jiyeong-kor/supplement_routine"
+base64 -i /secure/android/upload-keystore.jks | gh secret set ANDROID_KEYSTORE_BASE64 --repo "$repo"
+gh secret set ANDROID_KEYSTORE_PASSWORD --repo "$repo"
+gh secret set ANDROID_KEY_PASSWORD --repo "$repo"
+gh secret set ANDROID_KEY_ALIAS --repo "$repo"
+```
+
+### iOS distribution signing
+
+Windows PowerShell:
+
+```powershell
+$repo="Jiyeong-kor/supplement_routine"
+$certificate="<local-secure-path>"
+$profile="<local-secure-path>"
+[Convert]::ToBase64String([IO.File]::ReadAllBytes($certificate)) | gh secret set IOS_CERTIFICATE_BASE64 --repo $repo
+[Convert]::ToBase64String([IO.File]::ReadAllBytes($profile)) | gh secret set IOS_PROVISIONING_PROFILE_BASE64 --repo $repo
+gh secret set IOS_CERTIFICATE_PASSWORD --repo $repo
+gh secret set IOS_TEAM_ID --repo $repo
+gh secret set IOS_BUNDLE_IDENTIFIER --repo $repo
+```
+
+macOS/Linux:
+
+```bash
+repo="Jiyeong-kor/supplement_routine"
+base64 -i /secure/ios/distribution.p12 | gh secret set IOS_CERTIFICATE_BASE64 --repo "$repo"
+base64 -i /secure/ios/profile.mobileprovision | gh secret set IOS_PROVISIONING_PROFILE_BASE64 --repo "$repo"
+gh secret set IOS_CERTIFICATE_PASSWORD --repo "$repo"
+gh secret set IOS_TEAM_ID --repo "$repo"
+gh secret set IOS_BUNDLE_IDENTIFIER --repo "$repo"
+```
+
+### 등록 확인
+
+```bash
+gh secret list --repo Jiyeong-kor/supplement_routine
+```
+
+목록에는 secret 이름만 보여야 하며 값은 출력되지 않아야 합니다.
+
+### 릴리즈 workflow 실행
+
+```bash
+gh workflow run kmp_release.yml --repo Jiyeong-kor/supplement_routine --ref main -f platform=all
+gh run list --repo Jiyeong-kor/supplement_routine --workflow "KMP Release" --limit 5
+```
+
+성공한 run id를 확인한 뒤 artifact를 내려받습니다.
+
+```bash
+gh run download RUN_ID --repo Jiyeong-kor/supplement_routine --name kmp-android-release --dir <local-path>
+gh run download RUN_ID --repo Jiyeong-kor/supplement_routine --name kmp-ios-xcarchive-tar --dir <local-path>
+gh run download RUN_ID --repo Jiyeong-kor/supplement_routine --name kmp-ios-ipa --dir <local-path>
+```
+
+artifact 확인 결과는 #67에 comment로 남깁니다.

@@ -49,6 +49,7 @@
 | Android/iOS resource parse | 통과 | Android manifest/backup/data extraction XML, iOS `PrivacyInfo.xcprivacy`, iOS asset catalog `Contents.json` 파싱 성공 |
 | KMP manual release workflow | 구성됨 | `.github/workflows/kmp_release.yml`에서 Android signed APK/AAB와 iOS signed archive tarball/IPA artifact 생성 경로 제공. Workflow 파일은 `main`에 있으므로 수동 실행 가능. 실제 signing secrets 필요 |
 | Release signing secrets | 미등록 | 2026-06-05 `gh secret list --repo Jiyeong-kor/supplement_routine` 결과 release signing secrets 없음. Android/iOS signed artifact 생성 전 등록 필요. [#67](https://github.com/Jiyeong-kor/supplement_routine/issues/67)에서 추적 |
+| Release secret setup runbook | 구성됨 | `docs/release_signing.md`에 Android/iOS secret base64 변환, `gh secret set`, `KMP Release` 실행, artifact 다운로드 명령 정리 |
 
 Windows 로컬 검증에는 Android SDK 경로가 필요하다.
 
