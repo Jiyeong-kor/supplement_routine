@@ -60,7 +60,7 @@ Before Play Store upload, verify `assembleRelease` and `bundleRelease` again wit
 
 `.github/workflows/kmp_release.yml` creates KMP Android signed APK/AAB artifacts and iOS signed archive/IPA artifacts from manual dispatch.
 
-GitHub Actions `workflow_dispatch` can be manually triggered only after the workflow file exists on the default branch. Run `KMP Release` after this PR is merged into `main`.
+GitHub Actions `workflow_dispatch` can be manually triggered only after the workflow file exists on the default branch. `KMP Release` now exists on `main`, so it can be manually dispatched after the signing secrets are configured.
 
 As of 2026-06-05, `gh secret list --repo Jiyeong-kor/supplement_routine` returns no configured repository secrets for release signing. Add all of the following secrets before generating signed store artifacts.
 
@@ -79,4 +79,4 @@ The iOS release job requires these secrets:
 - `IOS_CERTIFICATE_BASE64`
 - `IOS_CERTIFICATE_PASSWORD`
 
-If the secrets are missing, the workflow fails instead of creating release artifacts.
+If the secrets are missing, the workflow fails instead of creating release artifacts. Track the remaining signed artifact verification in [#67](https://github.com/Jiyeong-kor/supplement_routine/issues/67).

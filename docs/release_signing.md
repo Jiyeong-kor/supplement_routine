@@ -60,7 +60,7 @@ Play Store 업로드 전에는 실제 upload keystore가 설정된 `kmp/key.prop
 
 `.github/workflows/kmp_release.yml`은 수동 실행으로 KMP Android signed APK/AAB와 iOS signed archive/IPA를 생성합니다.
 
-GitHub Actions `workflow_dispatch`는 workflow 파일이 default branch에 있어야 수동 실행할 수 있습니다. 따라서 이 PR이 `main`에 병합된 뒤 `KMP Release` workflow를 실행합니다.
+GitHub Actions `workflow_dispatch`는 workflow 파일이 default branch에 있어야 수동 실행할 수 있습니다. `KMP Release` workflow는 현재 `main`에 있으므로 signing secrets를 등록한 뒤 수동 실행할 수 있습니다.
 
 2026-06-05 기준 `gh secret list --repo Jiyeong-kor/supplement_routine` 결과, 아래 release signing secrets는 아직 저장소에 등록되어 있지 않습니다. 실제 signed artifact 생성 전 모두 등록해야 합니다.
 
@@ -79,4 +79,4 @@ iOS release job은 다음 Secrets를 요구합니다.
 - `IOS_CERTIFICATE_BASE64`
 - `IOS_CERTIFICATE_PASSWORD`
 
-Secrets가 없으면 workflow는 릴리즈 artifact를 만들지 않고 실패합니다.
+Secrets가 없으면 workflow는 릴리즈 artifact를 만들지 않고 실패합니다. 남은 signed artifact 검증은 [#67](https://github.com/Jiyeong-kor/supplement_routine/issues/67)에서 추적합니다.
