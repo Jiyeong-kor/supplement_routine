@@ -105,7 +105,7 @@ private fun TodayScreen(
     }
     val incompleteItems = sortedItems.filterNot { it.record.isDone }
     val completedItems = sortedItems.filter { it.record.isDone }
-    val shouldShowCompletedItems = showCompletedItems || incompleteItems.isEmpty()
+    val shouldShowCompletedItems = showCompletedItems
     val nextItem = sortedItems.firstOrNull { !it.record.isDone }
 
     LaunchedEffect(completionMessage) {

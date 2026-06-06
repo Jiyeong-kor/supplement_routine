@@ -138,8 +138,10 @@ fun SupplementRoutineKmpApp(
                         supplements = uiState.supplements,
                         defaultNotificationEnabled = uiState.notificationEnabled,
                         onAddSupplement = { supplement ->
-                            viewModel.addSupplement(supplement)
-                            selectedDestinationKey = "today"
+                            viewModel.addSupplement(
+                                supplement = supplement,
+                                onSuccess = { selectedDestinationKey = "today" },
+                            )
                         },
                         onUpdateSupplement = viewModel::updateSupplement,
                         onRemoveSupplement = viewModel::removeSupplement,

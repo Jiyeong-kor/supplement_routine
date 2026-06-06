@@ -57,9 +57,14 @@ class SupplementRoutineViewModel @Inject constructor(
         }
     }
 
-    fun addSupplement(supplement: Supplement) {
+    fun addSupplement(
+        supplement: Supplement,
+        onSuccess: () -> Unit = {},
+    ) {
         viewModelScope.launch {
-            runRepositoryAction {
+            runRepositoryAction(
+                onSuccess = onSuccess,
+            ) {
                 supplementRepository.addSupplement(supplement)
                 loadState()
             }
@@ -137,7 +142,10 @@ class SupplementRoutineViewModel @Inject constructor(
         }
     }
 
-    private suspend fun runRepositoryAction(action: suspend () -> SupplementRoutineUiState) {
+    private suspend fun runRepositoryAction(
+        onSuccess: () -> Unit = {},
+        action: suspend () -> SupplementRoutineUiState,
+    ) {
         val result = runCatching {
             withContext(Dispatchers.IO) { action() }
         }
@@ -145,6 +153,7 @@ class SupplementRoutineViewModel @Inject constructor(
         result.fold(
             onSuccess = { nextState ->
                 _uiState.value = nextState.copy(isLoading = false, errorMessage = null)
+                onSuccess()
             },
             onFailure = { throwable ->
                 _uiState.update { state ->
