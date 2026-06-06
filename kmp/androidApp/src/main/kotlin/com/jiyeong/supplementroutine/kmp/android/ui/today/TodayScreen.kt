@@ -284,7 +284,7 @@ private fun ErrorCard(message: String) {
 private fun TodayHeader(date: LocalDateValue) {
     RoutinePageHeader(
         title = "오늘 루틴",
-        eyebrow = "${date.year}년 ${date.month}월 ${date.day}일 ${weekdayLabel()}요일",
+        eyebrow = "${date.year}년 ${date.month}월 ${date.day}일 ${weekdayLabel(date)}요일",
     )
 }
 
@@ -519,8 +519,13 @@ private fun TodayEmptyState(onAddSupplementClick: () -> Unit) {
     }
 }
 
-private fun weekdayLabel(): String {
-    return when (Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) {
+private fun weekdayLabel(date: LocalDateValue): String {
+    val calendar = Calendar.getInstance().apply {
+        set(Calendar.YEAR, date.year)
+        set(Calendar.MONTH, date.month - 1)
+        set(Calendar.DAY_OF_MONTH, date.day)
+    }
+    return when (calendar.get(Calendar.DAY_OF_WEEK)) {
         Calendar.MONDAY -> "월"
         Calendar.TUESDAY -> "화"
         Calendar.WEDNESDAY -> "수"

@@ -299,6 +299,12 @@ private fun MealTimeDisplayRow(
             fontWeight = FontWeight.Bold,
         )
         if (editing) {
+            Text(
+                text = formatTime(time),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+            )
             TextButton(onClick = { onTimeChanged(time.plusMinutes(-10)) }) {
                 Text("-10")
             }

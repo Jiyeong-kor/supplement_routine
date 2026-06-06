@@ -222,7 +222,7 @@ private fun MonthHistoryCard(
                 }
             }
             tiles.chunked(7).forEach { week ->
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(0.dp)) {
                     week.forEach { summary ->
                         Box(modifier = Modifier.weight(1f)) {
                             if (summary != null) {
@@ -253,29 +253,35 @@ private fun MonthDayTile(
     onClick: () -> Unit,
 ) {
     val status = historyStatus(summary)
-    Surface(
+    Box(
         modifier = Modifier
-            .size(32.dp)
+            .fillMaxWidth()
+            .height(48.dp)
             .clickable(onClick = onClick)
             .semantics {
                 contentDescription = "${summary.date.day}일, ${status.label}, ${summary.doneCount}개 중 ${summary.totalCount}개 완료"
             },
-        shape = CircleShape,
-        color = status.background,
-        border = when {
-            selected -> BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
-            isToday -> BorderStroke(2.dp, GardenUi.Ink)
-            summary.isEmpty -> BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-            else -> null
-        },
+        contentAlignment = Alignment.Center,
     ) {
-        Box(contentAlignment = Alignment.Center) {
-            Text(
-                text = summary.date.day.toString(),
-                style = MaterialTheme.typography.labelSmall,
-                color = status.foreground,
-                fontWeight = if (selected || isToday) FontWeight.Bold else FontWeight.Medium,
-            )
+        Surface(
+            modifier = Modifier.size(32.dp),
+            shape = CircleShape,
+            color = status.background,
+            border = when {
+                selected -> BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
+                isToday -> BorderStroke(2.dp, GardenUi.Ink)
+                summary.isEmpty -> BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                else -> null
+            },
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Text(
+                    text = summary.date.day.toString(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = status.foreground,
+                    fontWeight = if (selected || isToday) FontWeight.Bold else FontWeight.Medium,
+                )
+            }
         }
     }
 }
