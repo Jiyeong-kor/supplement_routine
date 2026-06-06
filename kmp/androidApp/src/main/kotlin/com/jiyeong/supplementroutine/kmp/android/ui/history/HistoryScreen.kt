@@ -300,6 +300,7 @@ private fun RoutinePatternCard(summaries: List<DailyHistorySummary>) {
     val hint = when {
         daysWithSchedule.isEmpty() -> "오늘 화면에서 첫 기록을 남겨보세요."
         missedDays == 0 -> "지금 설정을 유지해도 좋아요."
+        daysWithSchedule.size < 3 -> "기록이 조금 더 쌓이면 놓치기 쉬운 시간대를 알려드릴게요."
         else -> missedPeriodHint(daysWithSchedule)
     }
 

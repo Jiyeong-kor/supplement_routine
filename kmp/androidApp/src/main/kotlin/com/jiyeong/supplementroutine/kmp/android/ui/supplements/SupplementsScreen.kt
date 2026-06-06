@@ -262,6 +262,7 @@ private fun SupplementFormScreen(
     }
     var memo by remember(initialSupplement) { mutableStateOf(initialSupplement?.memo.orEmpty()) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var saveFailureMessage by remember { mutableStateOf<String?>(null) }
     var isSaving by remember { mutableStateOf(false) }
 
     fun syncFixedTimes(count: Int) {
@@ -275,6 +276,7 @@ private fun SupplementFormScreen(
         val nameError = SupplementFormPolicy.validateName(trimmedName)
         if (nameError != null) {
             errorMessage = validationMessage(nameError)
+            saveFailureMessage = null
             onValidationError()
             return
         }
@@ -282,6 +284,7 @@ private fun SupplementFormScreen(
         val parsedDosage = SupplementFormPolicy.parseDosageInput(dosageText)
         if (parsedDosage == null) {
             errorMessage = validationMessage(SupplementFormValidationError.InvalidDosage)
+            saveFailureMessage = null
             onValidationError()
             return
         }
@@ -291,6 +294,7 @@ private fun SupplementFormScreen(
             val routineError = SupplementFormPolicy.validateRoutineSlots(selectedSlots)
             if (routineError != null) {
                 errorMessage = validationMessage(routineError)
+                saveFailureMessage = null
                 onValidationError()
                 return
             }
@@ -314,6 +318,7 @@ private fun SupplementFormScreen(
 
         isSaving = true
         errorMessage = null
+        saveFailureMessage = null
         onSubmit(
             SupplementFormMapper.toSupplement(
                 input = input,
@@ -322,6 +327,7 @@ private fun SupplementFormScreen(
             ),
         ) { message ->
             errorMessage = message
+            saveFailureMessage = "저장하지 못했어요. 다시 시도해주세요."
             isSaving = false
         }
     }
@@ -502,25 +508,37 @@ private fun SupplementFormScreen(
                 .fillMaxWidth(),
             color = MaterialTheme.colorScheme.background.copy(alpha = 0.96f),
         ) {
-            Button(
-                onClick = ::submit,
-                enabled = !isSaving,
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
                         start = 20.dp,
                         end = 20.dp,
-                        bottom = contentPadding.calculateBottomPadding() + 16.dp,
+                        bottom = contentPadding.calculateBottomPadding() + 14.dp,
                         top = 12.dp,
                     ),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Text(
-                    when {
-                        isSaving -> "저장 중"
-                        isEditMode -> "수정 완료"
-                        else -> "저장"
-                    },
-                )
+                saveFailureMessage?.let { message ->
+                    Text(
+                        text = message,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+                Button(
+                    onClick = ::submit,
+                    enabled = !isSaving,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(
+                        when {
+                            isSaving -> "저장 중"
+                            isEditMode -> "수정 완료"
+                            else -> "저장"
+                        },
+                    )
+                }
             }
         }
     }

@@ -70,6 +70,7 @@ fun SupplementRoutineKmpApp(
     val uiState by viewModel.uiState.collectAsState()
     val hapticFeedback = rememberRoutineHapticFeedback()
     var todayFeedbackMessage by remember { mutableStateOf<String?>(null) }
+    var todayHighlightedSupplementId by remember { mutableStateOf<String?>(null) }
     var notificationAttentionDismissedDate by remember { mutableStateOf<LocalDateValue?>(null) }
     var notificationPermissionState by remember {
         mutableStateOf(permissionController.currentState())
@@ -146,6 +147,7 @@ fun SupplementRoutineKmpApp(
                                 supplement = supplement,
                                 onSuccess = {
                                     onSuccess()
+                                    todayHighlightedSupplementId = supplement.id
                                     if (isFirstSupplement) {
                                         todayFeedbackMessage = "오늘 일정에 추가됐어요."
                                     }
@@ -218,6 +220,8 @@ fun SupplementRoutineKmpApp(
                         onDismissNotificationAttention = {
                             notificationAttentionDismissedDate = uiState.today
                         },
+                        highlightedSupplementId = todayHighlightedSupplementId,
+                        onHighlightedSupplementConsumed = { todayHighlightedSupplementId = null },
                         feedbackMessage = todayFeedbackMessage,
                         onFeedbackMessageConsumed = { todayFeedbackMessage = null },
                         onAddSupplementClick = { selectedDestinationKey = "supplements" },

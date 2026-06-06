@@ -712,7 +712,7 @@ private fun ResetDialog(
                     onValueChange = { confirmText = it },
                     label = { Text("초기화 입력") },
                     placeholder = { Text("초기화") },
-                    supportingText = { Text("위 단어를 그대로 입력하면 버튼이 활성화됩니다.") },
+                    supportingText = { Text("계속하려면 아래에 초기화를 입력해주세요.") },
                     singleLine = true,
                 )
             }

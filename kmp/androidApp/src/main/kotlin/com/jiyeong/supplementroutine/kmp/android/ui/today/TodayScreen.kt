@@ -69,6 +69,8 @@ fun TodayRoute(
     notificationNeedsAttention: Boolean,
     notificationAttentionDismissed: Boolean,
     onDismissNotificationAttention: () -> Unit,
+    highlightedSupplementId: String?,
+    onHighlightedSupplementConsumed: () -> Unit,
     feedbackMessage: String?,
     onFeedbackMessageConsumed: () -> Unit,
     onAddSupplementClick: () -> Unit,
@@ -83,6 +85,8 @@ fun TodayRoute(
         notificationNeedsAttention = notificationNeedsAttention,
         notificationAttentionDismissed = notificationAttentionDismissed,
         onDismissNotificationAttention = onDismissNotificationAttention,
+        highlightedSupplementId = highlightedSupplementId,
+        onHighlightedSupplementConsumed = onHighlightedSupplementConsumed,
         feedbackMessage = feedbackMessage,
         onFeedbackMessageConsumed = onFeedbackMessageConsumed,
         onAddSupplementClick = onAddSupplementClick,
@@ -100,6 +104,8 @@ private fun TodayScreen(
     notificationNeedsAttention: Boolean,
     notificationAttentionDismissed: Boolean,
     onDismissNotificationAttention: () -> Unit,
+    highlightedSupplementId: String?,
+    onHighlightedSupplementConsumed: () -> Unit,
     feedbackMessage: String?,
     onFeedbackMessageConsumed: () -> Unit,
     onAddSupplementClick: () -> Unit,
@@ -131,6 +137,13 @@ private fun TodayScreen(
         if (completionFeedback != null) {
             delay(2200)
             completionFeedback = null
+        }
+    }
+
+    LaunchedEffect(highlightedSupplementId) {
+        if (highlightedSupplementId != null) {
+            delay(3600)
+            onHighlightedSupplementConsumed()
         }
     }
 
@@ -196,6 +209,7 @@ private fun TodayScreen(
                 ) { item ->
                     TodaySupplementItem(
                         item = item,
+                        highlighted = item.supplement.id == highlightedSupplementId,
                         onClick = {
                             if (!item.record.isDone) {
                                 completionFeedback = CompletionFeedback(
@@ -233,6 +247,7 @@ private fun TodayScreen(
                         ) { item ->
                             TodaySupplementItem(
                                 item = item,
+                                highlighted = item.supplement.id == highlightedSupplementId,
                                 onClick = {
                                     completionFeedback = CompletionFeedback(
                                         message = "${item.supplement.name} 기록을 되돌렸어요.",
@@ -285,20 +300,20 @@ private fun NotificationAttentionCard(
                 )
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "알림 권한을 확인해주세요",
+                        text = "알림이 오지 않을 수 있어요",
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onErrorContainer,
                         fontWeight = FontWeight.Bold,
                     )
                     Text(
-                        text = "알림이 켜진 영양제가 있지만 기기 권한이 막혀 있을 수 있습니다.",
+                        text = "기기 설정에서 알림 권한을 허용해주세요.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onErrorContainer,
                     )
                 }
             }
             RoutinePillButton(
-                text = "알림 설정 확인",
+                text = "설정에서 허용하기",
                 onClick = onOpenSettingsClick,
                 height = 36.dp,
                 containerColor = MaterialTheme.colorScheme.error,
@@ -412,6 +427,7 @@ private fun TodayProgressCard(
 @Composable
 private fun TodaySupplementItem(
     item: ScheduledIntakeRecord,
+    highlighted: Boolean = false,
     onClick: () -> Unit,
 ) {
     val record = item.record
@@ -422,6 +438,8 @@ private fun TodaySupplementItem(
         colors = CardDefaults.cardColors(
             containerColor = if (record.isDone) {
                 MaterialTheme.colorScheme.surfaceContainerHighest
+            } else if (highlighted) {
+                GardenUi.SuccessSurface
             } else {
                 MaterialTheme.colorScheme.surface
             },
@@ -430,7 +448,13 @@ private fun TodaySupplementItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(role = Role.Checkbox, onClick = onClick)
+                .then(
+                    if (record.isDone) {
+                        Modifier
+                    } else {
+                        Modifier.clickable(role = Role.Checkbox, onClick = onClick)
+                    },
+                )
                 .semantics {
                     contentDescription = "${supplement.name}, ${formatTime(record.scheduledTime)}, $statusText"
                 }
@@ -460,6 +484,13 @@ private fun TodaySupplementItem(
                     RoutineMetaChip(text = formatTime(record.scheduledTime))
                     RoutineMetaChip(text = scheduleLabelText(item.label))
                     RoutineMetaChip(text = "${formatDosage(supplement.dosageValue)} ${supplement.dosageUnit}")
+                    if (highlighted) {
+                        RoutineMetaChip(
+                            text = "방금 추가됨",
+                            containerColor = GardenUi.LeafGreen,
+                            contentColor = GardenUi.Ink,
+                        )
+                    }
                 }
                 supplement.memo?.let { memo ->
                     Text(
@@ -471,6 +502,7 @@ private fun TodaySupplementItem(
             }
             RoutineCheckButton(
                 checked = record.isDone,
+                modifier = Modifier.clickable(role = Role.Checkbox, onClick = onClick),
                 contentDescription = statusText,
             )
         }
