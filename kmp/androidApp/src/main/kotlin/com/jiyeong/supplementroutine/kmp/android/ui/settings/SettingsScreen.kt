@@ -1,29 +1,26 @@
 package com.jiyeong.supplementroutine.kmp.android.ui.settings
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Alarm
+import androidx.compose.material.icons.outlined.Coffee
 import androidx.compose.material.icons.outlined.DeleteForever
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.LightMode
+import androidx.compose.material.icons.outlined.ModeNight
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Restaurant
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +28,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,10 +39,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.jiyeong.supplementroutine.kmp.android.ui.common.formatTime
-import com.jiyeong.supplementroutine.kmp.android.ui.common.routineGlassBorder
-import com.jiyeong.supplementroutine.kmp.android.ui.common.routineGlassCardColors
-import com.jiyeong.supplementroutine.kmp.android.ui.common.routineGlassCardElevation
-import com.jiyeong.supplementroutine.kmp.android.ui.common.routineGlassSheen
+import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineCard
+import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineIconBadge
+import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutinePageHeader
+import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutinePillButton
+import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineSectionLabel
 import com.jiyeong.supplementroutine.kmp.android.notification.NotificationPermissionState
 import com.jiyeong.supplementroutine.shared.domain.MealTimeSettings
 import com.jiyeong.supplementroutine.shared.domain.TimeOfDayValue
@@ -67,145 +66,107 @@ fun SettingsRoute(
     onResetRoutineData: () -> Unit,
 ) {
     var dialog by remember { mutableStateOf<SettingsDialog?>(null) }
+    var mealTimesEditing by remember { mutableStateOf(false) }
+    var draftMealTimeSettings by remember { mutableStateOf(mealTimeSettings) }
+
+    LaunchedEffect(mealTimeSettings, mealTimesEditing) {
+        if (!mealTimesEditing) {
+            draftMealTimeSettings = mealTimeSettings
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier
-                .fillMaxSize()
-                .windowInsetsPadding(WindowInsets.statusBars),
+                .fillMaxSize(),
             contentPadding = PaddingValues(
                 start = 20.dp,
-                top = 20.dp,
+                top = 16.dp,
                 end = 20.dp,
                 bottom = contentPadding.calculateBottomPadding() + 24.dp,
             ),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             item {
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text(
-                        text = "설정",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Text(
-                        text = "복용 시간, 기본 알림, 앱 정보를 관리합니다.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
+                RoutinePageHeader(
+                    title = "설정",
+                    subtitle = "루틴 기준과 알림을 조정해요",
+                )
             }
             item {
-                SettingsCard(title = "기본값") {
-                    SettingsRow(
-                        icon = Icons.Outlined.Restaurant,
-                        title = "식사 시간",
-                        description = "식사 기준 복용 일정에 바로 반영됩니다.",
-                    )
-                    MealTimeEditorRow(
-                        title = "아침",
-                        time = mealTimeSettings.breakfastTime,
-                        onTimeChanged = onBreakfastTimeChanged,
-                    )
-                    MealTimeEditorRow(
-                        title = "점심",
-                        time = mealTimeSettings.lunchTime,
-                        onTimeChanged = onLunchTimeChanged,
-                    )
-                    MealTimeEditorRow(
-                        title = "저녁",
-                        time = mealTimeSettings.dinnerTime,
-                        onTimeChanged = onDinnerTimeChanged,
-                    )
-                    NotificationDefaultRow(
-                        enabled = notificationEnabled,
-                        onEnabledChanged = onNotificationEnabledChanged,
-                    )
-                    PermissionActionRow(
-                        icon = Icons.Outlined.Notifications,
-                        title = "알림 표시 권한",
-                        description = if (notificationPermissionState.canPostNotifications) {
-                            "허용됨. 복용 알림을 표시할 수 있습니다."
-                        } else {
-                            "Android 13 이상에서는 알림 표시 권한이 필요합니다."
-                        },
-                        actionLabel = if (notificationPermissionState.canPostNotifications) "새로고침" else "권한 요청",
-                        onClick = if (notificationPermissionState.canPostNotifications) {
-                            onRefreshNotificationPermissions
-                        } else {
-                            onRequestNotificationPermission
-                        },
-                    )
-                    PermissionActionRow(
-                        icon = Icons.Outlined.Alarm,
-                        title = "정확한 알림 권한",
-                        description = if (notificationPermissionState.canScheduleExactAlarms) {
-                            "허용됨. 정해진 시간에 복용 알림을 예약할 수 있습니다."
-                        } else {
-                            "권한이 없어도 근처 시간에 알림을 예약합니다. 더 정확한 알림은 설정에서 허용하세요."
-                        },
-                        actionLabel = if (notificationPermissionState.canScheduleExactAlarms) "새로고침" else "정확 알림 설정",
-                        onClick = if (notificationPermissionState.canScheduleExactAlarms) {
-                            onRefreshNotificationPermissions
-                        } else {
-                            onRequestExactAlarmPermission
-                        },
-                    )
-                    PermissionActionRow(
-                        icon = Icons.Outlined.Notifications,
-                        title = "테스트 알림",
-                        description = "복용 알림이 실제로 표시되는지 바로 확인합니다.",
-                        actionLabel = "보내기",
-                        onClick = {
-                            dialog = if (onSendTestNotification()) {
-                                SettingsDialog.TestNotificationSent
-                            } else {
-                                SettingsDialog.TestNotificationBlocked
-                            }
-                        },
-                    )
-                    PermissionActionRow(
-                        icon = Icons.Outlined.Alarm,
-                        title = "예약 테스트 알림",
-                        description = "15초 뒤 알림을 예약해 실제 발화 경로를 확인합니다.",
-                        actionLabel = "예약",
-                        onClick = {
-                            dialog = if (onScheduleTestNotification()) {
-                                SettingsDialog.TestNotificationScheduled
-                            } else {
-                                SettingsDialog.TestNotificationBlocked
-                            }
-                        },
-                    )
-                }
+                RoutineSectionLabel(title = "식사 시간")
             }
             item {
-                SettingsCard(title = "데이터") {
-                    DestructiveRow(
-                        title = "복용 데이터 초기화",
-                        description = "등록한 영양제와 복용 기록을 삭제합니다.",
-                        onClick = { dialog = SettingsDialog.Reset },
-                    )
-                }
+                MealTimesCard(
+                    mealTimeSettings = if (mealTimesEditing) draftMealTimeSettings else mealTimeSettings,
+                    editing = mealTimesEditing,
+                    changed = mealTimesEditing && draftMealTimeSettings != mealTimeSettings,
+                    onStartEditing = {
+                        draftMealTimeSettings = mealTimeSettings
+                        mealTimesEditing = true
+                    },
+                    onSave = {
+                        onBreakfastTimeChanged(draftMealTimeSettings.breakfastTime)
+                        onLunchTimeChanged(draftMealTimeSettings.lunchTime)
+                        onDinnerTimeChanged(draftMealTimeSettings.dinnerTime)
+                        mealTimesEditing = false
+                    },
+                    onCancel = {
+                        draftMealTimeSettings = mealTimeSettings
+                        mealTimesEditing = false
+                    },
+                    onBreakfastTimeChanged = {
+                        draftMealTimeSettings = draftMealTimeSettings.copy(breakfastTime = it)
+                    },
+                    onLunchTimeChanged = {
+                        draftMealTimeSettings = draftMealTimeSettings.copy(lunchTime = it)
+                    },
+                    onDinnerTimeChanged = {
+                        draftMealTimeSettings = draftMealTimeSettings.copy(dinnerTime = it)
+                    },
+                )
             }
             item {
-                SettingsCard(title = "정보") {
-                    InfoActionRow(
-                        icon = Icons.AutoMirrored.Outlined.HelpOutline,
-                        title = "사용 가이드",
-                        onClick = { dialog = SettingsDialog.Guide },
-                    )
-                    InfoActionRow(
-                        icon = Icons.Outlined.Info,
-                        title = "면책 고지",
-                        onClick = { dialog = SettingsDialog.Disclaimer },
-                    )
-                    SettingsRow(
-                        icon = Icons.Outlined.Info,
-                        title = "버전",
-                        description = "1.0.0",
-                    )
-                }
+                RoutineSectionLabel(title = "알림")
+            }
+            item {
+                NotificationSettingsCard(
+                    notificationEnabled = notificationEnabled,
+                    notificationPermissionState = notificationPermissionState,
+                    onNotificationEnabledChanged = onNotificationEnabledChanged,
+                    onRequestNotificationPermission = onRequestNotificationPermission,
+                    onRequestExactAlarmPermission = onRequestExactAlarmPermission,
+                    onRefreshNotificationPermissions = onRefreshNotificationPermissions,
+                    onSendTestNotification = {
+                        dialog = if (onSendTestNotification()) {
+                            SettingsDialog.TestNotificationSent
+                        } else {
+                            SettingsDialog.TestNotificationBlocked
+                        }
+                    },
+                    onScheduleTestNotification = {
+                        dialog = if (onScheduleTestNotification()) {
+                            SettingsDialog.TestNotificationScheduled
+                        } else {
+                            SettingsDialog.TestNotificationBlocked
+                        }
+                    },
+                )
+            }
+            item {
+                RoutineSectionLabel(title = "앱 정보")
+            }
+            item {
+                AppInfoCard(
+                    onGuideClick = { dialog = SettingsDialog.Guide },
+                    onDisclaimerClick = { dialog = SettingsDialog.Disclaimer },
+                )
+            }
+            item {
+                RoutineSectionLabel(title = "데이터")
+            }
+            item {
+                DataResetCard(onClick = { dialog = SettingsDialog.Reset })
             }
         }
     }
@@ -248,6 +209,224 @@ fun SettingsRoute(
 }
 
 @Composable
+private fun MealTimesCard(
+    mealTimeSettings: MealTimeSettings,
+    editing: Boolean,
+    changed: Boolean,
+    onStartEditing: () -> Unit,
+    onSave: () -> Unit,
+    onCancel: () -> Unit,
+    onBreakfastTimeChanged: (TimeOfDayValue) -> Unit,
+    onLunchTimeChanged: (TimeOfDayValue) -> Unit,
+    onDinnerTimeChanged: (TimeOfDayValue) -> Unit,
+) {
+    RoutineCard {
+        Column(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            MealTimeDisplayRow(
+                icon = Icons.Outlined.LightMode,
+                title = "아침",
+                time = mealTimeSettings.breakfastTime,
+                editing = editing,
+                onTimeChanged = onBreakfastTimeChanged,
+            )
+            MealTimeDisplayRow(
+                icon = Icons.Outlined.Coffee,
+                title = "점심",
+                time = mealTimeSettings.lunchTime,
+                editing = editing,
+                onTimeChanged = onLunchTimeChanged,
+            )
+            MealTimeDisplayRow(
+                icon = Icons.Outlined.ModeNight,
+                title = "저녁",
+                time = mealTimeSettings.dinnerTime,
+                editing = editing,
+                onTimeChanged = onDinnerTimeChanged,
+            )
+            RoutinePillButton(
+                text = if (editing) "식사 시간 저장" else "식사 시간 편집",
+                icon = Icons.Outlined.Restaurant,
+                onClick = if (editing) onSave else onStartEditing,
+                height = 38.dp,
+            )
+            if (editing) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = if (changed) "변경된 시간이 아직 저장되지 않았습니다." else "시간을 10분 단위로 조정할 수 있습니다.",
+                        modifier = Modifier.weight(1f),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    TextButton(onClick = onCancel) {
+                        Text("취소")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MealTimeDisplayRow(
+    icon: ImageVector,
+    title: String,
+    time: TimeOfDayValue,
+    editing: Boolean,
+    onTimeChanged: (TimeOfDayValue) -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        RoutineIconBadge(
+            icon = icon,
+            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.62f),
+            tint = MaterialTheme.colorScheme.secondary,
+        )
+        Text(
+            text = title,
+            modifier = Modifier.weight(1f),
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Bold,
+        )
+        if (editing) {
+            TextButton(onClick = { onTimeChanged(time.plusMinutes(-10)) }) {
+                Text("-10")
+            }
+            TextButton(onClick = { onTimeChanged(time.plusMinutes(10)) }) {
+                Text("+10")
+            }
+        } else {
+            Text(
+                text = formatTime(time),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+    }
+}
+
+@Composable
+private fun NotificationSettingsCard(
+    notificationEnabled: Boolean,
+    notificationPermissionState: NotificationPermissionState,
+    onNotificationEnabledChanged: (Boolean) -> Unit,
+    onRequestNotificationPermission: () -> Unit,
+    onRequestExactAlarmPermission: () -> Unit,
+    onRefreshNotificationPermissions: () -> Unit,
+    onSendTestNotification: () -> Unit,
+    onScheduleTestNotification: () -> Unit,
+) {
+    var showTroubleshooting by remember { mutableStateOf(false) }
+
+    RoutineCard {
+        Column(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            NotificationDefaultRow(
+                enabled = notificationEnabled,
+                onEnabledChanged = onNotificationEnabledChanged,
+            )
+            RoutinePillButton(
+                text = if (showTroubleshooting) "알림 문제 해결 접기" else "알림 문제 해결",
+                icon = Icons.Outlined.Alarm,
+                onClick = { showTroubleshooting = !showTroubleshooting },
+                height = 38.dp,
+            )
+            if (showTroubleshooting) {
+                PermissionActionRow(
+                    icon = Icons.Outlined.Notifications,
+                    title = "알림 표시 권한",
+                    description = if (notificationPermissionState.canPostNotifications) {
+                        "허용됨. 복용 알림을 표시할 수 있습니다."
+                    } else {
+                        "Android 13 이상에서는 알림 표시 권한이 필요합니다."
+                    },
+                    actionLabel = if (notificationPermissionState.canPostNotifications) "새로고침" else "권한 요청",
+                    onClick = if (notificationPermissionState.canPostNotifications) {
+                        onRefreshNotificationPermissions
+                    } else {
+                        onRequestNotificationPermission
+                    },
+                )
+                PermissionActionRow(
+                    icon = Icons.Outlined.Alarm,
+                    title = "정확한 알림 권한",
+                    description = if (notificationPermissionState.canScheduleExactAlarms) {
+                        "허용됨. 정해진 시간에 정확히 알립니다."
+                    } else {
+                        "정확한 시간 알림은 설정에서 허용할 수 있습니다."
+                    },
+                    actionLabel = if (notificationPermissionState.canScheduleExactAlarms) "새로고침" else "설정",
+                    onClick = if (notificationPermissionState.canScheduleExactAlarms) {
+                        onRefreshNotificationPermissions
+                    } else {
+                        onRequestExactAlarmPermission
+                    },
+                )
+                PermissionActionRow(
+                    icon = Icons.Outlined.Notifications,
+                    title = "테스트 알림",
+                    description = "복용 알림 표시를 바로 확인합니다.",
+                    actionLabel = "보내기",
+                    onClick = onSendTestNotification,
+                )
+                PermissionActionRow(
+                    icon = Icons.Outlined.Alarm,
+                    title = "예약 테스트 알림",
+                    description = "15초 뒤 알림을 예약합니다.",
+                    actionLabel = "예약",
+                    onClick = onScheduleTestNotification,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun AppInfoCard(
+    onGuideClick: () -> Unit,
+    onDisclaimerClick: () -> Unit,
+) {
+    RoutineCard {
+        Column(modifier = Modifier.padding(vertical = 8.dp)) {
+            InfoActionRow(
+                icon = Icons.AutoMirrored.Outlined.HelpOutline,
+                title = "앱 사용 가이드",
+                onClick = onGuideClick,
+            )
+            InfoActionRow(
+                icon = Icons.Outlined.Info,
+                title = "면책 고지",
+                onClick = onDisclaimerClick,
+            )
+            StaticInfoRow(title = "버전", value = "1.0.0")
+        }
+    }
+}
+
+@Composable
+private fun DataResetCard(onClick: () -> Unit) {
+    RoutineCard {
+        DestructiveRow(
+            title = "데이터 초기화",
+            description = "등록한 영양제와 기록을 삭제합니다.",
+            onClick = onClick,
+        )
+    }
+}
+
+@Composable
 private fun PermissionActionRow(
     icon: ImageVector,
     title: String,
@@ -258,15 +437,11 @@ private fun PermissionActionRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 10.dp),
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-        )
+        RoutineIconBadge(icon = icon)
         Column(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -293,12 +468,7 @@ private fun SettingsCard(
     title: String,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Card(
-        colors = routineGlassCardColors(),
-        elevation = routineGlassCardElevation(),
-        border = routineGlassBorder(),
-        modifier = Modifier.routineGlassSheen(),
-    ) {
+    RoutineCard {
         Column(
             modifier = Modifier.padding(vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -328,11 +498,7 @@ private fun SettingsRow(
         horizontalArrangement = Arrangement.spacedBy(14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-        )
+        RoutineIconBadge(icon = icon)
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(
                 text = title,
@@ -393,20 +559,20 @@ private fun NotificationDefaultRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+            .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(
-                imageVector = Icons.Outlined.Notifications,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-            )
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            RoutineIconBadge(icon = Icons.Outlined.Notifications)
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
                 Text(
                     text = "새 영양제 알림 기본값",
                     style = MaterialTheme.typography.titleSmall,
@@ -439,13 +605,13 @@ private fun DestructiveRow(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(14.dp),
+                .padding(horizontal = 14.dp, vertical = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(
-                imageVector = Icons.Outlined.DeleteForever,
-                contentDescription = null,
+            RoutineIconBadge(
+                icon = Icons.Outlined.DeleteForever,
+                containerColor = MaterialTheme.colorScheme.errorContainer,
                 tint = MaterialTheme.colorScheme.error,
             )
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -478,15 +644,11 @@ private fun InfoActionRow(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(14.dp),
+                .padding(horizontal = 14.dp, vertical = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-            )
+            RoutineIconBadge(icon = icon)
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleSmall,
@@ -494,6 +656,33 @@ private fun InfoActionRow(
                 fontWeight = FontWeight.SemiBold,
             )
         }
+    }
+}
+
+@Composable
+private fun StaticInfoRow(
+    title: String,
+    value: String,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 14.dp, vertical = 10.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.SemiBold,
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontWeight = FontWeight.Bold,
+        )
     }
 }
 

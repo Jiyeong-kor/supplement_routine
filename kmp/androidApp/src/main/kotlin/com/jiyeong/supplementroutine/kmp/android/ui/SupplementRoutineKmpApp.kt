@@ -4,27 +4,32 @@ import android.Manifest
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Spa
-import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Spa
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,9 +42,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.jiyeong.supplementroutine.kmp.android.notification.AndroidNotificationPermissionController
@@ -89,32 +95,12 @@ fun SupplementRoutineKmpApp(
         }
     }
     val colorScheme = MaterialTheme.colorScheme
-    val glassHighlight = colorScheme.surface.copy(alpha = 0.72f)
-    val glassWarmTint = colorScheme.secondaryContainer.copy(alpha = 0.54f)
-    val glassCoolTint = colorScheme.tertiaryContainer.copy(alpha = 0.42f)
-    val navigationTopLine = colorScheme.outline.copy(alpha = 0.82f)
+    val navigationTopLine = colorScheme.outlineVariant
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(routineGlassBackground())
-            .drawBehind {
-                drawCircle(
-                    color = glassHighlight,
-                    radius = size.minDimension * 0.72f,
-                    center = Offset(size.width * 0.12f, size.height * 0.08f),
-                )
-                drawCircle(
-                    color = glassWarmTint,
-                    radius = size.minDimension * 0.64f,
-                    center = Offset(size.width * 0.92f, size.height * 0.28f),
-                )
-                drawCircle(
-                    color = glassCoolTint,
-                    radius = size.minDimension * 0.82f,
-                    center = Offset(size.width * 0.28f, size.height * 0.86f),
-                )
-            },
+            .background(colorScheme.background),
     ) {
         Scaffold(
             modifier = Modifier
@@ -122,9 +108,11 @@ fun SupplementRoutineKmpApp(
                 .safeDrawingPadding(),
             containerColor = Color.Transparent,
             bottomBar = {
-                NavigationBar(
+                Row(
                     modifier = Modifier
-                        .background(MaterialTheme.colorScheme.background)
+                        .fillMaxWidth()
+                        .height(72.dp)
+                        .background(MaterialTheme.colorScheme.surface)
                         .drawBehind {
                             drawLine(
                                 color = navigationTopLine,
@@ -133,8 +121,6 @@ fun SupplementRoutineKmpApp(
                                 strokeWidth = 1.dp.toPx(),
                             )
                         },
-                    containerColor = MaterialTheme.colorScheme.background,
-                    tonalElevation = NavigationBarDefaults.Elevation / 2,
                 ) {
                     DestinationItems(
                         selectedDestinationKey = selectedDestinationKey,
@@ -217,20 +203,6 @@ fun SupplementRoutineKmpApp(
 }
 
 @Composable
-private fun routineGlassBackground(): Brush {
-    val colorScheme = MaterialTheme.colorScheme
-    return Brush.verticalGradient(
-        colors = listOf(
-            colorScheme.background,
-            colorScheme.primaryContainer.copy(alpha = 0.82f),
-            colorScheme.tertiaryContainer.copy(alpha = 0.58f),
-            colorScheme.secondaryContainer.copy(alpha = 0.64f),
-            colorScheme.surfaceVariant.copy(alpha = 0.72f),
-        ),
-    )
-}
-
-@Composable
 private fun LoadingState(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier.fillMaxSize(),
@@ -250,7 +222,7 @@ private fun RowScope.DestinationItems(
     onDestinationSelected: (String) -> Unit,
 ) {
     val icons = listOf(
-        DestinationIcon(Icons.Filled.CheckCircle, Icons.Outlined.CheckCircle),
+        DestinationIcon(Icons.Filled.Home, Icons.Outlined.Home),
         DestinationIcon(Icons.Filled.Spa, Icons.Outlined.Spa),
         DestinationIcon(Icons.Filled.History, Icons.Outlined.History),
         DestinationIcon(Icons.Filled.Settings, Icons.Outlined.Settings),
@@ -258,17 +230,64 @@ private fun RowScope.DestinationItems(
 
     SupplementRoutineInfo.topLevelDestinations.forEachIndexed { index, destination ->
         val selected = destination.key == selectedDestinationKey
-        NavigationBarItem(
+        DestinationItem(
             selected = selected,
+            selectedIcon = icons[index].selected,
+            unselectedIcon = icons[index].unselected,
+            label = destination.koreanLabel,
             onClick = { onDestinationSelected(destination.key) },
-            icon = {
-                Icon(
-                    imageVector = if (selected) icons[index].selected else icons[index].unselected,
-                    contentDescription = destination.koreanLabel,
-                )
-            },
-            label = { Text(destination.koreanLabel) },
         )
+    }
+}
+
+@Composable
+private fun RowScope.DestinationItem(
+    selected: Boolean,
+    selectedIcon: ImageVector,
+    unselectedIcon: ImageVector,
+    label: String,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .weight(1f)
+            .selectable(
+                selected = selected,
+                onClick = onClick,
+                role = Role.Tab,
+            )
+            .padding(top = 8.dp, bottom = 7.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        androidx.compose.foundation.layout.Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Surface(
+                modifier = Modifier.size(width = 52.dp, height = 30.dp),
+                shape = CircleShape,
+                color = if (selected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
+                border = if (selected) null else BorderStroke(0.dp, Color.Transparent),
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = if (selected) selectedIcon else unselectedIcon,
+                        contentDescription = label,
+                        tint = if (selected) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        },
+                        modifier = Modifier.size(22.dp),
+                    )
+                }
+            }
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.Bold,
+            )
+        }
     }
 }
 

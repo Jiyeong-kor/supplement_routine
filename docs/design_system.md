@@ -47,29 +47,32 @@ Supplement Routine은 의료 조언 앱이 아니라 사용자가 직접 정한 
 
 ## 4. 컬러 시스템
 
-기존 보라/라벤더 중심 팔레트는 새 방향에서 제외합니다. 새 팔레트는 따뜻한 흰 배경, 베리/코랄 포인트, 민트 성공 상태, 짙은 잉크 텍스트를 사용합니다.
+기존 보라/라벤더 중심 팔레트는 새 방향에서 제외합니다. 2026-06 `Supplement Routine Release UI Handoff 1.0.0` 기준 팔레트는 warm paper 배경, hand-made fruit/flower avatar, seed/leaf progress, 선명한 berry blue, leaf green, flower red, egg yellow 포인트를 사용합니다.
 
 | 분류 | 토큰 | 값 | 용도 | 미리보기 |
 | --- | --- | --- | --- | --- |
-| Base | `AppColors.background` | `#FFFDF9` | 앱 배경 | ![Background](assets/colors/background.svg) |
-| Base | `AppColors.surface` | `#FFFFFF` | 카드, sheet, dialog | |
-| Base | `AppColors.surfaceSoft` | `#F7F8FA` | 낮은 강조 표면 | |
-| Text | `AppColors.ink` | `#20232B` | 주요 텍스트 | ![Ink](assets/colors/ink.svg) |
-| Text | `AppColors.inkSubtle` | `#667085` | 보조 텍스트 | |
-| Brand | `AppColors.seed` | `#E95E7B` | primary seed, 주요 CTA | ![Seed](assets/colors/seed.svg) |
-| Brand | `AppColors.primaryContainer` | `#FFE6EC` | 완료/선택 container | |
-| Brand | `AppColors.coral` | `#FF9A76` | 따뜻한 보조 accent | ![Coral](assets/colors/coral.svg) |
-| Status | `AppColors.success` | `#24B88A` | 복용 완료, 성공 상태 | ![Success](assets/colors/success.svg) |
-| Status | `AppColors.warning` | `#F5A524` | 주의, 권한 안내 | ![Warning](assets/colors/warning.svg) |
-| Status | `AppColors.error` | `#D6455D` | 삭제, 오류 | ![Error](assets/colors/error.svg) |
-| Line | `AppColors.outline` | `#E6E2DE` | 카드/입력 outline | |
+| Base | `GardenUi.WarmWhite` | `#F8F4EC` | 앱 배경 | ![Background](assets/colors/background.svg) |
+| Base | `GardenUi.Paper` | `#F2EBDD` | 낮은 강조 배경 | |
+| Base | `GardenUi.Surface` | `#FFFDF8` | 카드, sheet, dialog | |
+| Base | `GardenUi.SurfaceSoft` | `#FAF3E6` | pill, 검색, 낮은 강조 표면 | |
+| Brand | `GardenUi.MistBlue` | `#DDEAF1` | Today organic hero, 선택 indicator | |
+| Brand | `GardenUi.PrimaryBlue` | `#496DFF` | 주요 CTA, 기록 hero, 선택 navigation | ![Seed](assets/colors/seed.svg) |
+| Brand | `GardenUi.PrimaryBlueDark` | `#AEBBFF` | reverse/accent blue | |
+| Brand | `GardenUi.LeafGreen` | `#B9DE65` | 완료 체크, leaf progress | ![Success](assets/colors/success.svg) |
+| Brand | `GardenUi.LeafGreenDark` | `#5E7E2A` | active seed/leaf fill | |
+| Brand | `GardenUi.FlowerRed` | `#FF4A3D` | 삭제, 위험 상태, flower avatar | ![Error](assets/colors/error.svg) |
+| Brand | `GardenUi.Coral` | `#FF7A62` | 보조 경고 accent | |
+| Brand | `GardenUi.EggYellow` | `#F4C052` | 주의, egg flower avatar, 낮은 완료율 | ![Warning](assets/colors/warning.svg) |
+| Text | `GardenUi.Ink` | `#202124` | 주요 텍스트 | ![Ink](assets/colors/ink.svg) |
+| Text | `GardenUi.InkMuted` | `#5F5B53` | 보조 텍스트 | |
+| Line | `GardenUi.Line` | `#E7DDCC` | 카드/입력 outline | |
 
 컬러 사용 규칙:
 
 - Primary는 CTA와 중요한 완료 신호에만 사용합니다.
-- Coral은 보조 강조, warm chip, friendly highlight에 제한합니다.
-- Mint는 성공/완료 상태에 사용하되, primary와 경쟁하지 않게 합니다.
-- 배경은 따뜻하지만 beige 앱처럼 보이지 않도록 흰색과 차가운 surfaceSoft를 함께 사용합니다.
+- 과일/정원 장식은 정보 구조를 밀어내지 않는 leading avatar, empty state, hero 보조 요소로 제한합니다.
+- 완료 상태는 leaf green, check icon, text/semantics를 함께 사용합니다.
+- 배경은 warm paper 계열로 유지하고, 카드와 bottom navigation은 `#FFFDF8` surface로 분리합니다.
 - 상태 의미는 색상만으로 전달하지 않고 text, icon, semantics를 함께 사용합니다.
 
 ## 5. Typography
@@ -107,6 +110,8 @@ Supplement Routine은 의료 조언 앱이 아니라 사용자가 직접 정한 
 
 Layout 규칙:
 
+- Compact 화면의 horizontal padding은 20dp를 기본으로 합니다.
+- 공통 top bar 높이는 64dp, bottom navigation 높이는 72dp를 기준으로 합니다.
 - Compact phone은 bottom navigation을 기본으로 합니다.
 - expanded width에서는 navigation rail과 2-column layout을 검토합니다.
 - 본문 최대 폭은 일반 화면 `720dp`, 넓은 비교 화면 `1040dp`를 기준으로 합니다.
@@ -118,11 +123,11 @@ Layout 규칙:
 
 | 토큰 | 값 | 용도 |
 | --- | --- | --- |
-| `sm` | 8 | 작은 chip, badge |
-| `md` | 12 | icon button container, compact control |
-| `lg` | 16 | 카드, 입력창 |
-| `xl` | 20 | 강조 카드, bottom sheet content |
-| `xxl` | 24 | dialog, modal |
+| `xs` | 8 | 작은 chip, badge |
+| `sm` | 12 | compact control |
+| `md` | 20 | 입력, 일부 강조 surface |
+| `lg` | 28 | 카드, 진행 카드, bottom sheet content |
+| `xl` | 36 | dialog, modal, 큰 hero surface |
 | `pill` | 999 | CTA, 완료 badge, capsule chip |
 
 ## 8. Elevation과 Surface
