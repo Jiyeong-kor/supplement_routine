@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -29,6 +30,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,6 +57,7 @@ import com.jiyeong.supplementroutine.shared.domain.LocalDateValue
 import com.jiyeong.supplementroutine.shared.history.DailyHistorySummary
 import com.jiyeong.supplementroutine.shared.history.HistoryViewState
 import com.jiyeong.supplementroutine.shared.history.MissedIntakePeriod
+import kotlinx.coroutines.launch
 import java.util.Calendar
 
 @Composable
@@ -64,6 +67,8 @@ fun HistoryRoute(
     historyViewState: HistoryViewState,
     onOpenNotificationSettingsClick: () -> Unit,
 ) {
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
     var selectedDate by remember(today.year, today.month) {
         mutableStateOf(today)
     }
@@ -77,6 +82,7 @@ fun HistoryRoute(
     }
 
     LazyColumn(
+        state = listState,
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(
             start = 20.dp,
@@ -111,6 +117,11 @@ fun HistoryRoute(
         item {
             RoutinePatternCard(
                 summaries = historyViewState.recentSummaries,
+                onReviewRecentClick = {
+                    coroutineScope.launch {
+                        listState.animateScrollToItem(6)
+                    }
+                },
                 onOpenNotificationSettingsClick = onOpenNotificationSettingsClick,
             )
         }
@@ -297,6 +308,7 @@ private fun MonthDayTile(
 @Composable
 private fun RoutinePatternCard(
     summaries: List<DailyHistorySummary>,
+    onReviewRecentClick: () -> Unit,
     onOpenNotificationSettingsClick: () -> Unit,
 ) {
     val daysWithSchedule = summaries.filterNot { it.isEmpty }
@@ -341,6 +353,13 @@ private fun RoutinePatternCard(
                 fontWeight = FontWeight.Bold,
             )
             if (canOfferSettingsAction) {
+                RoutinePillButton(
+                    text = "최근 기록 먼저 보기",
+                    onClick = onReviewRecentClick,
+                    height = 34.dp,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = GardenUi.Ink,
+                )
                 RoutinePillButton(
                     text = "알림/식사 시간 조정",
                     onClick = onOpenNotificationSettingsClick,

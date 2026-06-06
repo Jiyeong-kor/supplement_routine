@@ -37,6 +37,7 @@ data class ParsedDosage(
 object SupplementFormPolicy {
     const val DEFAULT_DOSAGE_TEXT = "1"
     const val DEFAULT_UNIT = "정"
+    val primaryDosageUnits = listOf("정", "mg", "IU")
     val dosageUnits = listOf("정", "캡슐", "포", "방울", "mg", "g", "mcg", "IU", "ml")
 
     const val DEFAULT_COUNT = 1

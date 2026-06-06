@@ -265,6 +265,14 @@ private fun SupplementFormScreen(
     var validationErrorMessage by remember { mutableStateOf<String?>(null) }
     var saveFailureMessage by remember { mutableStateOf<String?>(null) }
     var isSaving by remember { mutableStateOf(false) }
+    var showMoreDosageUnits by remember(initialSupplement) {
+        mutableStateOf(
+            initialSupplement?.dosageUnit
+                ?.let(SupplementFormPolicy::normalizeDosageUnitForSelection)
+                ?.let { it !in SupplementFormPolicy.primaryDosageUnits }
+                ?: false,
+        )
+    }
 
     fun syncFixedTimes(count: Int) {
         fixedCount = count
@@ -386,13 +394,25 @@ private fun SupplementFormScreen(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
                             ) {
-                                SupplementFormPolicy.dosageUnits.forEach { unit ->
+                                val visibleDosageUnits = if (showMoreDosageUnits) {
+                                    SupplementFormPolicy.dosageUnits
+                                } else {
+                                    SupplementFormPolicy.primaryDosageUnits
+                                }
+                                visibleDosageUnits.forEach { unit ->
                                     FilterChip(
                                         selected = dosageUnit == unit,
                                         onClick = { dosageUnit = unit },
                                         label = { Text(unit) },
                                     )
                                 }
+                                FilterChip(
+                                    selected = showMoreDosageUnits,
+                                    onClick = { showMoreDosageUnits = !showMoreDosageUnits },
+                                    label = {
+                                        Text(if (showMoreDosageUnits) "간단히" else "더보기")
+                                    },
+                                )
                             }
                         }
                     }

@@ -126,6 +126,7 @@ private fun TodayScreen(
     val completedItems = sortedItems.filter { it.record.isDone }
     val shouldShowCompletedItems = showCompletedItems
     val shouldShowCompletedItemUndoLabels = completedItems.size <= 2
+    val allItemsCompleted = items.isNotEmpty() && incompleteItems.isEmpty()
     val nextItem = sortedItems.firstOrNull { !it.record.isDone }
     val listState = rememberLazyListState()
     val willShowFeedback = completionFeedback != null || feedbackMessage != null
@@ -260,13 +261,23 @@ private fun TodayScreen(
                         RoutinePillButton(
                             text = if (shouldShowCompletedItems) {
                                 "완료한 복용 접기"
+                            } else if (allItemsCompleted) {
+                                "오늘 완료한 복용 보기"
                             } else {
                                 "완료한 복용 ${completedItems.size}개 보기"
                             },
                             onClick = { showCompletedItems = !showCompletedItems },
-                            height = 38.dp,
-                            containerColor = GardenUi.SurfaceSoft,
-                            contentColor = GardenUi.Ink,
+                            height = if (allItemsCompleted && !shouldShowCompletedItems) 42.dp else 38.dp,
+                            containerColor = if (allItemsCompleted && !shouldShowCompletedItems) {
+                                GardenUi.SuccessSurface
+                            } else {
+                                GardenUi.SurfaceSoft
+                            },
+                            contentColor = if (allItemsCompleted && !shouldShowCompletedItems) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                GardenUi.Ink
+                            },
                         )
                     }
                     if (shouldShowCompletedItems) {

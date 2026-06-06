@@ -49,6 +49,7 @@ import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineSectionLabel
 import com.jiyeong.supplementroutine.kmp.android.notification.NotificationPermissionState
 import com.jiyeong.supplementroutine.shared.domain.MealTimeSettings
 import com.jiyeong.supplementroutine.shared.domain.TimeOfDayValue
+import kotlinx.coroutines.delay
 
 @Composable
 fun SettingsRoute(
@@ -72,6 +73,7 @@ fun SettingsRoute(
     var dialog by remember { mutableStateOf<SettingsDialog?>(null) }
     var mealTimesEditing by remember { mutableStateOf(false) }
     var draftMealTimeSettings by remember { mutableStateOf(mealTimeSettings) }
+    var resetFeedbackVisible by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
 
     LaunchedEffect(mealTimeSettings, mealTimesEditing) {
@@ -83,6 +85,13 @@ fun SettingsRoute(
     LaunchedEffect(expandNotificationTroubleshooting) {
         if (expandNotificationTroubleshooting) {
             listState.animateScrollToItem(3)
+        }
+    }
+
+    LaunchedEffect(resetFeedbackVisible) {
+        if (resetFeedbackVisible) {
+            delay(2400)
+            resetFeedbackVisible = false
         }
     }
 
@@ -104,6 +113,11 @@ fun SettingsRoute(
                     title = "설정",
                     subtitle = "루틴 기준과 알림을 조정해요",
                 )
+            }
+            if (resetFeedbackVisible) {
+                item(key = "reset-feedback") {
+                    ResetFeedbackCard()
+                }
             }
             item(key = "meal-section") {
                 RoutineSectionLabel(title = "식사 시간")
@@ -190,6 +204,7 @@ fun SettingsRoute(
             onDismiss = { dialog = null },
             onConfirm = {
                 onResetRoutineData()
+                resetFeedbackVisible = true
                 dialog = null
             },
         )
@@ -780,6 +795,23 @@ private enum class SettingsDialog {
     TestNotificationSent,
     TestNotificationBlocked,
     TestNotificationScheduled,
+}
+
+@Composable
+private fun ResetFeedbackCard() {
+    RoutineCard(
+        colors = androidx.compose.material3.CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+        ),
+    ) {
+        Text(
+            text = "데이터를 초기화했어요.",
+            modifier = Modifier.padding(16.dp),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            fontWeight = FontWeight.Bold,
+        )
+    }
 }
 
 private fun TimeOfDayValue.plusMinutes(minutes: Int): TimeOfDayValue {
