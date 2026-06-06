@@ -127,8 +127,26 @@ private fun TodayScreen(
     val shouldShowCompletedItems = showCompletedItems
     val nextItem = sortedItems.firstOrNull { !it.record.isDone }
     val listState = rememberLazyListState()
-    val highlightedIncompleteIndex = incompleteItems.indexOfFirst { it.supplement.id == highlightedSupplementId }
     val willShowFeedback = completionFeedback != null || feedbackMessage != null
+    val highlightedItemKey = incompleteItems
+        .firstOrNull { it.supplement.id == highlightedSupplementId }
+        ?.record
+        ?.id
+        ?.let { id -> "intake-$id" }
+    val renderedItemKeys = buildList {
+        add("today-header")
+        add("today-progress")
+        if (notificationNeedsAttention && !notificationAttentionDismissed) add("notification-attention")
+        if (willShowFeedback) add("completion-feedback")
+        if (errorMessage != null) add("error-message")
+        add("routine-section")
+        incompleteItems.forEach { item -> add("intake-${item.record.id}") }
+        if (completedItems.isNotEmpty()) add("completed-toggle")
+        if (shouldShowCompletedItems) {
+            completedItems.forEach { item -> add("done-${item.record.id}") }
+        }
+    }
+    val highlightedItemIndex = highlightedItemKey?.let(renderedItemKeys::indexOf) ?: -1
 
     LaunchedEffect(feedbackMessage) {
         feedbackMessage?.let {
@@ -146,12 +164,8 @@ private fun TodayScreen(
 
     LaunchedEffect(highlightedSupplementId) {
         if (highlightedSupplementId != null) {
-            if (highlightedIncompleteIndex >= 0) {
-                val leadingItems = 3 +
-                    if (notificationNeedsAttention && !notificationAttentionDismissed) 1 else 0 +
-                    if (willShowFeedback) 1 else 0 +
-                    if (errorMessage != null) 1 else 0
-                listState.animateScrollToItem(leadingItems + highlightedIncompleteIndex)
+            if (highlightedItemIndex >= 0) {
+                listState.animateScrollToItem(highlightedItemIndex)
             }
             delay(3600)
             onHighlightedSupplementConsumed()
@@ -171,10 +185,10 @@ private fun TodayScreen(
             ),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            item {
+            item(key = "today-header") {
                 TodayHeader(date = date)
             }
-            item {
+            item(key = "today-progress") {
                 TodayProgressCard(
                     done = items.count { it.record.isDone },
                     total = items.size,
@@ -182,7 +196,7 @@ private fun TodayScreen(
                 )
             }
             if (notificationNeedsAttention && !notificationAttentionDismissed) {
-                item {
+                item(key = "notification-attention") {
                     NotificationAttentionCard(
                         onOpenSettingsClick = onOpenNotificationSettingsClick,
                         onDismissClick = onDismissNotificationAttention,
@@ -190,7 +204,7 @@ private fun TodayScreen(
                 }
             }
             completionFeedback?.let { feedback ->
-                item {
+                item(key = "completion-feedback") {
                     CompletionFeedbackCard(
                         message = feedback.message,
                         actionLabel = feedback.actionLabel,
@@ -204,9 +218,9 @@ private fun TodayScreen(
                 }
             }
             errorMessage?.let { message ->
-                item { ErrorCard(message = message) }
+                item(key = "error-message") { ErrorCard(message = message) }
             }
-            item {
+            item(key = "routine-section") {
                 RoutineSectionLabel(
                     title = "복용 목록",
                     trailing = "${items.count { it.record.isDone }}/${items.size}",
@@ -217,7 +231,7 @@ private fun TodayScreen(
             } else {
                 items(
                     items = incompleteItems,
-                    key = { it.record.id },
+                    key = { "intake-${it.record.id}" },
                 ) { item ->
                     TodaySupplementItem(
                         item = item,
@@ -239,7 +253,7 @@ private fun TodayScreen(
                     )
                 }
                 if (completedItems.isNotEmpty()) {
-                    item {
+                    item(key = "completed-toggle") {
                         RoutinePillButton(
                             text = if (shouldShowCompletedItems) {
                                 "완료한 복용 접기"
