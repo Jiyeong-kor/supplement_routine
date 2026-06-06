@@ -500,11 +500,24 @@ private fun TodaySupplementItem(
                     )
                 }
             }
-            RoutineCheckButton(
-                checked = record.isDone,
-                modifier = Modifier.clickable(role = Role.Checkbox, onClick = onClick),
-                contentDescription = statusText,
-            )
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clickable(role = Role.Checkbox, onClick = onClick)
+                    .semantics {
+                        contentDescription = if (record.isDone) {
+                            "${supplement.name}, 완료됨, 되돌리기"
+                        } else {
+                            "${supplement.name}, 미완료, 완료로 표시"
+                        }
+                    },
+                contentAlignment = Alignment.Center,
+            ) {
+                RoutineCheckButton(
+                    checked = record.isDone,
+                    contentDescription = statusText,
+                )
+            }
         }
     }
 }
