@@ -1,6 +1,5 @@
 package com.jiyeong.supplementroutine.kmp.android.ui.today
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,40 +7,35 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.EventAvailable
-import androidx.compose.material.icons.outlined.RadioButtonUnchecked
-import androidx.compose.material3.Card
+import androidx.compose.material.icons.outlined.Spa
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.jiyeong.supplementroutine.shared.domain.IntakeRecord
 import com.jiyeong.supplementroutine.shared.domain.LocalDateValue
@@ -50,11 +44,18 @@ import com.jiyeong.supplementroutine.shared.scheduling.ScheduledIntakeRecord
 import com.jiyeong.supplementroutine.kmp.android.ui.common.formatDosage
 import com.jiyeong.supplementroutine.kmp.android.ui.common.formatHourMinute
 import com.jiyeong.supplementroutine.kmp.android.ui.common.formatTime
-import com.jiyeong.supplementroutine.kmp.android.ui.common.routineGlassBorder
-import com.jiyeong.supplementroutine.kmp.android.ui.common.routineGlassCardColors
-import com.jiyeong.supplementroutine.kmp.android.ui.common.routineGlassCardElevation
-import com.jiyeong.supplementroutine.kmp.android.ui.common.routineGlassSheen
+import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineCard
+import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineCheckButton
+import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineFab
+import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineIconBadge
+import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineMetaChip
+import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutinePageHeader
+import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutinePillButton
+import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineProgressLeaves
+import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineSectionLabel
 import com.jiyeong.supplementroutine.kmp.android.ui.common.scheduleLabelText
+import com.jiyeong.supplementroutine.kmp.android.ui.common.GardenUi
+import kotlinx.coroutines.delay
 import java.util.Calendar
 
 @Composable
@@ -85,14 +86,30 @@ private fun TodayScreen(
     onAddSupplementClick: () -> Unit,
     onToggleRecord: (IntakeRecord) -> Unit,
 ) {
+    var completionMessage by remember { mutableStateOf<String?>(null) }
+    val sortedItems = remember(items) {
+        items.sortedWith(
+            compareBy<ScheduledIntakeRecord> { it.record.isDone }
+                .thenBy { it.record.scheduledTime.hour }
+                .thenBy { it.record.scheduledTime.minute },
+        )
+    }
+    val nextItem = sortedItems.firstOrNull { !it.record.isDone }
+
+    LaunchedEffect(completionMessage) {
+        if (completionMessage != null) {
+            delay(2200)
+            completionMessage = null
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier
-                .fillMaxSize()
-                .windowInsetsPadding(WindowInsets.statusBars),
+                .fillMaxSize(),
             contentPadding = PaddingValues(
                 start = 20.dp,
-                top = 20.dp,
+                top = 16.dp,
                 end = 20.dp,
                 bottom = contentPadding.calculateBottomPadding() + 104.dp,
             ),
@@ -105,57 +122,61 @@ private fun TodayScreen(
                 TodayProgressCard(
                     done = items.count { it.record.isDone },
                     total = items.size,
+                    nextItem = nextItem,
                 )
+            }
+            completionMessage?.let { message ->
+                item { CompletionFeedbackCard(message = message) }
             }
             errorMessage?.let { message ->
                 item { ErrorCard(message = message) }
             }
             item {
-                Text(
-                    text = "복용 목록",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.SemiBold,
+                RoutineSectionLabel(
+                    title = "복용 목록",
+                    trailing = "${items.count { it.record.isDone }}/${items.size}",
                 )
             }
             if (items.isEmpty()) {
-                item { TodayEmptyState() }
+                item { TodayEmptyState(onAddSupplementClick = onAddSupplementClick) }
             } else {
                 items(
-                    items = items,
+                    items = sortedItems,
                     key = { it.record.id },
                 ) { item ->
                     TodaySupplementItem(
                         item = item,
-                        onClick = { onToggleRecord(item.record) },
+                        onClick = {
+                            if (!item.record.isDone) {
+                                completionMessage = "${item.supplement.name} 기록에 반영됐어요."
+                            }
+                            onToggleRecord(item.record)
+                        },
                     )
                 }
             }
         }
 
-        FloatingActionButton(
+        RoutineFab(
             onClick = onAddSupplementClick,
+            icon = Icons.Filled.Add,
+            contentDescription = "영양제 추가 화면으로 이동",
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(
                     end = 20.dp,
                     bottom = contentPadding.calculateBottomPadding() + 16.dp,
                 ),
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Add,
-                contentDescription = "영양제 추가 화면으로 이동",
-            )
-        }
+        )
     }
 }
 
 @Composable
 private fun ErrorCard(message: String) {
-    Card(
+    RoutineCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.errorContainer,
         ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
     ) {
         Text(
             text = message,
@@ -168,82 +189,78 @@ private fun ErrorCard(message: String) {
 
 @Composable
 private fun TodayHeader(date: LocalDateValue) {
-    val quotes = listOf(
-        "복용 후 바로 체크하면 오늘 기록이 더 정확해집니다.",
-        "복용 시간을 고정하면 루틴을 확인하기 쉽습니다.",
-        "오늘 복용할 항목을 확인하고 완료 여부를 기록해보세요.",
+    RoutinePageHeader(
+        title = "오늘 루틴",
+        eyebrow = "${date.year}년 ${date.month}월 ${date.day}일 ${weekdayLabel()}요일",
     )
-    val quoteText = quotes[date.day % quotes.size]
-
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Surface(
-            shape = CircleShape,
-            color = MaterialTheme.colorScheme.primaryContainer,
-        ) {
-            Text(
-                text = "${date.year}년 ${date.month}월 ${date.day}일 ${weekdayLabel()}요일",
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Bold,
-            )
-        }
-        Text(
-            text = quoteText,
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.SemiBold,
-            lineHeight = MaterialTheme.typography.headlineSmall.lineHeight,
-        )
-    }
 }
 
 @Composable
-private fun TodayProgressCard(done: Int, total: Int) {
+private fun TodayProgressCard(
+    done: Int,
+    total: Int,
+    nextItem: ScheduledIntakeRecord?,
+) {
     val percent = if (total == 0) 0f else done.toFloat() / total.toFloat()
+    val title = when {
+        total == 0 -> "오늘 복용 일정 없음"
+        nextItem == null -> "오늘 루틴 완료"
+        else -> "다음 복용"
+    }
+    val nextText = when {
+        total == 0 -> "영양제를 등록하면 일정이 여기에 보여요"
+        nextItem == null -> "오늘 남은 복용이 없습니다"
+        else -> "${formatTime(nextItem.record.scheduledTime)} · ${nextItem.supplement.name}"
+    }
 
-    Card(
-        colors = routineGlassCardColors(),
-        elevation = routineGlassCardElevation(),
-        border = routineGlassBorder(),
-        modifier = Modifier.routineGlassSheen(),
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(116.dp),
+        shape = MaterialTheme.shapes.extraLarge,
+        color = GardenUi.MistBlue,
+        tonalElevation = 0.dp,
     ) {
-        Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Bottom,
-            ) {
-                Column {
-                    Text(
-                        text = "오늘의 루틴",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "$done / $total 완료",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "${(percent * 100).toInt()}%",
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold,
+                    text = title,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = GardenUi.Ink,
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = nextText,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = GardenUi.Ink,
+                    fontWeight = FontWeight.ExtraBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "$done / $total 완료",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = GardenUi.InkMuted,
                 )
             }
-            LinearProgressIndicator(
-                progress = { percent },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(8.dp)
-                    .clip(CircleShape),
-                trackColor = MaterialTheme.colorScheme.primaryContainer,
-            )
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                Text(
+                    text = "${(percent * 100).toInt()}%",
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = GardenUi.Ink,
+                    fontWeight = FontWeight.ExtraBold,
+                )
+                RoutineProgressLeaves(done = done, total = total)
+            }
         }
     }
 }
@@ -257,17 +274,14 @@ private fun TodaySupplementItem(
     val supplement = item.supplement
     val statusText = if (record.isDone) "완료됨" else "미완료"
 
-    Card(
-        colors = routineGlassCardColors(
+    RoutineCard(
+        colors = CardDefaults.cardColors(
             containerColor = if (record.isDone) {
                 MaterialTheme.colorScheme.surfaceContainerHighest
             } else {
                 MaterialTheme.colorScheme.surface
             },
         ),
-        elevation = routineGlassCardElevation(),
-        border = routineGlassBorder(),
-        modifier = Modifier.routineGlassSheen(),
     ) {
         Row(
             modifier = Modifier
@@ -276,14 +290,14 @@ private fun TodaySupplementItem(
                 .semantics {
                     contentDescription = "${supplement.name}, ${formatTime(record.scheduledTime)}, $statusText"
                 }
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                .padding(14.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.Top,
         ) {
-            TimeBadge(time = record.scheduledTime)
+            TimeBadge(time = record.scheduledTime, isDone = record.isDone)
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 Text(
                     text = supplement.name,
@@ -296,8 +310,9 @@ private fun TodaySupplementItem(
                     fontWeight = FontWeight.SemiBold,
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    MetaChip(text = scheduleLabelText(item.label))
-                    MetaChip(text = "${formatDosage(supplement.dosageValue)} ${supplement.dosageUnit}")
+                    RoutineMetaChip(text = formatTime(record.scheduledTime))
+                    RoutineMetaChip(text = scheduleLabelText(item.label))
+                    RoutineMetaChip(text = "${formatDosage(supplement.dosageValue)} ${supplement.dosageUnit}")
                 }
                 supplement.memo?.let { memo ->
                     Text(
@@ -307,33 +322,26 @@ private fun TodaySupplementItem(
                     )
                 }
             }
-            Icon(
-                imageVector = if (record.isDone) {
-                    Icons.Filled.CheckCircle
-                } else {
-                    Icons.Outlined.RadioButtonUnchecked
-                },
+            RoutineCheckButton(
+                checked = record.isDone,
                 contentDescription = statusText,
-                tint = if (record.isDone) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.outline
-                },
-                modifier = Modifier.size(28.dp),
             )
         }
     }
 }
 
 @Composable
-private fun TimeBadge(time: TimeOfDayValue) {
+private fun TimeBadge(time: TimeOfDayValue, isDone: Boolean) {
     Surface(
-        modifier = Modifier.size(width = 64.dp, height = 64.dp),
-        shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.secondaryContainer,
+        modifier = Modifier.size(width = 58.dp, height = 52.dp),
+        shape = MaterialTheme.shapes.medium,
+        color = if (isDone) {
+            MaterialTheme.colorScheme.primaryContainer
+        } else {
+            MaterialTheme.colorScheme.surfaceContainerHighest
+        },
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 10.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
@@ -345,7 +353,7 @@ private fun TimeBadge(time: TimeOfDayValue) {
             )
             Text(
                 text = formatHourMinute(time),
-                style = MaterialTheme.typography.labelLarge,
+                style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
             )
@@ -354,51 +362,62 @@ private fun TimeBadge(time: TimeOfDayValue) {
 }
 
 @Composable
-private fun MetaChip(text: String) {
-    Surface(
-        shape = CircleShape,
-        color = MaterialTheme.colorScheme.primaryContainer,
+private fun CompletionFeedbackCard(message: String) {
+    RoutineCard(
+        colors = CardDefaults.cardColors(containerColor = GardenUi.SuccessSurface),
     ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.primary,
-        )
+        Row(
+            modifier = Modifier.padding(14.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            RoutineIconBadge(
+                icon = Icons.Outlined.EventAvailable,
+                containerColor = GardenUi.LeafGreen,
+                tint = GardenUi.Ink,
+            )
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Bold,
+            )
+        }
     }
 }
 
 @Composable
-private fun TodayEmptyState() {
-    Card(
-        colors = routineGlassCardColors(),
-        elevation = routineGlassCardElevation(),
-        border = routineGlassBorder(),
-        modifier = Modifier.routineGlassSheen(),
-    ) {
+private fun TodayEmptyState(onAddSupplementClick: () -> Unit) {
+    RoutineCard {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 32.dp),
+                .padding(horizontal = 18.dp, vertical = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Icon(
-                imageVector = Icons.Outlined.EventAvailable,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.outline,
-                modifier = Modifier.size(36.dp),
+            RoutineIconBadge(
+                icon = Icons.Outlined.Spa,
+                modifier = Modifier.size(56.dp),
+                containerColor = GardenUi.MistBlue,
+                tint = GardenUi.PrimaryBlue,
             )
             Text(
-                text = "등록된 복용 일정이 없습니다",
+                text = "첫 영양제를 추가해볼까요?",
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
+                fontWeight = FontWeight.Bold,
             )
             Text(
-                text = "오른쪽 아래 + 버튼으로 영양제 화면으로 이동해 등록해보세요.",
-                textAlign = TextAlign.Center,
+                text = "비타민 D처럼 매일 먹는 항목부터 등록해보세요.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            RoutinePillButton(
+                text = "첫 영양제 추가하기",
+                icon = Icons.Filled.Add,
+                onClick = onAddSupplementClick,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
             )
         }
     }

@@ -41,6 +41,9 @@ object SupplementFormPolicy {
     const val MAX_INTERVAL_HOURS = 24
     const val DEFAULT_INTERVAL_HOURS = 8
     val defaultTime = TimeOfDayValue(hour = 8, minute = 0)
+    val defaultRoutineSlots = setOf(
+        IntakeSlot(mealType = MealType.Breakfast, condition = IntakeCondition.AfterMeal),
+    )
 
     val routineSlots = listOf(
         IntakeSlot(condition = IntakeCondition.Fasting),
