@@ -91,7 +91,7 @@ Windows PowerShell:
 
 ```powershell
 $repo="Jiyeong-kor/supplement_routine"
-$keystore="<local-secure-path>"
+$keystore="<local-upload-keystore-path>"
 [Convert]::ToBase64String([IO.File]::ReadAllBytes($keystore)) | gh secret set ANDROID_KEYSTORE_BASE64 --repo $repo
 gh secret set ANDROID_KEYSTORE_PASSWORD --repo $repo
 gh secret set ANDROID_KEY_PASSWORD --repo $repo
@@ -102,7 +102,8 @@ macOS/Linux:
 
 ```bash
 repo="Jiyeong-kor/supplement_routine"
-base64 < /secure/android/upload-keystore.jks | tr -d '\n' | gh secret set ANDROID_KEYSTORE_BASE64 --repo "$repo"
+LOCAL_UPLOAD_KEYSTORE_PATH="<local-upload-keystore-path>"
+base64 < "$LOCAL_UPLOAD_KEYSTORE_PATH" | tr -d '\n' | gh secret set ANDROID_KEYSTORE_BASE64 --repo "$repo"
 gh secret set ANDROID_KEYSTORE_PASSWORD --repo "$repo"
 gh secret set ANDROID_KEY_PASSWORD --repo "$repo"
 gh secret set ANDROID_KEY_ALIAS --repo "$repo"
@@ -114,8 +115,8 @@ Windows PowerShell:
 
 ```powershell
 $repo="Jiyeong-kor/supplement_routine"
-$certificate="<local-secure-path>"
-$profile="<local-secure-path>"
+$certificate="<local-ios-distribution-certificate-path>"
+$profile="<local-ios-provisioning-profile-path>"
 [Convert]::ToBase64String([IO.File]::ReadAllBytes($certificate)) | gh secret set IOS_CERTIFICATE_BASE64 --repo $repo
 [Convert]::ToBase64String([IO.File]::ReadAllBytes($profile)) | gh secret set IOS_PROVISIONING_PROFILE_BASE64 --repo $repo
 gh secret set IOS_CERTIFICATE_PASSWORD --repo $repo
@@ -127,8 +128,10 @@ macOS/Linux:
 
 ```bash
 repo="Jiyeong-kor/supplement_routine"
-base64 < /secure/ios/distribution.p12 | tr -d '\n' | gh secret set IOS_CERTIFICATE_BASE64 --repo "$repo"
-base64 < /secure/ios/profile.mobileprovision | tr -d '\n' | gh secret set IOS_PROVISIONING_PROFILE_BASE64 --repo "$repo"
+LOCAL_IOS_DISTRIBUTION_CERTIFICATE_PATH="<local-ios-distribution-certificate-path>"
+LOCAL_IOS_PROVISIONING_PROFILE_PATH="<local-ios-provisioning-profile-path>"
+base64 < "$LOCAL_IOS_DISTRIBUTION_CERTIFICATE_PATH" | tr -d '\n' | gh secret set IOS_CERTIFICATE_BASE64 --repo "$repo"
+base64 < "$LOCAL_IOS_PROVISIONING_PROFILE_PATH" | tr -d '\n' | gh secret set IOS_PROVISIONING_PROFILE_BASE64 --repo "$repo"
 gh secret set IOS_CERTIFICATE_PASSWORD --repo "$repo"
 gh secret set IOS_TEAM_ID --repo "$repo"
 gh secret set IOS_BUNDLE_IDENTIFIER --repo "$repo"
@@ -154,18 +157,19 @@ After finding the successful run id, download the artifacts.
 Windows PowerShell:
 
 ```powershell
-gh run download RUN_ID --repo Jiyeong-kor/supplement_routine --name kmp-android-release --dir <local-path>
-gh run download RUN_ID --repo Jiyeong-kor/supplement_routine --name kmp-ios-xcarchive-tar --dir <local-path>
-gh run download RUN_ID --repo Jiyeong-kor/supplement_routine --name kmp-ios-ipa --dir <local-path>
+gh run download RUN_ID --repo Jiyeong-kor/supplement_routine --name kmp-android-release --dir <local-artifact-download-dir>
+gh run download RUN_ID --repo Jiyeong-kor/supplement_routine --name kmp-ios-xcarchive-tar --dir <local-artifact-download-dir>
+gh run download RUN_ID --repo Jiyeong-kor/supplement_routine --name kmp-ios-ipa --dir <local-artifact-download-dir>
 ```
 
 macOS/Linux:
 
 ```bash
-mkdir -p /tmp/release-artifacts
-gh run download RUN_ID --repo Jiyeong-kor/supplement_routine --name kmp-android-release --dir /tmp/release-artifacts
-gh run download RUN_ID --repo Jiyeong-kor/supplement_routine --name kmp-ios-xcarchive-tar --dir /tmp/release-artifacts
-gh run download RUN_ID --repo Jiyeong-kor/supplement_routine --name kmp-ios-ipa --dir /tmp/release-artifacts
+LOCAL_ARTIFACT_DOWNLOAD_DIR="<local-artifact-download-dir>"
+mkdir -p "$LOCAL_ARTIFACT_DOWNLOAD_DIR"
+gh run download RUN_ID --repo Jiyeong-kor/supplement_routine --name kmp-android-release --dir "$LOCAL_ARTIFACT_DOWNLOAD_DIR"
+gh run download RUN_ID --repo Jiyeong-kor/supplement_routine --name kmp-ios-xcarchive-tar --dir "$LOCAL_ARTIFACT_DOWNLOAD_DIR"
+gh run download RUN_ID --repo Jiyeong-kor/supplement_routine --name kmp-ios-ipa --dir "$LOCAL_ARTIFACT_DOWNLOAD_DIR"
 ```
 
 Record the artifact verification result as a comment on #67.

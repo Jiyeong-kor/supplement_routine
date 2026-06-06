@@ -7,7 +7,7 @@
 최신 Android 제출 후보:
 
 ```text
-<local-path><release-run-artifact-dir>\bundle\release\androidApp-release.aab
+GitHub Actions `KMP Release` run `27008729353`의 `kmp-android-release` artifact 안에 있는 `bundle/release/androidApp-release.aab`
 ```
 
 검증:

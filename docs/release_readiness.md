@@ -24,9 +24,9 @@
 | KMP Android release signing fallback | 통과 | `kmp/key.properties`가 없을 때 debug signing config로 `:androidApp:assembleRelease` 성공 |
 | KMP Android release APK install | 통과 | Galaxy A31 `SM-A315N`, Android 12(API 31)에 기존 Flutter 앱 승계 package `com.jiyeong.supplement_routine`으로 `androidApp-release.apk` 설치 성공 |
 | KMP Android release launch smoke | 통과 | Galaxy A31에서 `com.jiyeong.supplement_routine/com.jiyeong.supplementroutine.kmp.android.MainActivity` foreground 실행 확인 |
-| KMP Android glass UI screenshot QA | 통과 | API 36 emulator에서 재조정된 glass surface screenshot 확인: `<local-path>` |
-| KMP Android phone screenshot QA | 통과 | API 36 emulator phone size에서 Today/Supplements/History/Settings 캡처 확인. Today empty state, FAB, bottom navigation 겹침 없음. 화면: `<local-path>`, `<local-path>`, `<local-path>`, `<local-path>` |
-| KMP Android expanded-width screenshot QA | 통과 | API 36 emulator `wm size 1920x1280`, density `320`에서 Today/History/Settings 캡처 확인. History 월간 기록과 bottom navigation 겹침을 발견해 bottom navigation background를 불투명 surface로 보강. 수정 후 화면: `<local-path>` |
+| KMP Android glass UI screenshot QA | 통과 | API 36 emulator에서 재조정된 glass surface screenshot 증거 확인됨 |
+| KMP Android phone screenshot QA | 통과 | API 36 emulator phone size에서 Today/Supplements/History/Settings 캡처 확인. Today empty state, FAB, bottom navigation 겹침 없음. 스크린샷 증거 확인됨 |
+| KMP Android expanded-width screenshot QA | 통과 | API 36 emulator `wm size 1920x1280`, density `320`에서 Today/History/Settings 캡처 확인. History 월간 기록과 bottom navigation 겹침을 발견해 bottom navigation background를 불투명 surface로 보강. 수정 후 스크린샷 증거 확인됨 |
 | KMP Android accessibility label QA | 통과 | Today checklist row는 코드상 `${supplement.name}, ${formatTime(record.scheduledTime)}, 완료됨/미완료` semantics 제공. 현재 QA 데이터는 empty state라 row 미노출. History calendar tile은 UI dump에서 `1일, 일정 없음`, `5일, 일정 없음`처럼 날짜와 상태를 content description으로 제공 |
 | KMP Android physical install | 통과 | Galaxy A31 `SM-A315N`, Android 12(API 31)에 `com.jiyeong.supplement_routine` release APK 설치 성공 |
 | KMP Android physical launch smoke | 통과 | Galaxy A31에서 `com.jiyeong.supplement_routine/com.jiyeong.supplementroutine.kmp.android.MainActivity` foreground 실행 확인 |
@@ -35,11 +35,11 @@
 | KMP Android app label | 구성됨 | 사용자 표시명은 `영양제 루틴`으로 설정. 내부 KMP 표기는 launcher label에 노출하지 않음 |
 | KMP Android backup/data extraction rules | 구성됨 | `backup_rules.xml`, `data_extraction_rules.xml`을 manifest에 연결해 shared preferences와 DataStore 루틴 데이터를 cloud backup/device transfer 대상으로 명시 |
 | KMP Android notification app-op | 확인됨 | API 36 emulator에서 `POST_NOTIFICATION` default mode allow, package permission granted |
-| KMP Android notification runtime permission dialog | 통과 | API 36 emulator에서 `POST_NOTIFICATIONS` 사용자 플래그 초기화 후 Settings `권한 요청` 실행. 시스템 `GrantPermissionsActivity`가 `Allow 영양제 루틴 to send you notifications?` 다이얼로그와 `Allow`/`Don’t allow` 버튼 표시. 거부 후 `POST_NOTIFICATION: ignore`, 허용 후 `granted=true` 확인. 화면: `<local-path>` |
-| KMP Android notification display smoke | 통과 | API 36 emulator Settings 테스트 알림 전송 후 `dumpsys notification`에서 `id=4901`, channel `supplement_reminders`, title `테스트 알림 복용 시간` 확인. 화면: `<local-path>` |
+| KMP Android notification runtime permission dialog | 통과 | API 36 emulator에서 `POST_NOTIFICATIONS` 사용자 플래그 초기화 후 Settings `권한 요청` 실행. 시스템 `GrantPermissionsActivity`가 `Allow 영양제 루틴 to send you notifications?` 다이얼로그와 `Allow`/`Don’t allow` 버튼 표시. 거부 후 `POST_NOTIFICATION: ignore`, 허용 후 `granted=true` 확인. 스크린샷 증거 확인됨 |
+| KMP Android notification display smoke | 통과 | API 36 emulator Settings 테스트 알림 전송 후 `dumpsys notification`에서 `id=4901`, channel `supplement_reminders`, title `테스트 알림 복용 시간` 확인. 스크린샷 증거 확인됨 |
 | KMP Android scheduled notification smoke | 통과 | API 36 emulator Settings 예약 테스트 알림 실행 후 15초 뒤 `dumpsys notification`에서 `id=44588649`, channel `supplement_reminders` 확인. 즉시 알림 `id=4901`과 함께 app group에 묶임 |
 | KMP Android exact alarm permission | 확인됨 | Galaxy A31 Android 12에서 `SCHEDULE_EXACT_ALARM` granted, app-op default |
-| KMP Android exact alarm settings/fallback | 통과 | API 36 emulator에서 `Alarms & reminders` 시스템 설정 화면 이동 확인. 앱 `영양제 루틴`의 `Allow setting alarms and reminders` 토글은 unchecked. 권한이 없어도 Settings 예약 테스트 알림이 `SupplementReminderReceiver`를 통해 발화했고, `AlarmManager.setAndAllowWhileIdle`/`set` fallback으로 근처 시간 알림 예약 확인. 화면: `<local-path>` |
+| KMP Android exact alarm settings/fallback | 통과 | API 36 emulator에서 `Alarms & reminders` 시스템 설정 화면 이동 확인. 앱 `영양제 루틴`의 `Allow setting alarms and reminders` 토글은 unchecked. 권한이 없어도 Settings 예약 테스트 알림이 `SupplementReminderReceiver`를 통해 발화했고, `AlarmManager.setAndAllowWhileIdle`/`set` fallback으로 근처 시간 알림 예약 확인. 스크린샷 증거 확인됨 |
 | iOS SwiftUI form validation | 구현됨 | 영양제 이름/복용량 empty state와 `HH:mm` 시간 입력 검증 |
 | iOS shared framework CI path | 구성됨 | `.github/workflows/ios_kmp_ci.yml` |
 | iOS shared release XCFramework CI path | 구성됨 | `.github/workflows/ios_kmp_ci.yml`에서 `:shared:assembleSupplementRoutineSharedReleaseXCFramework` 실행 |
@@ -56,7 +56,7 @@
 | iOS release signing secrets | 보류 | 2026-06-05 제품 결정으로 iOS 출시는 후속으로 미룬다. iOS signed archive/IPA 생성은 이번 Android-only 출시 범위에서 제외 |
 | Release secret setup runbook | 구성됨 | `docs/release_signing.md`에 Android/iOS secret base64 변환, `gh secret set`, `KMP Release` 실행, artifact 다운로드 명령 정리 |
 | Android KMP Release workflow | 통과 | 최신 `main` 기준 `KMP Release` run `27008729353`, `platform=android`, Android signed release artifacts job 성공. iOS job은 의도적으로 skipped |
-| Android signed release artifacts | 생성됨 | `kmp-android-release` artifact 다운로드 확인. `androidApp-release.apk` 13,686,333 bytes, `androidApp-release.aab` 13,252,323 bytes. 위치: `<local-path><release-run-artifact-dir>` |
+| Android signed release artifacts | 생성됨 | `kmp-android-release` artifact 다운로드 확인. `androidApp-release.apk` 13,686,333 bytes, `androidApp-release.aab` 13,252,323 bytes |
 | Android signed APK verification | 통과 | `apksigner verify --verbose --print-certs` 결과 `Verifies`, v1/v2 signing true. 인증서 SHA-256 digest `f90457e364fc0c14d30abdd841efadc8d7ba69b55cff9455cfcf63cb6afe83c2` |
 | Android signed AAB verification | 통과 | `jarsigner -verify` 결과 `jar verified`. 자체 서명 upload certificate라 PKIX chain warning은 예상됨 |
 

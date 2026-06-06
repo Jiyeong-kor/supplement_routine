@@ -156,7 +156,7 @@ xcodebuild \
 
 ## Release And Signing
 
-Android signing is configured through GitHub Secrets, and the `KMP Release` workflow has generated and verified signed APK/AAB artifacts. The latest Android submission candidate is the `kmp-android-release` artifact from run `27008729353`, downloaded locally to `<local-path><release-run-artifact-dir>`.
+Android signing is configured through GitHub Secrets, and the `KMP Release` workflow has generated and verified signed APK/AAB artifacts. The latest Android submission candidate is the `kmp-android-release` artifact from run `27008729353`.
 
 iOS signed archive/IPA generation is configured, but the current release is Android-first. iOS signing/provisioning will be handled when the iOS release resumes.
 

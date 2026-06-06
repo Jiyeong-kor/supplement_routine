@@ -165,7 +165,7 @@ xcodebuild \
 
 ## 릴리스와 서명
 
-Android signing은 GitHub Secrets 기반 `KMP Release` workflow로 signed APK/AAB artifact 생성과 검증까지 완료했습니다. 최신 Android 제출 후보는 run `27008729353`의 `kmp-android-release` artifact이며, 로컬 다운로드 위치는 `<local-path><release-run-artifact-dir>`입니다.
+Android signing은 GitHub Secrets 기반 `KMP Release` workflow로 signed APK/AAB artifact 생성과 검증까지 완료했습니다. 최신 Android 제출 후보는 run `27008729353`의 `kmp-android-release` artifact입니다.
 
 iOS signed archive/IPA workflow는 준비되어 있지만, 이번 출시는 Android 우선으로 진행하므로 iOS signing/provisioning은 후속 출시 재개 시 처리합니다.
 
