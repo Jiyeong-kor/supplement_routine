@@ -167,11 +167,9 @@ private fun TodayScreen(
         }
     }
 
-    LaunchedEffect(highlightedSupplementId) {
-        if (highlightedSupplementId != null) {
-            if (highlightedItemIndex >= 0) {
-                listState.animateScrollToItem(highlightedItemIndex)
-            }
+    LaunchedEffect(highlightedSupplementId, highlightedItemIndex) {
+        if (highlightedSupplementId != null && highlightedItemIndex >= 0) {
+            listState.animateScrollToItem(highlightedItemIndex)
             delay(3600)
             onHighlightedSupplementConsumed()
         }
@@ -562,7 +560,7 @@ private fun TodaySupplementItem(
                 ) {
                     RoutineCheckButton(
                         checked = record.isDone,
-                        contentDescription = statusText,
+                        contentDescription = null,
                     )
                 }
                 if (record.isDone && showUndoLabel) {

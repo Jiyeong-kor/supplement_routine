@@ -245,7 +245,7 @@ internal fun RoutinePillButton(
 internal fun RoutineCheckButton(
     checked: Boolean,
     modifier: Modifier = Modifier,
-    contentDescription: String,
+    contentDescription: String? = null,
 ) {
     Surface(
         modifier = modifier.size(34.dp),
