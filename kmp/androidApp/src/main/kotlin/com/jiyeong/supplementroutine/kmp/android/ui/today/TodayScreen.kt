@@ -125,6 +125,7 @@ private fun TodayScreen(
     val incompleteItems = sortedItems.filterNot { it.record.isDone }
     val completedItems = sortedItems.filter { it.record.isDone }
     val shouldShowCompletedItems = showCompletedItems
+    val shouldShowCompletedItemUndoLabels = completedItems.size <= 2
     val nextItem = sortedItems.firstOrNull { !it.record.isDone }
     val listState = rememberLazyListState()
     val willShowFeedback = completionFeedback != null || feedbackMessage != null
@@ -143,6 +144,7 @@ private fun TodayScreen(
         incompleteItems.forEach { item -> add("intake-${item.record.id}") }
         if (completedItems.isNotEmpty()) add("completed-toggle")
         if (shouldShowCompletedItems) {
+            if (!shouldShowCompletedItemUndoLabels) add("completed-undo-guide")
             completedItems.forEach { item -> add("done-${item.record.id}") }
         }
     }
@@ -150,14 +152,17 @@ private fun TodayScreen(
 
     LaunchedEffect(feedbackMessage) {
         feedbackMessage?.let {
-            completionFeedback = CompletionFeedback(message = it)
+            completionFeedback = CompletionFeedback(
+                message = it,
+                durationMillis = 1200,
+            )
             onFeedbackMessageConsumed()
         }
     }
 
-    LaunchedEffect(completionFeedback?.message) {
-        if (completionFeedback != null) {
-            delay(2200)
+    LaunchedEffect(completionFeedback) {
+        completionFeedback?.let { feedback ->
+            delay(feedback.durationMillis)
             completionFeedback = null
         }
     }
@@ -267,6 +272,16 @@ private fun TodayScreen(
                         )
                     }
                     if (shouldShowCompletedItems) {
+                        if (!shouldShowCompletedItemUndoLabels) {
+                            item(key = "completed-undo-guide") {
+                                Text(
+                                    text = "완료 항목은 체크를 눌러 되돌릴 수 있어요.",
+                                    modifier = Modifier.padding(horizontal = 4.dp),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
                         items(
                             items = completedItems,
                             key = { "done-${it.record.id}" },
@@ -274,6 +289,7 @@ private fun TodayScreen(
                             TodaySupplementItem(
                                 item = item,
                                 highlighted = item.supplement.id == highlightedSupplementId,
+                                showUndoLabel = shouldShowCompletedItemUndoLabels,
                                 onClick = {
                                     completionFeedback = CompletionFeedback(
                                         message = "${item.supplement.name} 기록을 되돌렸어요.",
@@ -454,6 +470,7 @@ private fun TodayProgressCard(
 private fun TodaySupplementItem(
     item: ScheduledIntakeRecord,
     highlighted: Boolean = false,
+    showUndoLabel: Boolean = true,
     onClick: () -> Unit,
 ) {
     val record = item.record
@@ -548,7 +565,7 @@ private fun TodaySupplementItem(
                         contentDescription = statusText,
                     )
                 }
-                if (record.isDone) {
+                if (record.isDone && showUndoLabel) {
                     Text(
                         text = "되돌리기",
                         style = MaterialTheme.typography.labelSmall,
@@ -639,6 +656,7 @@ private data class CompletionFeedback(
     val message: String,
     val actionLabel: String? = null,
     val actionRecord: IntakeRecord? = null,
+    val durationMillis: Long = 2200,
 )
 
 @Composable

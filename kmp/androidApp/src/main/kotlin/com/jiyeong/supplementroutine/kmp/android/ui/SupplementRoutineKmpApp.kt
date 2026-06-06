@@ -151,7 +151,7 @@ fun SupplementRoutineKmpApp(
                                     onSuccess()
                                     todayHighlightedSupplementId = supplement.id
                                     if (isFirstSupplement) {
-                                        todayFeedbackMessage = "오늘 일정에 추가됐어요."
+                                        todayFeedbackMessage = "추가됐어요."
                                     }
                                     selectedDestinationKey = "today"
                                 },

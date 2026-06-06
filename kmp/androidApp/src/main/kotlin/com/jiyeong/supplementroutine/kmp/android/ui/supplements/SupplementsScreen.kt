@@ -520,13 +520,26 @@ private fun SupplementFormScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 saveFailureMessage?.let { message ->
-                    Text(
-                        text = message,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.error,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = message,
+                            modifier = Modifier.weight(1f),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.error,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        TextButton(
+                            onClick = ::submit,
+                            enabled = !isSaving,
+                        ) {
+                            Text("다시 시도")
+                        }
+                    }
                 }
                 Button(
                     onClick = ::submit,

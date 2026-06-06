@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Alarm
@@ -71,6 +72,7 @@ fun SettingsRoute(
     var dialog by remember { mutableStateOf<SettingsDialog?>(null) }
     var mealTimesEditing by remember { mutableStateOf(false) }
     var draftMealTimeSettings by remember { mutableStateOf(mealTimeSettings) }
+    val listState = rememberLazyListState()
 
     LaunchedEffect(mealTimeSettings, mealTimesEditing) {
         if (!mealTimesEditing) {
@@ -78,8 +80,15 @@ fun SettingsRoute(
         }
     }
 
+    LaunchedEffect(expandNotificationTroubleshooting) {
+        if (expandNotificationTroubleshooting) {
+            listState.animateScrollToItem(3)
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxSize(),
             contentPadding = PaddingValues(
@@ -90,16 +99,16 @@ fun SettingsRoute(
             ),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            item {
+            item(key = "settings-header") {
                 RoutinePageHeader(
                     title = "설정",
                     subtitle = "루틴 기준과 알림을 조정해요",
                 )
             }
-            item {
+            item(key = "meal-section") {
                 RoutineSectionLabel(title = "식사 시간")
             }
-            item {
+            item(key = "meal-card") {
                 MealTimesCard(
                     mealTimeSettings = if (mealTimesEditing) draftMealTimeSettings else mealTimeSettings,
                     editing = mealTimesEditing,
@@ -129,10 +138,10 @@ fun SettingsRoute(
                     },
                 )
             }
-            item {
+            item(key = "notification-section") {
                 RoutineSectionLabel(title = "알림")
             }
-            item {
+            item(key = "notification-card") {
                 NotificationSettingsCard(
                     notificationEnabled = notificationEnabled,
                     notificationPermissionState = notificationPermissionState,

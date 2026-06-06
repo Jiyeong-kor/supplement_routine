@@ -342,7 +342,7 @@ private fun RoutinePatternCard(
             )
             if (canOfferSettingsAction) {
                 RoutinePillButton(
-                    text = "알림 설정 조정",
+                    text = "알림/식사 시간 조정",
                     onClick = onOpenNotificationSettingsClick,
                     height = 34.dp,
                     containerColor = MaterialTheme.colorScheme.surface,
