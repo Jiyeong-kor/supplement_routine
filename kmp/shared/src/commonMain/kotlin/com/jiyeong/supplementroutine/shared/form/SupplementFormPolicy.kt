@@ -29,10 +29,15 @@ data class SupplementFormInput(
     val memo: String?,
 )
 
+data class ParsedDosage(
+    val value: Double,
+    val unit: String?,
+)
+
 object SupplementFormPolicy {
     const val DEFAULT_DOSAGE_TEXT = "1"
     const val DEFAULT_UNIT = "개"
-    val dosageUnits = listOf("개", "ml")
+    val dosageUnits = listOf("개", "정", "캡슐", "mg", "IU", "ml")
 
     const val DEFAULT_COUNT = 1
     const val MIN_COUNT = 1
@@ -67,8 +72,24 @@ object SupplementFormPolicy {
     }
 
     fun parseDosage(value: String): Double? {
-        val dosageValue = value.trim().toDoubleOrNull()
-        return dosageValue?.takeIf { it > 0.0 }
+        return parseDosageInput(value)?.value
+    }
+
+    fun parseDosageInput(value: String): ParsedDosage? {
+        val compact = value.trim().replace(" ", "")
+        val match = Regex("""^([0-9]+(?:[.,][0-9]+)?)([A-Za-z가-힣]+)?$""").matchEntire(compact)
+            ?: return null
+        val dosageValue = match.groupValues[1].replace(",", ".").toDoubleOrNull()
+            ?.takeIf { it > 0.0 }
+            ?: return null
+        val parsedUnit = match.groupValues.getOrNull(2)
+            ?.takeIf { it.isNotBlank() }
+            ?.let(::normalizeDosageUnit)
+
+        return ParsedDosage(
+            value = dosageValue,
+            unit = parsedUnit,
+        )
     }
 
     fun validateRoutineSlots(slots: Set<IntakeSlot>): SupplementFormValidationError? {
@@ -84,6 +105,12 @@ object SupplementFormPolicy {
             value.toInt().toString()
         } else {
             value.toString()
+        }
+    }
+
+    private fun normalizeDosageUnit(unit: String): String? {
+        return dosageUnits.firstOrNull { candidate ->
+            candidate.equals(unit, ignoreCase = true)
         }
     }
 }

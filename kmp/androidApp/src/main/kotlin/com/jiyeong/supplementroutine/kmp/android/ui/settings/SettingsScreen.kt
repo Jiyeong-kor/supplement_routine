@@ -24,6 +24,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -691,12 +692,29 @@ private fun ResetDialog(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
 ) {
+    var confirmText by remember { mutableStateOf("") }
+    val canReset = confirmText.trim() == "초기화"
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("복용 데이터 초기화") },
-        text = { Text("등록한 영양제와 복용 기록을 삭제합니다. 이 작업은 되돌릴 수 없습니다.") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text("등록한 영양제와 복용 기록을 삭제합니다. 이 작업은 되돌릴 수 없습니다.")
+                OutlinedTextField(
+                    value = confirmText,
+                    onValueChange = { confirmText = it },
+                    label = { Text("초기화 입력") },
+                    placeholder = { Text("초기화") },
+                    singleLine = true,
+                )
+            }
+        },
         confirmButton = {
-            TextButton(onClick = onConfirm) {
+            TextButton(
+                onClick = onConfirm,
+                enabled = canReset,
+            ) {
                 Text("초기화", color = MaterialTheme.colorScheme.error)
             }
         },

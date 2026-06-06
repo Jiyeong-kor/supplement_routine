@@ -137,7 +137,10 @@ fun SupplementRoutineKmpApp(
                         contentPadding = paddingValues,
                         supplements = uiState.supplements,
                         defaultNotificationEnabled = uiState.notificationEnabled,
-                        onAddSupplement = viewModel::addSupplement,
+                        onAddSupplement = { supplement ->
+                            viewModel.addSupplement(supplement)
+                            selectedDestinationKey = "today"
+                        },
                         onUpdateSupplement = viewModel::updateSupplement,
                         onRemoveSupplement = viewModel::removeSupplement,
                         onToggleNotification = viewModel::toggleSupplementNotification,
@@ -188,7 +191,12 @@ fun SupplementRoutineKmpApp(
                         date = uiState.today,
                         items = uiState.todayItems,
                         errorMessage = uiState.errorMessage,
+                        notificationNeedsAttention = uiState.notificationEnabled &&
+                            uiState.supplements.any { it.isNotificationEnabled } &&
+                            (!notificationPermissionState.canPostNotifications ||
+                                !notificationPermissionState.canScheduleExactAlarms),
                         onAddSupplementClick = { selectedDestinationKey = "supplements" },
+                        onOpenNotificationSettingsClick = { selectedDestinationKey = "settings" },
                         onToggleRecord = { record ->
                             if (!record.isDone) {
                                 hapticFeedback.intakeCompleted()

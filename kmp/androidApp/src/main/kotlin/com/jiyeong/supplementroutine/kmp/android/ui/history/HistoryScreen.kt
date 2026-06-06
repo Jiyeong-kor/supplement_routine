@@ -284,16 +284,17 @@ private fun MonthDayTile(
 private fun RoutinePatternCard(summaries: List<DailyHistorySummary>) {
     val daysWithSchedule = summaries.filterNot { it.isEmpty }
     val missedDays = daysWithSchedule.count { it.doneCount < it.totalCount }
-    val average = if (daysWithSchedule.isEmpty()) {
-        0
-    } else {
-        (daysWithSchedule.map { it.completionRate }.average() * 100).toInt()
-    }
     val message = when {
         daysWithSchedule.isEmpty() -> "기록이 쌓이면 최근 루틴 흐름을 여기서 볼 수 있어요."
         missedDays == 0 -> "최근 복용 일정은 모두 잘 기록됐어요."
         missedDays == 1 -> "최근 2주 중 하루는 일부 복용이 남았어요."
         else -> "최근 2주 중 ${missedDays}일은 일부 복용이 남았어요."
+    }
+    val hint = when {
+        daysWithSchedule.isEmpty() -> "오늘 화면에서 첫 기록을 남겨보세요."
+        missedDays == 0 -> "지금 설정을 유지해도 좋아요."
+        missedDays >= daysWithSchedule.size / 2 -> "알림 시간이나 식사 시간을 더 현실적인 시간으로 조정해보세요."
+        else -> "자주 놓치는 날이 보이면 알림을 켜거나 식사 시간을 조정해보세요."
     }
 
     RoutineCard(
@@ -315,14 +316,12 @@ private fun RoutinePatternCard(summaries: List<DailyHistorySummary>) {
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            if (daysWithSchedule.isNotEmpty()) {
-                Text(
-                    text = "평균 완료율 $average%",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
+            Text(
+                text = hint,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+            )
         }
     }
 }

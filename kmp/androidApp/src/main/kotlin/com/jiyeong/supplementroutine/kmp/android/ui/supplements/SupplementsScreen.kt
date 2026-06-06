@@ -273,12 +273,13 @@ private fun SupplementFormScreen(
             return
         }
 
-        val dosageValue = SupplementFormPolicy.parseDosage(dosageText)
-        if (dosageValue == null) {
+        val parsedDosage = SupplementFormPolicy.parseDosageInput(dosageText)
+        if (parsedDosage == null) {
             errorMessage = validationMessage(SupplementFormValidationError.InvalidDosage)
             onValidationError()
             return
         }
+        val submittedDosageUnit = parsedDosage.unit ?: dosageUnit
 
         if (isRoutineBased) {
             val routineError = SupplementFormPolicy.validateRoutineSlots(selectedSlots)
@@ -291,8 +292,8 @@ private fun SupplementFormScreen(
 
         val input = SupplementFormInput(
             name = trimmedName,
-            dosageUnit = dosageUnit,
-            dosageValue = dosageValue,
+            dosageUnit = submittedDosageUnit,
+            dosageValue = parsedDosage.value,
             isRoutineBased = isRoutineBased,
             isSpecificTime = isSpecificTime,
             selectedSlots = selectedSlots,
@@ -349,10 +350,11 @@ private fun SupplementFormScreen(
                             value = dosageText,
                             onValueChange = { dosageText = it },
                             modifier = Modifier.weight(1f),
-                            label = { Text("복용량") },
-                            singleLine = true,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        )
+                        label = { Text("복용량") },
+                        supportingText = { Text("예: 1정, 400mg, 1000 IU") },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    )
                         Column(
                             modifier = Modifier.weight(1f),
                             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -892,7 +894,7 @@ private fun DeleteSupplementDialog(
 private fun validationMessage(error: SupplementFormValidationError): String {
     return when (error) {
         SupplementFormValidationError.EmptyName -> "영양제 이름을 입력해주세요."
-        SupplementFormValidationError.InvalidDosage -> "복용량은 0보다 큰 숫자로 입력해주세요."
+        SupplementFormValidationError.InvalidDosage -> "복용량은 0보다 큰 값으로 입력해주세요. 예: 1정, 400mg, 1000 IU"
         SupplementFormValidationError.EmptyRoutineSlots -> "복용 타이밍을 하나 이상 선택해주세요."
     }
 }
