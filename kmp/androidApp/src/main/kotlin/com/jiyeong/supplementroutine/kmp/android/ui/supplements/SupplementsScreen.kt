@@ -87,8 +87,8 @@ fun SupplementsRoute(
     contentPadding: PaddingValues,
     supplements: List<Supplement>,
     defaultNotificationEnabled: Boolean,
-    onAddSupplement: (Supplement) -> Unit,
-    onUpdateSupplement: (Supplement) -> Unit,
+    onAddSupplement: (Supplement, onSuccess: () -> Unit) -> Unit,
+    onUpdateSupplement: (Supplement, onSuccess: () -> Unit) -> Unit,
     onRemoveSupplement: (Supplement) -> Unit,
     onToggleNotification: (Supplement) -> Unit,
 ) {
@@ -107,14 +107,16 @@ fun SupplementsRoute(
                 formInitialSupplement = null
             },
             onSubmit = { supplement ->
-                if (formInitialSupplement == null) {
-                    onAddSupplement(supplement)
-                } else {
-                    onUpdateSupplement(supplement)
+                val closeForm = {
+                    hapticFeedback.saved()
+                    isAdding = false
+                    formInitialSupplement = null
                 }
-                hapticFeedback.saved()
-                isAdding = false
-                formInitialSupplement = null
+                if (formInitialSupplement == null) {
+                    onAddSupplement(supplement, closeForm)
+                } else {
+                    onUpdateSupplement(supplement, closeForm)
+                }
             },
             onValidationError = hapticFeedback::validationWarning,
         )
@@ -218,7 +220,10 @@ private fun SupplementFormScreen(
         )
     }
     var dosageUnit by remember(initialSupplement) {
-        mutableStateOf(initialSupplement?.dosageUnit ?: SupplementFormPolicy.DEFAULT_UNIT)
+        mutableStateOf(
+            initialSupplement?.dosageUnit?.let(SupplementFormPolicy::normalizeDosageUnitForSelection)
+                ?: SupplementFormPolicy.DEFAULT_UNIT,
+        )
     }
     var isRoutineBased by remember(initialSupplement) {
         mutableStateOf(initialSupplement?.method != IntakeMethod.FixedTime && initialSupplement?.method != IntakeMethod.Interval)

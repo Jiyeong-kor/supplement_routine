@@ -137,13 +137,21 @@ fun SupplementRoutineKmpApp(
                         contentPadding = paddingValues,
                         supplements = uiState.supplements,
                         defaultNotificationEnabled = uiState.notificationEnabled,
-                        onAddSupplement = { supplement ->
+                        onAddSupplement = { supplement, onSuccess ->
                             viewModel.addSupplement(
                                 supplement = supplement,
-                                onSuccess = { selectedDestinationKey = "today" },
+                                onSuccess = {
+                                    onSuccess()
+                                    selectedDestinationKey = "today"
+                                },
                             )
                         },
-                        onUpdateSupplement = viewModel::updateSupplement,
+                        onUpdateSupplement = { supplement, onSuccess ->
+                            viewModel.updateSupplement(
+                                supplement = supplement,
+                                onSuccess = onSuccess,
+                            )
+                        },
                         onRemoveSupplement = viewModel::removeSupplement,
                         onToggleNotification = viewModel::toggleSupplementNotification,
                     )

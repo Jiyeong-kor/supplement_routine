@@ -111,6 +111,10 @@ object SupplementFormPolicy {
         }
     }
 
+    fun normalizeDosageUnitForSelection(unit: String): String {
+        return normalizeDosageUnit(unit) ?: DEFAULT_UNIT
+    }
+
     private fun normalizeDosageUnit(unit: String): String? {
         val aliases = mapOf(
             "개" to "정",

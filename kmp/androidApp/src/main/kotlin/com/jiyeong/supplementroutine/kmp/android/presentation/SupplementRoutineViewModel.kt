@@ -71,9 +71,14 @@ class SupplementRoutineViewModel @Inject constructor(
         }
     }
 
-    fun updateSupplement(supplement: Supplement) {
+    fun updateSupplement(
+        supplement: Supplement,
+        onSuccess: () -> Unit = {},
+    ) {
         viewModelScope.launch {
-            runRepositoryAction {
+            runRepositoryAction(
+                onSuccess = onSuccess,
+            ) {
                 supplementRepository.updateSupplement(supplement)
                 loadState()
             }

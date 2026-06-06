@@ -59,6 +59,13 @@ class SupplementFormPolicyTest {
     }
 
     @Test
+    fun legacyRoutineUnitsNormalizeForSelection() {
+        assertEquals("정", SupplementFormPolicy.normalizeDosageUnitForSelection("개"))
+        assertEquals("정", SupplementFormPolicy.normalizeDosageUnitForSelection("알"))
+        assertEquals("정", SupplementFormPolicy.normalizeDosageUnitForSelection("unknown"))
+    }
+
+    @Test
     fun routineBasedInputRequiresAtLeastOneSlot() {
         assertEquals(
             SupplementFormValidationError.EmptyRoutineSlots,
