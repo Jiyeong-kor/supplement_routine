@@ -44,7 +44,6 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -88,9 +87,8 @@ fun SupplementsRoute(
     contentPadding: PaddingValues,
     supplements: List<Supplement>,
     defaultNotificationEnabled: Boolean,
-    persistenceErrorMessage: String?,
-    onAddSupplement: (Supplement, onSuccess: () -> Unit) -> Unit,
-    onUpdateSupplement: (Supplement, onSuccess: () -> Unit) -> Unit,
+    onAddSupplement: (Supplement, onSuccess: () -> Unit, onFailure: (String) -> Unit) -> Unit,
+    onUpdateSupplement: (Supplement, onSuccess: () -> Unit, onFailure: (String) -> Unit) -> Unit,
     onRemoveSupplement: (Supplement) -> Unit,
     onToggleNotification: (Supplement) -> Unit,
 ) {
@@ -104,21 +102,20 @@ fun SupplementsRoute(
             contentPadding = contentPadding,
             initialSupplement = formInitialSupplement,
             defaultNotificationEnabled = defaultNotificationEnabled,
-            persistenceErrorMessage = persistenceErrorMessage,
             onDismiss = {
                 isAdding = false
                 formInitialSupplement = null
             },
-            onSubmit = { supplement ->
+            onSubmit = { supplement, onFailure ->
                 val closeForm = {
                     hapticFeedback.saved()
                     isAdding = false
                     formInitialSupplement = null
                 }
                 if (formInitialSupplement == null) {
-                    onAddSupplement(supplement, closeForm)
+                    onAddSupplement(supplement, closeForm, onFailure)
                 } else {
-                    onUpdateSupplement(supplement, closeForm)
+                    onUpdateSupplement(supplement, closeForm, onFailure)
                 }
             },
             onValidationError = hapticFeedback::validationWarning,
@@ -210,9 +207,8 @@ private fun SupplementFormScreen(
     contentPadding: PaddingValues,
     initialSupplement: Supplement?,
     defaultNotificationEnabled: Boolean,
-    persistenceErrorMessage: String?,
     onDismiss: () -> Unit,
-    onSubmit: (Supplement) -> Unit,
+    onSubmit: (Supplement, onFailure: (String) -> Unit) -> Unit,
     onValidationError: () -> Unit,
 ) {
     val isEditMode = initialSupplement != null
@@ -267,15 +263,6 @@ private fun SupplementFormScreen(
     var memo by remember(initialSupplement) { mutableStateOf(initialSupplement?.memo.orEmpty()) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isSaving by remember { mutableStateOf(false) }
-    var ignoredPersistenceError by remember { mutableStateOf<String?>(null) }
-
-    LaunchedEffect(persistenceErrorMessage, isSaving) {
-        if (isSaving && persistenceErrorMessage != null && persistenceErrorMessage != ignoredPersistenceError) {
-            errorMessage = persistenceErrorMessage
-            isSaving = false
-            ignoredPersistenceError = persistenceErrorMessage
-        }
-    }
 
     fun syncFixedTimes(count: Int) {
         fixedCount = count
@@ -327,14 +314,16 @@ private fun SupplementFormScreen(
 
         isSaving = true
         errorMessage = null
-        ignoredPersistenceError = persistenceErrorMessage
         onSubmit(
             SupplementFormMapper.toSupplement(
                 input = input,
                 initialSupplement = initialSupplement,
                 idProvider = { System.currentTimeMillis().toString() },
             ),
-        )
+        ) { message ->
+            errorMessage = message
+            isSaving = false
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {

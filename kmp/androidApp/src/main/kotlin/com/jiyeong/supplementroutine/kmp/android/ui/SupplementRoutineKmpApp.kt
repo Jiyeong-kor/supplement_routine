@@ -58,6 +58,7 @@ import com.jiyeong.supplementroutine.kmp.android.ui.settings.SettingsRoute
 import com.jiyeong.supplementroutine.kmp.android.ui.supplements.SupplementsRoute
 import com.jiyeong.supplementroutine.kmp.android.ui.today.TodayRoute
 import com.jiyeong.supplementroutine.shared.SupplementRoutineInfo
+import com.jiyeong.supplementroutine.shared.domain.LocalDateValue
 
 @Composable
 fun SupplementRoutineKmpApp(
@@ -69,6 +70,7 @@ fun SupplementRoutineKmpApp(
     val uiState by viewModel.uiState.collectAsState()
     val hapticFeedback = rememberRoutineHapticFeedback()
     var todayFeedbackMessage by remember { mutableStateOf<String?>(null) }
+    var notificationAttentionDismissedDate by remember { mutableStateOf<LocalDateValue?>(null) }
     var notificationPermissionState by remember {
         mutableStateOf(permissionController.currentState())
     }
@@ -138,8 +140,7 @@ fun SupplementRoutineKmpApp(
                         contentPadding = paddingValues,
                         supplements = uiState.supplements,
                         defaultNotificationEnabled = uiState.notificationEnabled,
-                        persistenceErrorMessage = uiState.errorMessage,
-                        onAddSupplement = { supplement, onSuccess ->
+                        onAddSupplement = { supplement, onSuccess, onFailure ->
                             val isFirstSupplement = uiState.supplements.isEmpty()
                             viewModel.addSupplement(
                                 supplement = supplement,
@@ -150,12 +151,14 @@ fun SupplementRoutineKmpApp(
                                     }
                                     selectedDestinationKey = "today"
                                 },
+                                onFailure = onFailure,
                             )
                         },
-                        onUpdateSupplement = { supplement, onSuccess ->
+                        onUpdateSupplement = { supplement, onSuccess, onFailure ->
                             viewModel.updateSupplement(
                                 supplement = supplement,
                                 onSuccess = onSuccess,
+                                onFailure = onFailure,
                             )
                         },
                         onRemoveSupplement = viewModel::removeSupplement,
@@ -211,6 +214,10 @@ fun SupplementRoutineKmpApp(
                             uiState.supplements.any { it.isNotificationEnabled } &&
                             (!notificationPermissionState.canPostNotifications ||
                                 !notificationPermissionState.canScheduleExactAlarms),
+                        notificationAttentionDismissed = notificationAttentionDismissedDate == uiState.today,
+                        onDismissNotificationAttention = {
+                            notificationAttentionDismissedDate = uiState.today
+                        },
                         feedbackMessage = todayFeedbackMessage,
                         onFeedbackMessageConsumed = { todayFeedbackMessage = null },
                         onAddSupplementClick = { selectedDestinationKey = "supplements" },

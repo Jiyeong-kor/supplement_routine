@@ -60,10 +60,12 @@ class SupplementRoutineViewModel @Inject constructor(
     fun addSupplement(
         supplement: Supplement,
         onSuccess: () -> Unit = {},
+        onFailure: (String) -> Unit = {},
     ) {
         viewModelScope.launch {
             runRepositoryAction(
                 onSuccess = onSuccess,
+                onFailure = onFailure,
             ) {
                 supplementRepository.addSupplement(supplement)
                 loadState()
@@ -74,10 +76,12 @@ class SupplementRoutineViewModel @Inject constructor(
     fun updateSupplement(
         supplement: Supplement,
         onSuccess: () -> Unit = {},
+        onFailure: (String) -> Unit = {},
     ) {
         viewModelScope.launch {
             runRepositoryAction(
                 onSuccess = onSuccess,
+                onFailure = onFailure,
             ) {
                 supplementRepository.updateSupplement(supplement)
                 loadState()
@@ -149,6 +153,7 @@ class SupplementRoutineViewModel @Inject constructor(
 
     private suspend fun runRepositoryAction(
         onSuccess: () -> Unit = {},
+        onFailure: (String) -> Unit = {},
         action: suspend () -> SupplementRoutineUiState,
     ) {
         val result = runCatching {
@@ -161,12 +166,14 @@ class SupplementRoutineViewModel @Inject constructor(
                 onSuccess()
             },
             onFailure = { throwable ->
+                val message = throwable.message ?: "저장된 데이터를 불러오지 못했습니다."
                 _uiState.update { state ->
                     state.copy(
                         isLoading = false,
-                        errorMessage = throwable.message ?: "저장된 데이터를 불러오지 못했습니다.",
+                        errorMessage = message,
                     )
                 }
+                onFailure(message)
             },
         )
     }

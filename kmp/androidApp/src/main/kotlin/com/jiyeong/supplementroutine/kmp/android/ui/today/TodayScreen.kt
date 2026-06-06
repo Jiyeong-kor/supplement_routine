@@ -67,6 +67,8 @@ fun TodayRoute(
     items: List<ScheduledIntakeRecord>,
     errorMessage: String?,
     notificationNeedsAttention: Boolean,
+    notificationAttentionDismissed: Boolean,
+    onDismissNotificationAttention: () -> Unit,
     feedbackMessage: String?,
     onFeedbackMessageConsumed: () -> Unit,
     onAddSupplementClick: () -> Unit,
@@ -79,6 +81,8 @@ fun TodayRoute(
         items = items,
         errorMessage = errorMessage,
         notificationNeedsAttention = notificationNeedsAttention,
+        notificationAttentionDismissed = notificationAttentionDismissed,
+        onDismissNotificationAttention = onDismissNotificationAttention,
         feedbackMessage = feedbackMessage,
         onFeedbackMessageConsumed = onFeedbackMessageConsumed,
         onAddSupplementClick = onAddSupplementClick,
@@ -94,6 +98,8 @@ private fun TodayScreen(
     items: List<ScheduledIntakeRecord>,
     errorMessage: String?,
     notificationNeedsAttention: Boolean,
+    notificationAttentionDismissed: Boolean,
+    onDismissNotificationAttention: () -> Unit,
     feedbackMessage: String?,
     onFeedbackMessageConsumed: () -> Unit,
     onAddSupplementClick: () -> Unit,
@@ -102,7 +108,6 @@ private fun TodayScreen(
 ) {
     var completionFeedback by remember { mutableStateOf<CompletionFeedback?>(null) }
     var showCompletedItems by remember { mutableStateOf(false) }
-    var notificationAttentionDismissed by remember(date) { mutableStateOf(false) }
     val sortedItems = remember(items) {
         items.sortedWith(
             compareBy<ScheduledIntakeRecord> { it.record.isDone }
@@ -155,7 +160,7 @@ private fun TodayScreen(
                 item {
                     NotificationAttentionCard(
                         onOpenSettingsClick = onOpenNotificationSettingsClick,
-                        onDismissClick = { notificationAttentionDismissed = true },
+                        onDismissClick = onDismissNotificationAttention,
                     )
                 }
             }
