@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -193,6 +194,8 @@ internal fun RoutineMetaChip(
             style = MaterialTheme.typography.labelSmall,
             color = contentColor,
             fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }
@@ -242,7 +245,7 @@ internal fun RoutinePillButton(
 internal fun RoutineCheckButton(
     checked: Boolean,
     modifier: Modifier = Modifier,
-    contentDescription: String,
+    contentDescription: String? = null,
 ) {
     Surface(
         modifier = modifier.size(34.dp),

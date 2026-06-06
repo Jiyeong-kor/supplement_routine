@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Alarm
@@ -24,6 +25,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -47,6 +49,7 @@ import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineSectionLabel
 import com.jiyeong.supplementroutine.kmp.android.notification.NotificationPermissionState
 import com.jiyeong.supplementroutine.shared.domain.MealTimeSettings
 import com.jiyeong.supplementroutine.shared.domain.TimeOfDayValue
+import kotlinx.coroutines.delay
 
 @Composable
 fun SettingsRoute(
@@ -54,6 +57,8 @@ fun SettingsRoute(
     mealTimeSettings: MealTimeSettings,
     notificationEnabled: Boolean,
     notificationPermissionState: NotificationPermissionState,
+    expandNotificationTroubleshooting: Boolean,
+    onNotificationTroubleshootingExpanded: () -> Unit,
     onBreakfastTimeChanged: (TimeOfDayValue) -> Unit,
     onLunchTimeChanged: (TimeOfDayValue) -> Unit,
     onDinnerTimeChanged: (TimeOfDayValue) -> Unit,
@@ -68,6 +73,8 @@ fun SettingsRoute(
     var dialog by remember { mutableStateOf<SettingsDialog?>(null) }
     var mealTimesEditing by remember { mutableStateOf(false) }
     var draftMealTimeSettings by remember { mutableStateOf(mealTimeSettings) }
+    var resetFeedbackVisible by remember { mutableStateOf(false) }
+    val listState = rememberLazyListState()
 
     LaunchedEffect(mealTimeSettings, mealTimesEditing) {
         if (!mealTimesEditing) {
@@ -75,8 +82,22 @@ fun SettingsRoute(
         }
     }
 
+    LaunchedEffect(expandNotificationTroubleshooting) {
+        if (expandNotificationTroubleshooting) {
+            listState.animateScrollToItem(3)
+        }
+    }
+
+    LaunchedEffect(resetFeedbackVisible) {
+        if (resetFeedbackVisible) {
+            delay(2400)
+            resetFeedbackVisible = false
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxSize(),
             contentPadding = PaddingValues(
@@ -87,16 +108,21 @@ fun SettingsRoute(
             ),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            item {
+            item(key = "settings-header") {
                 RoutinePageHeader(
                     title = "설정",
                     subtitle = "루틴 기준과 알림을 조정해요",
                 )
             }
-            item {
+            if (resetFeedbackVisible) {
+                item(key = "reset-feedback") {
+                    ResetFeedbackCard()
+                }
+            }
+            item(key = "meal-section") {
                 RoutineSectionLabel(title = "식사 시간")
             }
-            item {
+            item(key = "meal-card") {
                 MealTimesCard(
                     mealTimeSettings = if (mealTimesEditing) draftMealTimeSettings else mealTimeSettings,
                     editing = mealTimesEditing,
@@ -126,13 +152,15 @@ fun SettingsRoute(
                     },
                 )
             }
-            item {
+            item(key = "notification-section") {
                 RoutineSectionLabel(title = "알림")
             }
-            item {
+            item(key = "notification-card") {
                 NotificationSettingsCard(
                     notificationEnabled = notificationEnabled,
                     notificationPermissionState = notificationPermissionState,
+                    expandTroubleshooting = expandNotificationTroubleshooting,
+                    onTroubleshootingExpanded = onNotificationTroubleshootingExpanded,
                     onNotificationEnabledChanged = onNotificationEnabledChanged,
                     onRequestNotificationPermission = onRequestNotificationPermission,
                     onRequestExactAlarmPermission = onRequestExactAlarmPermission,
@@ -176,6 +204,7 @@ fun SettingsRoute(
             onDismiss = { dialog = null },
             onConfirm = {
                 onResetRoutineData()
+                resetFeedbackVisible = true
                 dialog = null
             },
         )
@@ -298,6 +327,12 @@ private fun MealTimeDisplayRow(
             fontWeight = FontWeight.Bold,
         )
         if (editing) {
+            Text(
+                text = formatTime(time),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+            )
             TextButton(onClick = { onTimeChanged(time.plusMinutes(-10)) }) {
                 Text("-10")
             }
@@ -319,6 +354,8 @@ private fun MealTimeDisplayRow(
 private fun NotificationSettingsCard(
     notificationEnabled: Boolean,
     notificationPermissionState: NotificationPermissionState,
+    expandTroubleshooting: Boolean,
+    onTroubleshootingExpanded: () -> Unit,
     onNotificationEnabledChanged: (Boolean) -> Unit,
     onRequestNotificationPermission: () -> Unit,
     onRequestExactAlarmPermission: () -> Unit,
@@ -327,6 +364,13 @@ private fun NotificationSettingsCard(
     onScheduleTestNotification: () -> Unit,
 ) {
     var showTroubleshooting by remember { mutableStateOf(false) }
+
+    LaunchedEffect(expandTroubleshooting) {
+        if (expandTroubleshooting) {
+            showTroubleshooting = true
+            onTroubleshootingExpanded()
+        }
+    }
 
     RoutineCard {
         Column(
@@ -691,12 +735,30 @@ private fun ResetDialog(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
 ) {
+    var confirmText by remember { mutableStateOf("") }
+    val canReset = confirmText.trim() == "초기화"
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("복용 데이터 초기화") },
-        text = { Text("등록한 영양제와 복용 기록을 삭제합니다. 이 작업은 되돌릴 수 없습니다.") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text("등록한 영양제와 복용 기록을 삭제합니다. 이 작업은 되돌릴 수 없습니다.")
+                OutlinedTextField(
+                    value = confirmText,
+                    onValueChange = { confirmText = it },
+                    label = { Text("초기화 입력") },
+                    placeholder = { Text("초기화") },
+                    supportingText = { Text("계속하려면 아래에 초기화를 입력해주세요.") },
+                    singleLine = true,
+                )
+            }
+        },
         confirmButton = {
-            TextButton(onClick = onConfirm) {
+            TextButton(
+                onClick = onConfirm,
+                enabled = canReset,
+            ) {
                 Text("초기화", color = MaterialTheme.colorScheme.error)
             }
         },
@@ -733,6 +795,23 @@ private enum class SettingsDialog {
     TestNotificationSent,
     TestNotificationBlocked,
     TestNotificationScheduled,
+}
+
+@Composable
+private fun ResetFeedbackCard() {
+    RoutineCard(
+        colors = androidx.compose.material3.CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+        ),
+    ) {
+        Text(
+            text = "데이터를 초기화했어요.",
+            modifier = Modifier.padding(16.dp),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            fontWeight = FontWeight.Bold,
+        )
+    }
 }
 
 private fun TimeOfDayValue.plusMinutes(minutes: Int): TimeOfDayValue {

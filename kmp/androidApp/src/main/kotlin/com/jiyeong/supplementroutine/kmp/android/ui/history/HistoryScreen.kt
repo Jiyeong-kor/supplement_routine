@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -29,6 +30,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineCard
 import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineEmptyCard
 import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutinePageHeader
+import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutinePillButton
 import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineSectionLabel
 import com.jiyeong.supplementroutine.kmp.android.ui.common.FruitAvatar
 import com.jiyeong.supplementroutine.kmp.android.ui.common.FruitVariant
@@ -53,6 +56,8 @@ import com.jiyeong.supplementroutine.kmp.android.ui.common.GardenUi
 import com.jiyeong.supplementroutine.shared.domain.LocalDateValue
 import com.jiyeong.supplementroutine.shared.history.DailyHistorySummary
 import com.jiyeong.supplementroutine.shared.history.HistoryViewState
+import com.jiyeong.supplementroutine.shared.history.MissedIntakePeriod
+import kotlinx.coroutines.launch
 import java.util.Calendar
 
 @Composable
@@ -60,7 +65,10 @@ fun HistoryRoute(
     contentPadding: PaddingValues,
     today: LocalDateValue,
     historyViewState: HistoryViewState,
+    onOpenNotificationSettingsClick: () -> Unit,
 ) {
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
     var selectedDate by remember(today.year, today.month) {
         mutableStateOf(today)
     }
@@ -74,6 +82,7 @@ fun HistoryRoute(
     }
 
     LazyColumn(
+        state = listState,
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(
             start = 20.dp,
@@ -105,7 +114,17 @@ fun HistoryRoute(
             )
         }
         item { SelectedDateSummaryCard(summary = selectedSummary) }
-        item { RoutinePatternCard(summaries = historyViewState.recentSummaries) }
+        item {
+            RoutinePatternCard(
+                summaries = historyViewState.recentSummaries,
+                onReviewRecentClick = {
+                    coroutineScope.launch {
+                        listState.animateScrollToItem(6)
+                    }
+                },
+                onOpenNotificationSettingsClick = onOpenNotificationSettingsClick,
+            )
+        }
         item {
             SectionHeader(
                 title = "최근 기록",
@@ -222,7 +241,7 @@ private fun MonthHistoryCard(
                 }
             }
             tiles.chunked(7).forEach { week ->
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(0.dp)) {
                     week.forEach { summary ->
                         Box(modifier = Modifier.weight(1f)) {
                             if (summary != null) {
@@ -253,48 +272,60 @@ private fun MonthDayTile(
     onClick: () -> Unit,
 ) {
     val status = historyStatus(summary)
-    Surface(
+    Box(
         modifier = Modifier
-            .size(32.dp)
+            .fillMaxWidth()
+            .height(48.dp)
             .clickable(onClick = onClick)
             .semantics {
                 contentDescription = "${summary.date.day}일, ${status.label}, ${summary.doneCount}개 중 ${summary.totalCount}개 완료"
             },
-        shape = CircleShape,
-        color = status.background,
-        border = when {
-            selected -> BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
-            isToday -> BorderStroke(2.dp, GardenUi.Ink)
-            summary.isEmpty -> BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-            else -> null
-        },
+        contentAlignment = Alignment.Center,
     ) {
-        Box(contentAlignment = Alignment.Center) {
-            Text(
-                text = summary.date.day.toString(),
-                style = MaterialTheme.typography.labelSmall,
-                color = status.foreground,
-                fontWeight = if (selected || isToday) FontWeight.Bold else FontWeight.Medium,
-            )
+        Surface(
+            modifier = Modifier.size(32.dp),
+            shape = CircleShape,
+            color = status.background,
+            border = when {
+                selected -> BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
+                isToday -> BorderStroke(2.dp, GardenUi.Ink)
+                summary.isEmpty -> BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                else -> null
+            },
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Text(
+                    text = summary.date.day.toString(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = status.foreground,
+                    fontWeight = if (selected || isToday) FontWeight.Bold else FontWeight.Medium,
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun RoutinePatternCard(summaries: List<DailyHistorySummary>) {
+private fun RoutinePatternCard(
+    summaries: List<DailyHistorySummary>,
+    onReviewRecentClick: () -> Unit,
+    onOpenNotificationSettingsClick: () -> Unit,
+) {
     val daysWithSchedule = summaries.filterNot { it.isEmpty }
     val missedDays = daysWithSchedule.count { it.doneCount < it.totalCount }
-    val average = if (daysWithSchedule.isEmpty()) {
-        0
-    } else {
-        (daysWithSchedule.map { it.completionRate }.average() * 100).toInt()
-    }
     val message = when {
         daysWithSchedule.isEmpty() -> "기록이 쌓이면 최근 루틴 흐름을 여기서 볼 수 있어요."
         missedDays == 0 -> "최근 복용 일정은 모두 잘 기록됐어요."
         missedDays == 1 -> "최근 2주 중 하루는 일부 복용이 남았어요."
         else -> "최근 2주 중 ${missedDays}일은 일부 복용이 남았어요."
     }
+    val hint = when {
+        daysWithSchedule.isEmpty() -> "오늘 화면에서 첫 기록을 남겨보세요."
+        missedDays == 0 -> "지금 설정을 유지해도 좋아요."
+        daysWithSchedule.size < 3 -> "기록이 조금 더 쌓이면 놓치기 쉬운 시간대를 알려드릴게요."
+        else -> missedPeriodHint(daysWithSchedule)
+    }
+    val canOfferSettingsAction = daysWithSchedule.size >= 3 && missedDays > 0
 
     RoutineCard(
         colors = androidx.compose.material3.CardDefaults.cardColors(
@@ -315,15 +346,46 @@ private fun RoutinePatternCard(summaries: List<DailyHistorySummary>) {
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            if (daysWithSchedule.isNotEmpty()) {
-                Text(
-                    text = "평균 완료율 $average%",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold,
+            Text(
+                text = hint,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+            )
+            if (canOfferSettingsAction) {
+                RoutinePillButton(
+                    text = "최근 기록 먼저 보기",
+                    onClick = onReviewRecentClick,
+                    height = 34.dp,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = GardenUi.Ink,
+                )
+                RoutinePillButton(
+                    text = "알림/식사 시간 조정",
+                    onClick = onOpenNotificationSettingsClick,
+                    height = 34.dp,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.primary,
                 )
             }
         }
+    }
+}
+
+private fun missedPeriodHint(summaries: List<DailyHistorySummary>): String {
+    val missedPeriod = summaries
+        .flatMap { summary -> summary.missedPeriodCounts.entries }
+        .groupBy({ it.key }, { it.value })
+        .mapValues { (_, counts) -> counts.sum() }
+        .maxByOrNull { it.value }
+        ?.takeIf { it.value > 0 }
+        ?.key
+
+    return when (missedPeriod) {
+        MissedIntakePeriod.Morning -> "아침 복용을 자주 놓쳤어요. 아침 알림이나 식사 시간을 조정해보세요."
+        MissedIntakePeriod.Afternoon -> "오후 복용을 자주 놓쳤어요. 점심 이후 알림을 확인해보세요."
+        MissedIntakePeriod.Evening -> "저녁 복용을 자주 놓쳤어요. 저녁 식사 시간이나 알림을 조정해보세요."
+        null -> "자주 놓치는 날이 보이면 알림을 켜거나 식사 시간을 조정해보세요."
     }
 }
 

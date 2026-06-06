@@ -56,6 +56,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.jiyeong.supplementroutine.kmp.android.ui.common.formatDosage
 import com.jiyeong.supplementroutine.kmp.android.ui.common.formatTime
@@ -87,8 +88,8 @@ fun SupplementsRoute(
     contentPadding: PaddingValues,
     supplements: List<Supplement>,
     defaultNotificationEnabled: Boolean,
-    onAddSupplement: (Supplement) -> Unit,
-    onUpdateSupplement: (Supplement) -> Unit,
+    onAddSupplement: (Supplement, onSuccess: () -> Unit, onFailure: (String) -> Unit) -> Unit,
+    onUpdateSupplement: (Supplement, onSuccess: () -> Unit, onFailure: (String) -> Unit) -> Unit,
     onRemoveSupplement: (Supplement) -> Unit,
     onToggleNotification: (Supplement) -> Unit,
 ) {
@@ -106,15 +107,17 @@ fun SupplementsRoute(
                 isAdding = false
                 formInitialSupplement = null
             },
-            onSubmit = { supplement ->
-                if (formInitialSupplement == null) {
-                    onAddSupplement(supplement)
-                } else {
-                    onUpdateSupplement(supplement)
+            onSubmit = { supplement, onFailure ->
+                val closeForm = {
+                    hapticFeedback.saved()
+                    isAdding = false
+                    formInitialSupplement = null
                 }
-                hapticFeedback.saved()
-                isAdding = false
-                formInitialSupplement = null
+                if (formInitialSupplement == null) {
+                    onAddSupplement(supplement, closeForm, onFailure)
+                } else {
+                    onUpdateSupplement(supplement, closeForm, onFailure)
+                }
             },
             onValidationError = hapticFeedback::validationWarning,
         )
@@ -206,7 +209,7 @@ private fun SupplementFormScreen(
     initialSupplement: Supplement?,
     defaultNotificationEnabled: Boolean,
     onDismiss: () -> Unit,
-    onSubmit: (Supplement) -> Unit,
+    onSubmit: (Supplement, onFailure: (String) -> Unit) -> Unit,
     onValidationError: () -> Unit,
 ) {
     val isEditMode = initialSupplement != null
@@ -218,7 +221,10 @@ private fun SupplementFormScreen(
         )
     }
     var dosageUnit by remember(initialSupplement) {
-        mutableStateOf(initialSupplement?.dosageUnit ?: SupplementFormPolicy.DEFAULT_UNIT)
+        mutableStateOf(
+            initialSupplement?.dosageUnit?.let(SupplementFormPolicy::normalizeDosageUnitForSelection)
+                ?: SupplementFormPolicy.DEFAULT_UNIT,
+        )
     }
     var isRoutineBased by remember(initialSupplement) {
         mutableStateOf(initialSupplement?.method != IntakeMethod.FixedTime && initialSupplement?.method != IntakeMethod.Interval)
@@ -256,7 +262,17 @@ private fun SupplementFormScreen(
         mutableStateOf(initialSupplement?.isNotificationEnabled ?: defaultNotificationEnabled)
     }
     var memo by remember(initialSupplement) { mutableStateOf(initialSupplement?.memo.orEmpty()) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
+    var validationErrorMessage by remember { mutableStateOf<String?>(null) }
+    var saveFailureMessage by remember { mutableStateOf<String?>(null) }
+    var isSaving by remember { mutableStateOf(false) }
+    var showMoreDosageUnits by remember(initialSupplement) {
+        mutableStateOf(
+            initialSupplement?.dosageUnit
+                ?.let(SupplementFormPolicy::normalizeDosageUnitForSelection)
+                ?.let { it !in SupplementFormPolicy.primaryDosageUnits }
+                ?: false,
+        )
+    }
 
     fun syncFixedTimes(count: Int) {
         fixedCount = count
@@ -268,22 +284,26 @@ private fun SupplementFormScreen(
         val trimmedName = name.trim()
         val nameError = SupplementFormPolicy.validateName(trimmedName)
         if (nameError != null) {
-            errorMessage = validationMessage(nameError)
+            validationErrorMessage = validationMessage(nameError)
+            saveFailureMessage = null
             onValidationError()
             return
         }
 
-        val dosageValue = SupplementFormPolicy.parseDosage(dosageText)
-        if (dosageValue == null) {
-            errorMessage = validationMessage(SupplementFormValidationError.InvalidDosage)
+        val parsedDosage = SupplementFormPolicy.parseDosageInput(dosageText)
+        if (parsedDosage == null) {
+            validationErrorMessage = validationMessage(SupplementFormValidationError.InvalidDosage)
+            saveFailureMessage = null
             onValidationError()
             return
         }
+        val submittedDosageUnit = parsedDosage.unit ?: dosageUnit
 
         if (isRoutineBased) {
             val routineError = SupplementFormPolicy.validateRoutineSlots(selectedSlots)
             if (routineError != null) {
-                errorMessage = validationMessage(routineError)
+                validationErrorMessage = validationMessage(routineError)
+                saveFailureMessage = null
                 onValidationError()
                 return
             }
@@ -291,8 +311,8 @@ private fun SupplementFormScreen(
 
         val input = SupplementFormInput(
             name = trimmedName,
-            dosageUnit = dosageUnit,
-            dosageValue = dosageValue,
+            dosageUnit = submittedDosageUnit,
+            dosageValue = parsedDosage.value,
             isRoutineBased = isRoutineBased,
             isSpecificTime = isSpecificTime,
             selectedSlots = selectedSlots,
@@ -305,13 +325,19 @@ private fun SupplementFormScreen(
             memo = memo,
         )
 
+        isSaving = true
+        validationErrorMessage = null
+        saveFailureMessage = null
         onSubmit(
             SupplementFormMapper.toSupplement(
                 input = input,
                 initialSupplement = initialSupplement,
                 idProvider = { System.currentTimeMillis().toString() },
             ),
-        )
+        ) { _ ->
+            saveFailureMessage = "저장하지 못했어요. 다시 시도해주세요."
+            isSaving = false
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -330,9 +356,10 @@ private fun SupplementFormScreen(
                 FormHeader(
                     title = if (isEditMode) "영양제 수정" else "영양제 추가",
                     onDismiss = onDismiss,
+                    isDismissEnabled = !isSaving,
                 )
             }
-            errorMessage?.let { message ->
+            validationErrorMessage?.let { message ->
                 item { FormErrorCard(message = message) }
             }
             item {
@@ -350,8 +377,9 @@ private fun SupplementFormScreen(
                             onValueChange = { dosageText = it },
                             modifier = Modifier.weight(1f),
                             label = { Text("복용량") },
+                            supportingText = { Text("예: 1정, 400mg, 1000 IU") },
                             singleLine = true,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                         )
                         Column(
                             modifier = Modifier.weight(1f),
@@ -362,14 +390,29 @@ private fun SupplementFormScreen(
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                SupplementFormPolicy.dosageUnits.forEach { unit ->
+                            androidx.compose.foundation.layout.FlowRow(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                val visibleDosageUnits = if (showMoreDosageUnits) {
+                                    SupplementFormPolicy.dosageUnits
+                                } else {
+                                    SupplementFormPolicy.primaryDosageUnits
+                                }
+                                visibleDosageUnits.forEach { unit ->
                                     FilterChip(
                                         selected = dosageUnit == unit,
                                         onClick = { dosageUnit = unit },
                                         label = { Text(unit) },
                                     )
                                 }
+                                FilterChip(
+                                    selected = showMoreDosageUnits,
+                                    onClick = { showMoreDosageUnits = !showMoreDosageUnits },
+                                    label = {
+                                        Text(if (showMoreDosageUnits) "간단히" else "더보기")
+                                    },
+                                )
                             }
                         }
                     }
@@ -485,18 +528,52 @@ private fun SupplementFormScreen(
                 .fillMaxWidth(),
             color = MaterialTheme.colorScheme.background.copy(alpha = 0.96f),
         ) {
-            Button(
-            onClick = ::submit,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = 20.dp,
-                    end = 20.dp,
-                    bottom = contentPadding.calculateBottomPadding() + 16.dp,
-                    top = 12.dp,
-                ),
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = 20.dp,
+                        end = 20.dp,
+                        bottom = contentPadding.calculateBottomPadding() + 14.dp,
+                        top = 12.dp,
+                    ),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Text(if (isEditMode) "수정 완료" else "저장")
+                saveFailureMessage?.let { message ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = message,
+                            modifier = Modifier.weight(1f),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.error,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        TextButton(
+                            onClick = ::submit,
+                            enabled = !isSaving,
+                        ) {
+                            Text("다시 시도")
+                        }
+                    }
+                }
+                Button(
+                    onClick = ::submit,
+                    enabled = !isSaving,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(
+                        when {
+                            isSaving -> "저장 중"
+                            isEditMode -> "수정 완료"
+                            else -> "저장"
+                        },
+                    )
+                }
             }
         }
     }
@@ -506,6 +583,7 @@ private fun SupplementFormScreen(
 private fun FormHeader(
     title: String,
     onDismiss: () -> Unit,
+    isDismissEnabled: Boolean,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -524,7 +602,10 @@ private fun FormHeader(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        TextButton(onClick = onDismiss) {
+        TextButton(
+            onClick = onDismiss,
+            enabled = isDismissEnabled,
+        ) {
             Text("취소")
         }
     }
@@ -892,7 +973,7 @@ private fun DeleteSupplementDialog(
 private fun validationMessage(error: SupplementFormValidationError): String {
     return when (error) {
         SupplementFormValidationError.EmptyName -> "영양제 이름을 입력해주세요."
-        SupplementFormValidationError.InvalidDosage -> "복용량은 0보다 큰 숫자로 입력해주세요."
+        SupplementFormValidationError.InvalidDosage -> "복용량은 0보다 큰 값과 지원 단위로 입력해주세요. 예: 1정, 400mg, 1000 IU"
         SupplementFormValidationError.EmptyRoutineSlots -> "복용 타이밍을 하나 이상 선택해주세요."
     }
 }
