@@ -53,6 +53,7 @@ import com.jiyeong.supplementroutine.kmp.android.ui.common.GardenUi
 import com.jiyeong.supplementroutine.shared.domain.LocalDateValue
 import com.jiyeong.supplementroutine.shared.history.DailyHistorySummary
 import com.jiyeong.supplementroutine.shared.history.HistoryViewState
+import com.jiyeong.supplementroutine.shared.history.MissedIntakePeriod
 import java.util.Calendar
 
 @Composable
@@ -299,8 +300,7 @@ private fun RoutinePatternCard(summaries: List<DailyHistorySummary>) {
     val hint = when {
         daysWithSchedule.isEmpty() -> "오늘 화면에서 첫 기록을 남겨보세요."
         missedDays == 0 -> "지금 설정을 유지해도 좋아요."
-        missedDays >= daysWithSchedule.size / 2 -> "알림 시간이나 식사 시간을 더 현실적인 시간으로 조정해보세요."
-        else -> "자주 놓치는 날이 보이면 알림을 켜거나 식사 시간을 조정해보세요."
+        else -> missedPeriodHint(daysWithSchedule)
     }
 
     RoutineCard(
@@ -329,6 +329,23 @@ private fun RoutinePatternCard(summaries: List<DailyHistorySummary>) {
                 fontWeight = FontWeight.Bold,
             )
         }
+    }
+}
+
+private fun missedPeriodHint(summaries: List<DailyHistorySummary>): String {
+    val missedPeriod = summaries
+        .flatMap { summary -> summary.missedPeriodCounts.entries }
+        .groupBy({ it.key }, { it.value })
+        .mapValues { (_, counts) -> counts.sum() }
+        .maxByOrNull { it.value }
+        ?.takeIf { it.value > 0 }
+        ?.key
+
+    return when (missedPeriod) {
+        MissedIntakePeriod.Morning -> "아침 복용을 자주 놓쳤어요. 아침 알림이나 식사 시간을 조정해보세요."
+        MissedIntakePeriod.Afternoon -> "오후 복용을 자주 놓쳤어요. 점심 이후 알림을 확인해보세요."
+        MissedIntakePeriod.Evening -> "저녁 복용을 자주 놓쳤어요. 저녁 식사 시간이나 알림을 조정해보세요."
+        null -> "자주 놓치는 날이 보이면 알림을 켜거나 식사 시간을 조정해보세요."
     }
 }
 

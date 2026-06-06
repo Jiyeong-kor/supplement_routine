@@ -67,6 +67,8 @@ fun TodayRoute(
     items: List<ScheduledIntakeRecord>,
     errorMessage: String?,
     notificationNeedsAttention: Boolean,
+    feedbackMessage: String?,
+    onFeedbackMessageConsumed: () -> Unit,
     onAddSupplementClick: () -> Unit,
     onOpenNotificationSettingsClick: () -> Unit,
     onToggleRecord: (IntakeRecord) -> Unit,
@@ -77,6 +79,8 @@ fun TodayRoute(
         items = items,
         errorMessage = errorMessage,
         notificationNeedsAttention = notificationNeedsAttention,
+        feedbackMessage = feedbackMessage,
+        onFeedbackMessageConsumed = onFeedbackMessageConsumed,
         onAddSupplementClick = onAddSupplementClick,
         onOpenNotificationSettingsClick = onOpenNotificationSettingsClick,
         onToggleRecord = onToggleRecord,
@@ -90,12 +94,15 @@ private fun TodayScreen(
     items: List<ScheduledIntakeRecord>,
     errorMessage: String?,
     notificationNeedsAttention: Boolean,
+    feedbackMessage: String?,
+    onFeedbackMessageConsumed: () -> Unit,
     onAddSupplementClick: () -> Unit,
     onOpenNotificationSettingsClick: () -> Unit,
     onToggleRecord: (IntakeRecord) -> Unit,
 ) {
-    var completionMessage by remember { mutableStateOf<String?>(null) }
+    var completionFeedback by remember { mutableStateOf<CompletionFeedback?>(null) }
     var showCompletedItems by remember { mutableStateOf(false) }
+    var notificationAttentionDismissed by remember(date) { mutableStateOf(false) }
     val sortedItems = remember(items) {
         items.sortedWith(
             compareBy<ScheduledIntakeRecord> { it.record.isDone }
@@ -108,10 +115,17 @@ private fun TodayScreen(
     val shouldShowCompletedItems = showCompletedItems
     val nextItem = sortedItems.firstOrNull { !it.record.isDone }
 
-    LaunchedEffect(completionMessage) {
-        if (completionMessage != null) {
+    LaunchedEffect(feedbackMessage) {
+        feedbackMessage?.let {
+            completionFeedback = CompletionFeedback(message = it)
+            onFeedbackMessageConsumed()
+        }
+    }
+
+    LaunchedEffect(completionFeedback?.message) {
+        if (completionFeedback != null) {
             delay(2200)
-            completionMessage = null
+            completionFeedback = null
         }
     }
 
@@ -137,15 +151,27 @@ private fun TodayScreen(
                     nextItem = nextItem,
                 )
             }
-            if (notificationNeedsAttention) {
+            if (notificationNeedsAttention && !notificationAttentionDismissed) {
                 item {
                     NotificationAttentionCard(
                         onOpenSettingsClick = onOpenNotificationSettingsClick,
+                        onDismissClick = { notificationAttentionDismissed = true },
                     )
                 }
             }
-            completionMessage?.let { message ->
-                item { CompletionFeedbackCard(message = message) }
+            completionFeedback?.let { feedback ->
+                item {
+                    CompletionFeedbackCard(
+                        message = feedback.message,
+                        actionLabel = feedback.actionLabel,
+                        onActionClick = feedback.actionRecord?.let { record ->
+                            {
+                                completionFeedback = null
+                                onToggleRecord(record)
+                            }
+                        },
+                    )
+                }
             }
             errorMessage?.let { message ->
                 item { ErrorCard(message = message) }
@@ -167,9 +193,15 @@ private fun TodayScreen(
                         item = item,
                         onClick = {
                             if (!item.record.isDone) {
-                                completionMessage = "${item.supplement.name} 기록에 반영됐어요."
+                                completionFeedback = CompletionFeedback(
+                                    message = "${item.supplement.name} 기록에 반영됐어요.",
+                                )
                             } else {
-                                completionMessage = "${item.supplement.name} 기록을 되돌렸어요."
+                                completionFeedback = CompletionFeedback(
+                                    message = "${item.supplement.name} 기록을 되돌렸어요.",
+                                    actionLabel = "다시 완료",
+                                    actionRecord = item.record.markUndone(),
+                                )
                             }
                             onToggleRecord(item.record)
                         },
@@ -197,7 +229,11 @@ private fun TodayScreen(
                             TodaySupplementItem(
                                 item = item,
                                 onClick = {
-                                    completionMessage = "${item.supplement.name} 기록을 되돌렸어요."
+                                    completionFeedback = CompletionFeedback(
+                                        message = "${item.supplement.name} 기록을 되돌렸어요.",
+                                        actionLabel = "다시 완료",
+                                        actionRecord = item.record.markUndone(),
+                                    )
                                     onToggleRecord(item.record)
                                 },
                             )
@@ -222,7 +258,10 @@ private fun TodayScreen(
 }
 
 @Composable
-private fun NotificationAttentionCard(onOpenSettingsClick: () -> Unit) {
+private fun NotificationAttentionCard(
+    onOpenSettingsClick: () -> Unit,
+    onDismissClick: () -> Unit,
+) {
     RoutineCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
     ) {
@@ -259,6 +298,13 @@ private fun NotificationAttentionCard(onOpenSettingsClick: () -> Unit) {
                 height = 36.dp,
                 containerColor = MaterialTheme.colorScheme.error,
                 contentColor = MaterialTheme.colorScheme.onError,
+            )
+            RoutinePillButton(
+                text = "오늘은 숨기기",
+                onClick = onDismissClick,
+                height = 34.dp,
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface,
             )
         }
     }
@@ -458,7 +504,11 @@ private fun TimeBadge(time: TimeOfDayValue, isDone: Boolean) {
 }
 
 @Composable
-private fun CompletionFeedbackCard(message: String) {
+private fun CompletionFeedbackCard(
+    message: String,
+    actionLabel: String? = null,
+    onActionClick: (() -> Unit)? = null,
+) {
     RoutineCard(
         colors = CardDefaults.cardColors(containerColor = GardenUi.SuccessSurface),
     ) {
@@ -472,15 +522,35 @@ private fun CompletionFeedbackCard(message: String) {
                 containerColor = GardenUi.LeafGreen,
                 tint = GardenUi.Ink,
             )
-            Text(
-                text = message,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Bold,
-            )
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold,
+                )
+                if (actionLabel != null && onActionClick != null) {
+                    RoutinePillButton(
+                        text = actionLabel,
+                        onClick = onActionClick,
+                        height = 32.dp,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
         }
     }
 }
+
+private data class CompletionFeedback(
+    val message: String,
+    val actionLabel: String? = null,
+    val actionRecord: IntakeRecord? = null,
+)
 
 @Composable
 private fun TodayEmptyState(onAddSupplementClick: () -> Unit) {

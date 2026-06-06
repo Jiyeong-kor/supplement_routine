@@ -44,6 +44,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -87,6 +88,7 @@ fun SupplementsRoute(
     contentPadding: PaddingValues,
     supplements: List<Supplement>,
     defaultNotificationEnabled: Boolean,
+    persistenceErrorMessage: String?,
     onAddSupplement: (Supplement, onSuccess: () -> Unit) -> Unit,
     onUpdateSupplement: (Supplement, onSuccess: () -> Unit) -> Unit,
     onRemoveSupplement: (Supplement) -> Unit,
@@ -102,6 +104,7 @@ fun SupplementsRoute(
             contentPadding = contentPadding,
             initialSupplement = formInitialSupplement,
             defaultNotificationEnabled = defaultNotificationEnabled,
+            persistenceErrorMessage = persistenceErrorMessage,
             onDismiss = {
                 isAdding = false
                 formInitialSupplement = null
@@ -207,6 +210,7 @@ private fun SupplementFormScreen(
     contentPadding: PaddingValues,
     initialSupplement: Supplement?,
     defaultNotificationEnabled: Boolean,
+    persistenceErrorMessage: String?,
     onDismiss: () -> Unit,
     onSubmit: (Supplement) -> Unit,
     onValidationError: () -> Unit,
@@ -262,6 +266,16 @@ private fun SupplementFormScreen(
     }
     var memo by remember(initialSupplement) { mutableStateOf(initialSupplement?.memo.orEmpty()) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var isSaving by remember { mutableStateOf(false) }
+    var ignoredPersistenceError by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(persistenceErrorMessage, isSaving) {
+        if (isSaving && persistenceErrorMessage != null && persistenceErrorMessage != ignoredPersistenceError) {
+            errorMessage = persistenceErrorMessage
+            isSaving = false
+            ignoredPersistenceError = persistenceErrorMessage
+        }
+    }
 
     fun syncFixedTimes(count: Int) {
         fixedCount = count
@@ -311,6 +325,9 @@ private fun SupplementFormScreen(
             memo = memo,
         )
 
+        isSaving = true
+        errorMessage = null
+        ignoredPersistenceError = persistenceErrorMessage
         onSubmit(
             SupplementFormMapper.toSupplement(
                 input = input,
@@ -336,6 +353,7 @@ private fun SupplementFormScreen(
                 FormHeader(
                     title = if (isEditMode) "영양제 수정" else "영양제 추가",
                     onDismiss = onDismiss,
+                    isDismissEnabled = !isSaving,
                 )
             }
             errorMessage?.let { message ->
@@ -496,17 +514,24 @@ private fun SupplementFormScreen(
             color = MaterialTheme.colorScheme.background.copy(alpha = 0.96f),
         ) {
             Button(
-            onClick = ::submit,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = 20.dp,
-                    end = 20.dp,
-                    bottom = contentPadding.calculateBottomPadding() + 16.dp,
-                    top = 12.dp,
-                ),
+                onClick = ::submit,
+                enabled = !isSaving,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = 20.dp,
+                        end = 20.dp,
+                        bottom = contentPadding.calculateBottomPadding() + 16.dp,
+                        top = 12.dp,
+                    ),
             ) {
-                Text(if (isEditMode) "수정 완료" else "저장")
+                Text(
+                    when {
+                        isSaving -> "저장 중"
+                        isEditMode -> "수정 완료"
+                        else -> "저장"
+                    },
+                )
             }
         }
     }
@@ -516,6 +541,7 @@ private fun SupplementFormScreen(
 private fun FormHeader(
     title: String,
     onDismiss: () -> Unit,
+    isDismissEnabled: Boolean,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -534,7 +560,10 @@ private fun FormHeader(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        TextButton(onClick = onDismiss) {
+        TextButton(
+            onClick = onDismiss,
+            enabled = isDismissEnabled,
+        ) {
             Text("취소")
         }
     }

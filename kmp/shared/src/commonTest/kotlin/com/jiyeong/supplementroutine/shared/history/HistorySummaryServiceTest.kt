@@ -51,6 +51,44 @@ class HistorySummaryServiceTest {
     }
 
     @Test
+    fun missedPeriodCountsReflectUndoneScheduledTimes() {
+        val supplement = Supplement(
+            id = "timed",
+            name = "테스트",
+            dailyCount = 3,
+            method = IntakeMethod.FixedTime,
+            dosageUnit = "정",
+            dosageValue = 1.0,
+            fixedTimes = listOf(
+                TimeOfDayValue(hour = 8, minute = 0),
+                TimeOfDayValue(hour = 14, minute = 0),
+                TimeOfDayValue(hour = 21, minute = 0),
+            ),
+            isNotificationEnabled = true,
+        )
+        val date = LocalDateValue(year = 2026, month = 5, day = 18)
+        val morningRecord = IntakeRecord(
+            id = "r_timed_20260518_0",
+            supplementId = "timed",
+            date = date,
+            scheduledTime = TimeOfDayValue(hour = 8, minute = 0),
+            isDone = true,
+        )
+
+        val summary = HistorySummaryService.createSummary(
+            date = date,
+            supplements = listOf(supplement),
+            records = mapOf(morningRecord.id to morningRecord),
+        )
+
+        assertEquals(1, summary.doneCount)
+        assertEquals(3, summary.totalCount)
+        assertEquals(null, summary.missedPeriodCounts[MissedIntakePeriod.Morning])
+        assertEquals(1, summary.missedPeriodCounts[MissedIntakePeriod.Afternoon])
+        assertEquals(1, summary.missedPeriodCounts[MissedIntakePeriod.Evening])
+    }
+
+    @Test
     fun currentMonthSummaryLeavesFutureDaysEmpty() {
         val today = LocalDateValue(year = 2026, month = 5, day = 18)
 

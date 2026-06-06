@@ -68,6 +68,7 @@ fun SupplementRoutineKmpApp(
     var selectedDestinationKey by remember { mutableStateOf("today") }
     val uiState by viewModel.uiState.collectAsState()
     val hapticFeedback = rememberRoutineHapticFeedback()
+    var todayFeedbackMessage by remember { mutableStateOf<String?>(null) }
     var notificationPermissionState by remember {
         mutableStateOf(permissionController.currentState())
     }
@@ -137,11 +138,16 @@ fun SupplementRoutineKmpApp(
                         contentPadding = paddingValues,
                         supplements = uiState.supplements,
                         defaultNotificationEnabled = uiState.notificationEnabled,
+                        persistenceErrorMessage = uiState.errorMessage,
                         onAddSupplement = { supplement, onSuccess ->
+                            val isFirstSupplement = uiState.supplements.isEmpty()
                             viewModel.addSupplement(
                                 supplement = supplement,
                                 onSuccess = {
                                     onSuccess()
+                                    if (isFirstSupplement) {
+                                        todayFeedbackMessage = "오늘 일정에 추가됐어요."
+                                    }
                                     selectedDestinationKey = "today"
                                 },
                             )
@@ -205,6 +211,8 @@ fun SupplementRoutineKmpApp(
                             uiState.supplements.any { it.isNotificationEnabled } &&
                             (!notificationPermissionState.canPostNotifications ||
                                 !notificationPermissionState.canScheduleExactAlarms),
+                        feedbackMessage = todayFeedbackMessage,
+                        onFeedbackMessageConsumed = { todayFeedbackMessage = null },
                         onAddSupplementClick = { selectedDestinationKey = "supplements" },
                         onOpenNotificationSettingsClick = { selectedDestinationKey = "settings" },
                         onToggleRecord = { record ->
