@@ -55,6 +55,8 @@ fun SettingsRoute(
     mealTimeSettings: MealTimeSettings,
     notificationEnabled: Boolean,
     notificationPermissionState: NotificationPermissionState,
+    expandNotificationTroubleshooting: Boolean,
+    onNotificationTroubleshootingExpanded: () -> Unit,
     onBreakfastTimeChanged: (TimeOfDayValue) -> Unit,
     onLunchTimeChanged: (TimeOfDayValue) -> Unit,
     onDinnerTimeChanged: (TimeOfDayValue) -> Unit,
@@ -134,6 +136,8 @@ fun SettingsRoute(
                 NotificationSettingsCard(
                     notificationEnabled = notificationEnabled,
                     notificationPermissionState = notificationPermissionState,
+                    expandTroubleshooting = expandNotificationTroubleshooting,
+                    onTroubleshootingExpanded = onNotificationTroubleshootingExpanded,
                     onNotificationEnabledChanged = onNotificationEnabledChanged,
                     onRequestNotificationPermission = onRequestNotificationPermission,
                     onRequestExactAlarmPermission = onRequestExactAlarmPermission,
@@ -326,6 +330,8 @@ private fun MealTimeDisplayRow(
 private fun NotificationSettingsCard(
     notificationEnabled: Boolean,
     notificationPermissionState: NotificationPermissionState,
+    expandTroubleshooting: Boolean,
+    onTroubleshootingExpanded: () -> Unit,
     onNotificationEnabledChanged: (Boolean) -> Unit,
     onRequestNotificationPermission: () -> Unit,
     onRequestExactAlarmPermission: () -> Unit,
@@ -334,6 +340,13 @@ private fun NotificationSettingsCard(
     onScheduleTestNotification: () -> Unit,
 ) {
     var showTroubleshooting by remember { mutableStateOf(false) }
+
+    LaunchedEffect(expandTroubleshooting) {
+        if (expandTroubleshooting) {
+            showTroubleshooting = true
+            onTroubleshootingExpanded()
+        }
+    }
 
     RoutineCard {
         Column(

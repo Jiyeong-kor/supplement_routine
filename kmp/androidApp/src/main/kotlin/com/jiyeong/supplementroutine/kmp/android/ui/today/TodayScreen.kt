@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -125,6 +126,9 @@ private fun TodayScreen(
     val completedItems = sortedItems.filter { it.record.isDone }
     val shouldShowCompletedItems = showCompletedItems
     val nextItem = sortedItems.firstOrNull { !it.record.isDone }
+    val listState = rememberLazyListState()
+    val highlightedIncompleteIndex = incompleteItems.indexOfFirst { it.supplement.id == highlightedSupplementId }
+    val willShowFeedback = completionFeedback != null || feedbackMessage != null
 
     LaunchedEffect(feedbackMessage) {
         feedbackMessage?.let {
@@ -142,6 +146,13 @@ private fun TodayScreen(
 
     LaunchedEffect(highlightedSupplementId) {
         if (highlightedSupplementId != null) {
+            if (highlightedIncompleteIndex >= 0) {
+                val leadingItems = 3 +
+                    if (notificationNeedsAttention && !notificationAttentionDismissed) 1 else 0 +
+                    if (willShowFeedback) 1 else 0 +
+                    if (errorMessage != null) 1 else 0
+                listState.animateScrollToItem(leadingItems + highlightedIncompleteIndex)
+            }
             delay(3600)
             onHighlightedSupplementConsumed()
         }
@@ -149,6 +160,7 @@ private fun TodayScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxSize(),
             contentPadding = PaddingValues(
@@ -500,23 +512,36 @@ private fun TodaySupplementItem(
                     )
                 }
             }
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clickable(role = Role.Checkbox, onClick = onClick)
-                    .semantics {
-                        contentDescription = if (record.isDone) {
-                            "${supplement.name}, 완료됨, 되돌리기"
-                        } else {
-                            "${supplement.name}, 미완료, 완료로 표시"
-                        }
-                    },
-                contentAlignment = Alignment.Center,
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
-                RoutineCheckButton(
-                    checked = record.isDone,
-                    contentDescription = statusText,
-                )
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clickable(role = Role.Checkbox, onClick = onClick)
+                        .semantics {
+                            contentDescription = if (record.isDone) {
+                                "${supplement.name}, 완료됨, 되돌리기"
+                            } else {
+                                "${supplement.name}, 미완료, 완료로 표시"
+                            }
+                        },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    RoutineCheckButton(
+                        checked = record.isDone,
+                        contentDescription = statusText,
+                    )
+                }
+                if (record.isDone) {
+                    Text(
+                        text = "되돌리기",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                    )
+                }
             }
         }
     }

@@ -56,6 +56,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.jiyeong.supplementroutine.kmp.android.ui.common.formatDosage
 import com.jiyeong.supplementroutine.kmp.android.ui.common.formatTime
@@ -261,7 +262,7 @@ private fun SupplementFormScreen(
         mutableStateOf(initialSupplement?.isNotificationEnabled ?: defaultNotificationEnabled)
     }
     var memo by remember(initialSupplement) { mutableStateOf(initialSupplement?.memo.orEmpty()) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
+    var validationErrorMessage by remember { mutableStateOf<String?>(null) }
     var saveFailureMessage by remember { mutableStateOf<String?>(null) }
     var isSaving by remember { mutableStateOf(false) }
 
@@ -275,7 +276,7 @@ private fun SupplementFormScreen(
         val trimmedName = name.trim()
         val nameError = SupplementFormPolicy.validateName(trimmedName)
         if (nameError != null) {
-            errorMessage = validationMessage(nameError)
+            validationErrorMessage = validationMessage(nameError)
             saveFailureMessage = null
             onValidationError()
             return
@@ -283,7 +284,7 @@ private fun SupplementFormScreen(
 
         val parsedDosage = SupplementFormPolicy.parseDosageInput(dosageText)
         if (parsedDosage == null) {
-            errorMessage = validationMessage(SupplementFormValidationError.InvalidDosage)
+            validationErrorMessage = validationMessage(SupplementFormValidationError.InvalidDosage)
             saveFailureMessage = null
             onValidationError()
             return
@@ -293,7 +294,7 @@ private fun SupplementFormScreen(
         if (isRoutineBased) {
             val routineError = SupplementFormPolicy.validateRoutineSlots(selectedSlots)
             if (routineError != null) {
-                errorMessage = validationMessage(routineError)
+                validationErrorMessage = validationMessage(routineError)
                 saveFailureMessage = null
                 onValidationError()
                 return
@@ -317,7 +318,7 @@ private fun SupplementFormScreen(
         )
 
         isSaving = true
-        errorMessage = null
+        validationErrorMessage = null
         saveFailureMessage = null
         onSubmit(
             SupplementFormMapper.toSupplement(
@@ -325,8 +326,7 @@ private fun SupplementFormScreen(
                 initialSupplement = initialSupplement,
                 idProvider = { System.currentTimeMillis().toString() },
             ),
-        ) { message ->
-            errorMessage = message
+        ) { _ ->
             saveFailureMessage = "저장하지 못했어요. 다시 시도해주세요."
             isSaving = false
         }
@@ -351,7 +351,7 @@ private fun SupplementFormScreen(
                     isDismissEnabled = !isSaving,
                 )
             }
-            errorMessage?.let { message ->
+            validationErrorMessage?.let { message ->
                 item { FormErrorCard(message = message) }
             }
             item {
@@ -524,6 +524,8 @@ private fun SupplementFormScreen(
                         text = message,
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.error,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
                 Button(

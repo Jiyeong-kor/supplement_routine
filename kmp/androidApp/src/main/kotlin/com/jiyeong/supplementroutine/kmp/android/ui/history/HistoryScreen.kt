@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineCard
 import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineEmptyCard
 import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutinePageHeader
+import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutinePillButton
 import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineSectionLabel
 import com.jiyeong.supplementroutine.kmp.android.ui.common.FruitAvatar
 import com.jiyeong.supplementroutine.kmp.android.ui.common.FruitVariant
@@ -61,6 +62,7 @@ fun HistoryRoute(
     contentPadding: PaddingValues,
     today: LocalDateValue,
     historyViewState: HistoryViewState,
+    onOpenNotificationSettingsClick: () -> Unit,
 ) {
     var selectedDate by remember(today.year, today.month) {
         mutableStateOf(today)
@@ -106,7 +108,12 @@ fun HistoryRoute(
             )
         }
         item { SelectedDateSummaryCard(summary = selectedSummary) }
-        item { RoutinePatternCard(summaries = historyViewState.recentSummaries) }
+        item {
+            RoutinePatternCard(
+                summaries = historyViewState.recentSummaries,
+                onOpenNotificationSettingsClick = onOpenNotificationSettingsClick,
+            )
+        }
         item {
             SectionHeader(
                 title = "최근 기록",
@@ -288,7 +295,10 @@ private fun MonthDayTile(
 }
 
 @Composable
-private fun RoutinePatternCard(summaries: List<DailyHistorySummary>) {
+private fun RoutinePatternCard(
+    summaries: List<DailyHistorySummary>,
+    onOpenNotificationSettingsClick: () -> Unit,
+) {
     val daysWithSchedule = summaries.filterNot { it.isEmpty }
     val missedDays = daysWithSchedule.count { it.doneCount < it.totalCount }
     val message = when {
@@ -303,6 +313,7 @@ private fun RoutinePatternCard(summaries: List<DailyHistorySummary>) {
         daysWithSchedule.size < 3 -> "기록이 조금 더 쌓이면 놓치기 쉬운 시간대를 알려드릴게요."
         else -> missedPeriodHint(daysWithSchedule)
     }
+    val canOfferSettingsAction = daysWithSchedule.size >= 3 && missedDays > 0
 
     RoutineCard(
         colors = androidx.compose.material3.CardDefaults.cardColors(
@@ -329,6 +340,15 @@ private fun RoutinePatternCard(summaries: List<DailyHistorySummary>) {
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
             )
+            if (canOfferSettingsAction) {
+                RoutinePillButton(
+                    text = "알림 설정 조정",
+                    onClick = onOpenNotificationSettingsClick,
+                    height = 34.dp,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                )
+            }
         }
     }
 }

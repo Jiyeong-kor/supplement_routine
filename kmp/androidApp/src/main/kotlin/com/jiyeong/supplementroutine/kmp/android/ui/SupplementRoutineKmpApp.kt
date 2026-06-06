@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.jiyeong.supplementroutine.kmp.android.notification.AndroidNotificationPermissionController
@@ -72,6 +73,7 @@ fun SupplementRoutineKmpApp(
     var todayFeedbackMessage by remember { mutableStateOf<String?>(null) }
     var todayHighlightedSupplementId by remember { mutableStateOf<String?>(null) }
     var notificationAttentionDismissedDate by remember { mutableStateOf<LocalDateValue?>(null) }
+    var expandNotificationTroubleshooting by remember { mutableStateOf(false) }
     var notificationPermissionState by remember {
         mutableStateOf(permissionController.currentState())
     }
@@ -170,12 +172,20 @@ fun SupplementRoutineKmpApp(
                         contentPadding = paddingValues,
                         today = uiState.today,
                         historyViewState = uiState.historyViewState,
+                        onOpenNotificationSettingsClick = {
+                            expandNotificationTroubleshooting = true
+                            selectedDestinationKey = "settings"
+                        },
                     )
                     "settings" -> SettingsRoute(
                         contentPadding = paddingValues,
                         mealTimeSettings = uiState.mealTimeSettings,
                         notificationEnabled = uiState.notificationEnabled,
                         notificationPermissionState = notificationPermissionState,
+                        expandNotificationTroubleshooting = expandNotificationTroubleshooting,
+                        onNotificationTroubleshootingExpanded = {
+                            expandNotificationTroubleshooting = false
+                        },
                         onBreakfastTimeChanged = viewModel::updateBreakfastTime,
                         onLunchTimeChanged = viewModel::updateLunchTime,
                         onDinnerTimeChanged = viewModel::updateDinnerTime,
@@ -225,7 +235,10 @@ fun SupplementRoutineKmpApp(
                         feedbackMessage = todayFeedbackMessage,
                         onFeedbackMessageConsumed = { todayFeedbackMessage = null },
                         onAddSupplementClick = { selectedDestinationKey = "supplements" },
-                        onOpenNotificationSettingsClick = { selectedDestinationKey = "settings" },
+                        onOpenNotificationSettingsClick = {
+                            expandNotificationTroubleshooting = true
+                            selectedDestinationKey = "settings"
+                        },
                         onToggleRecord = { record ->
                             if (!record.isDone) {
                                 hapticFeedback.intakeCompleted()
@@ -323,6 +336,8 @@ private fun RowScope.DestinationItem(
                 style = MaterialTheme.typography.labelSmall,
                 color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         }
     }
