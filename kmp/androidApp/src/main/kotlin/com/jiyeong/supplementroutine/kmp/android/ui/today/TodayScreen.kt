@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,10 +15,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.EventAvailable
+import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material.icons.outlined.Spa
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -64,7 +67,15 @@ fun TodayRoute(
     date: LocalDateValue,
     items: List<ScheduledIntakeRecord>,
     errorMessage: String?,
+    notificationNeedsAttention: Boolean,
+    notificationAttentionDismissed: Boolean,
+    onDismissNotificationAttention: () -> Unit,
+    highlightedSupplementId: String?,
+    onHighlightedSupplementConsumed: () -> Unit,
+    feedbackMessage: String?,
+    onFeedbackMessageConsumed: () -> Unit,
     onAddSupplementClick: () -> Unit,
+    onOpenNotificationSettingsClick: () -> Unit,
     onToggleRecord: (IntakeRecord) -> Unit,
 ) {
     TodayScreen(
@@ -72,7 +83,15 @@ fun TodayRoute(
         date = date,
         items = items,
         errorMessage = errorMessage,
+        notificationNeedsAttention = notificationNeedsAttention,
+        notificationAttentionDismissed = notificationAttentionDismissed,
+        onDismissNotificationAttention = onDismissNotificationAttention,
+        highlightedSupplementId = highlightedSupplementId,
+        onHighlightedSupplementConsumed = onHighlightedSupplementConsumed,
+        feedbackMessage = feedbackMessage,
+        onFeedbackMessageConsumed = onFeedbackMessageConsumed,
         onAddSupplementClick = onAddSupplementClick,
+        onOpenNotificationSettingsClick = onOpenNotificationSettingsClick,
         onToggleRecord = onToggleRecord,
     )
 }
@@ -83,10 +102,19 @@ private fun TodayScreen(
     date: LocalDateValue,
     items: List<ScheduledIntakeRecord>,
     errorMessage: String?,
+    notificationNeedsAttention: Boolean,
+    notificationAttentionDismissed: Boolean,
+    onDismissNotificationAttention: () -> Unit,
+    highlightedSupplementId: String?,
+    onHighlightedSupplementConsumed: () -> Unit,
+    feedbackMessage: String?,
+    onFeedbackMessageConsumed: () -> Unit,
     onAddSupplementClick: () -> Unit,
+    onOpenNotificationSettingsClick: () -> Unit,
     onToggleRecord: (IntakeRecord) -> Unit,
 ) {
-    var completionMessage by remember { mutableStateOf<String?>(null) }
+    var completionFeedback by remember { mutableStateOf<CompletionFeedback?>(null) }
+    var showCompletedItems by remember { mutableStateOf(false) }
     val sortedItems = remember(items) {
         items.sortedWith(
             compareBy<ScheduledIntakeRecord> { it.record.isDone }
@@ -94,17 +122,63 @@ private fun TodayScreen(
                 .thenBy { it.record.scheduledTime.minute },
         )
     }
+    val incompleteItems = sortedItems.filterNot { it.record.isDone }
+    val completedItems = sortedItems.filter { it.record.isDone }
+    val shouldShowCompletedItems = showCompletedItems
+    val shouldShowCompletedItemUndoLabels = completedItems.size <= 2
+    val allItemsCompleted = items.isNotEmpty() && incompleteItems.isEmpty()
     val nextItem = sortedItems.firstOrNull { !it.record.isDone }
+    val listState = rememberLazyListState()
+    val willShowFeedback = completionFeedback != null || feedbackMessage != null
+    val highlightedItemKey = incompleteItems
+        .firstOrNull { it.supplement.id == highlightedSupplementId }
+        ?.record
+        ?.id
+        ?.let { id -> "intake-$id" }
+    val renderedItemKeys = buildList {
+        add("today-header")
+        add("today-progress")
+        if (notificationNeedsAttention && !notificationAttentionDismissed) add("notification-attention")
+        if (willShowFeedback) add("completion-feedback")
+        if (errorMessage != null) add("error-message")
+        add("routine-section")
+        incompleteItems.forEach { item -> add("intake-${item.record.id}") }
+        if (completedItems.isNotEmpty()) add("completed-toggle")
+        if (shouldShowCompletedItems) {
+            if (!shouldShowCompletedItemUndoLabels) add("completed-undo-guide")
+            completedItems.forEach { item -> add("done-${item.record.id}") }
+        }
+    }
+    val highlightedItemIndex = highlightedItemKey?.let(renderedItemKeys::indexOf) ?: -1
 
-    LaunchedEffect(completionMessage) {
-        if (completionMessage != null) {
-            delay(2200)
-            completionMessage = null
+    LaunchedEffect(feedbackMessage) {
+        feedbackMessage?.let {
+            completionFeedback = CompletionFeedback(
+                message = it,
+                durationMillis = 1200,
+            )
+            onFeedbackMessageConsumed()
+        }
+    }
+
+    LaunchedEffect(completionFeedback) {
+        completionFeedback?.let { feedback ->
+            delay(feedback.durationMillis)
+            completionFeedback = null
+        }
+    }
+
+    LaunchedEffect(highlightedSupplementId, highlightedItemIndex) {
+        if (highlightedSupplementId != null && highlightedItemIndex >= 0) {
+            listState.animateScrollToItem(highlightedItemIndex)
+            delay(3600)
+            onHighlightedSupplementConsumed()
         }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxSize(),
             contentPadding = PaddingValues(
@@ -115,23 +189,42 @@ private fun TodayScreen(
             ),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            item {
+            item(key = "today-header") {
                 TodayHeader(date = date)
             }
-            item {
+            item(key = "today-progress") {
                 TodayProgressCard(
                     done = items.count { it.record.isDone },
                     total = items.size,
                     nextItem = nextItem,
                 )
             }
-            completionMessage?.let { message ->
-                item { CompletionFeedbackCard(message = message) }
+            if (notificationNeedsAttention && !notificationAttentionDismissed) {
+                item(key = "notification-attention") {
+                    NotificationAttentionCard(
+                        onOpenSettingsClick = onOpenNotificationSettingsClick,
+                        onDismissClick = onDismissNotificationAttention,
+                    )
+                }
+            }
+            completionFeedback?.let { feedback ->
+                item(key = "completion-feedback") {
+                    CompletionFeedbackCard(
+                        message = feedback.message,
+                        actionLabel = feedback.actionLabel,
+                        onActionClick = feedback.actionRecord?.let { record ->
+                            {
+                                completionFeedback = null
+                                onToggleRecord(record)
+                            }
+                        },
+                    )
+                }
             }
             errorMessage?.let { message ->
-                item { ErrorCard(message = message) }
+                item(key = "error-message") { ErrorCard(message = message) }
             }
-            item {
+            item(key = "routine-section") {
                 RoutineSectionLabel(
                     title = "복용 목록",
                     trailing = "${items.count { it.record.isDone }}/${items.size}",
@@ -141,18 +234,82 @@ private fun TodayScreen(
                 item { TodayEmptyState(onAddSupplementClick = onAddSupplementClick) }
             } else {
                 items(
-                    items = sortedItems,
-                    key = { it.record.id },
+                    items = incompleteItems,
+                    key = { "intake-${it.record.id}" },
                 ) { item ->
                     TodaySupplementItem(
                         item = item,
+                        highlighted = item.supplement.id == highlightedSupplementId,
                         onClick = {
                             if (!item.record.isDone) {
-                                completionMessage = "${item.supplement.name} 기록에 반영됐어요."
+                                completionFeedback = CompletionFeedback(
+                                    message = "${item.supplement.name} 기록에 반영됐어요.",
+                                )
+                            } else {
+                                completionFeedback = CompletionFeedback(
+                                    message = "${item.supplement.name} 기록을 되돌렸어요.",
+                                    actionLabel = "다시 완료",
+                                    actionRecord = item.record.markUndone(),
+                                )
                             }
                             onToggleRecord(item.record)
                         },
                     )
+                }
+                if (completedItems.isNotEmpty()) {
+                    item(key = "completed-toggle") {
+                        RoutinePillButton(
+                            text = if (shouldShowCompletedItems) {
+                                "완료한 복용 접기"
+                            } else if (allItemsCompleted) {
+                                "오늘 완료한 복용 보기"
+                            } else {
+                                "완료한 복용 ${completedItems.size}개 보기"
+                            },
+                            onClick = { showCompletedItems = !showCompletedItems },
+                            height = if (allItemsCompleted && !shouldShowCompletedItems) 42.dp else 38.dp,
+                            containerColor = if (allItemsCompleted && !shouldShowCompletedItems) {
+                                GardenUi.SuccessSurface
+                            } else {
+                                GardenUi.SurfaceSoft
+                            },
+                            contentColor = if (allItemsCompleted && !shouldShowCompletedItems) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                GardenUi.Ink
+                            },
+                        )
+                    }
+                    if (shouldShowCompletedItems) {
+                        if (!shouldShowCompletedItemUndoLabels) {
+                            item(key = "completed-undo-guide") {
+                                Text(
+                                    text = "완료 항목은 체크를 눌러 되돌릴 수 있어요.",
+                                    modifier = Modifier.padding(horizontal = 4.dp),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+                        items(
+                            items = completedItems,
+                            key = { "done-${it.record.id}" },
+                        ) { item ->
+                            TodaySupplementItem(
+                                item = item,
+                                highlighted = item.supplement.id == highlightedSupplementId,
+                                showUndoLabel = shouldShowCompletedItemUndoLabels,
+                                onClick = {
+                                    completionFeedback = CompletionFeedback(
+                                        message = "${item.supplement.name} 기록을 되돌렸어요.",
+                                        actionLabel = "다시 완료",
+                                        actionRecord = item.record.markUndone(),
+                                    )
+                                    onToggleRecord(item.record)
+                                },
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -168,6 +325,59 @@ private fun TodayScreen(
                     bottom = contentPadding.calculateBottomPadding() + 16.dp,
                 ),
         )
+    }
+}
+
+@Composable
+private fun NotificationAttentionCard(
+    onOpenSettingsClick: () -> Unit,
+    onDismissClick: () -> Unit,
+) {
+    RoutineCard(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+    ) {
+        Column(
+            modifier = Modifier.padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                RoutineIconBadge(
+                    icon = Icons.Outlined.NotificationsOff,
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    tint = MaterialTheme.colorScheme.error,
+                )
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "알림이 오지 않을 수 있어요",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        text = "기기 설정에서 알림 권한을 허용해주세요.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                    )
+                }
+            }
+            RoutinePillButton(
+                text = "설정에서 허용하기",
+                onClick = onOpenSettingsClick,
+                height = 36.dp,
+                containerColor = MaterialTheme.colorScheme.error,
+                contentColor = MaterialTheme.colorScheme.onError,
+            )
+            RoutinePillButton(
+                text = "오늘은 숨기기",
+                onClick = onDismissClick,
+                height = 34.dp,
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+            )
+        }
     }
 }
 
@@ -191,7 +401,7 @@ private fun ErrorCard(message: String) {
 private fun TodayHeader(date: LocalDateValue) {
     RoutinePageHeader(
         title = "오늘 루틴",
-        eyebrow = "${date.year}년 ${date.month}월 ${date.day}일 ${weekdayLabel()}요일",
+        eyebrow = "${date.year}년 ${date.month}월 ${date.day}일 ${weekdayLabel(date)}요일",
     )
 }
 
@@ -268,6 +478,8 @@ private fun TodayProgressCard(
 @Composable
 private fun TodaySupplementItem(
     item: ScheduledIntakeRecord,
+    highlighted: Boolean = false,
+    showUndoLabel: Boolean = true,
     onClick: () -> Unit,
 ) {
     val record = item.record
@@ -278,6 +490,8 @@ private fun TodaySupplementItem(
         colors = CardDefaults.cardColors(
             containerColor = if (record.isDone) {
                 MaterialTheme.colorScheme.surfaceContainerHighest
+            } else if (highlighted) {
+                GardenUi.SuccessSurface
             } else {
                 MaterialTheme.colorScheme.surface
             },
@@ -286,7 +500,13 @@ private fun TodaySupplementItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(role = Role.Checkbox, onClick = onClick)
+                .then(
+                    if (record.isDone) {
+                        Modifier
+                    } else {
+                        Modifier.clickable(role = Role.Checkbox, onClick = onClick)
+                    },
+                )
                 .semantics {
                     contentDescription = "${supplement.name}, ${formatTime(record.scheduledTime)}, $statusText"
                 }
@@ -309,10 +529,20 @@ private fun TodaySupplementItem(
                     },
                     fontWeight = FontWeight.SemiBold,
                 )
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
                     RoutineMetaChip(text = formatTime(record.scheduledTime))
                     RoutineMetaChip(text = scheduleLabelText(item.label))
                     RoutineMetaChip(text = "${formatDosage(supplement.dosageValue)} ${supplement.dosageUnit}")
+                    if (highlighted) {
+                        RoutineMetaChip(
+                            text = "방금 추가됨",
+                            containerColor = GardenUi.LeafGreen,
+                            contentColor = GardenUi.Ink,
+                        )
+                    }
                 }
                 supplement.memo?.let { memo ->
                     Text(
@@ -322,10 +552,37 @@ private fun TodaySupplementItem(
                     )
                 }
             }
-            RoutineCheckButton(
-                checked = record.isDone,
-                contentDescription = statusText,
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clickable(role = Role.Checkbox, onClick = onClick)
+                        .semantics {
+                            contentDescription = if (record.isDone) {
+                                "${supplement.name}, 완료됨, 되돌리기"
+                            } else {
+                                "${supplement.name}, 미완료, 완료로 표시"
+                            }
+                        },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    RoutineCheckButton(
+                        checked = record.isDone,
+                        contentDescription = null,
+                    )
+                }
+                if (record.isDone && showUndoLabel) {
+                    Text(
+                        text = "되돌리기",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                    )
+                }
+            }
         }
     }
 }
@@ -362,7 +619,11 @@ private fun TimeBadge(time: TimeOfDayValue, isDone: Boolean) {
 }
 
 @Composable
-private fun CompletionFeedbackCard(message: String) {
+private fun CompletionFeedbackCard(
+    message: String,
+    actionLabel: String? = null,
+    onActionClick: (() -> Unit)? = null,
+) {
     RoutineCard(
         colors = CardDefaults.cardColors(containerColor = GardenUi.SuccessSurface),
     ) {
@@ -376,15 +637,36 @@ private fun CompletionFeedbackCard(message: String) {
                 containerColor = GardenUi.LeafGreen,
                 tint = GardenUi.Ink,
             )
-            Text(
-                text = message,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Bold,
-            )
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold,
+                )
+                if (actionLabel != null && onActionClick != null) {
+                    RoutinePillButton(
+                        text = actionLabel,
+                        onClick = onActionClick,
+                        height = 32.dp,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
         }
     }
 }
+
+private data class CompletionFeedback(
+    val message: String,
+    val actionLabel: String? = null,
+    val actionRecord: IntakeRecord? = null,
+    val durationMillis: Long = 2200,
+)
 
 @Composable
 private fun TodayEmptyState(onAddSupplementClick: () -> Unit) {
@@ -423,8 +705,13 @@ private fun TodayEmptyState(onAddSupplementClick: () -> Unit) {
     }
 }
 
-private fun weekdayLabel(): String {
-    return when (Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) {
+private fun weekdayLabel(date: LocalDateValue): String {
+    val calendar = Calendar.getInstance().apply {
+        set(Calendar.YEAR, date.year)
+        set(Calendar.MONTH, date.month - 1)
+        set(Calendar.DAY_OF_MONTH, date.day)
+    }
+    return when (calendar.get(Calendar.DAY_OF_WEEK)) {
         Calendar.MONDAY -> "월"
         Calendar.TUESDAY -> "화"
         Calendar.WEDNESDAY -> "수"

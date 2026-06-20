@@ -4,12 +4,20 @@ import com.jiyeong.supplementroutine.shared.domain.IntakeRecord
 import com.jiyeong.supplementroutine.shared.domain.LocalDateValue
 import com.jiyeong.supplementroutine.shared.domain.MealTimeSettings
 import com.jiyeong.supplementroutine.shared.domain.Supplement
+import com.jiyeong.supplementroutine.shared.domain.TimeOfDayValue
 import com.jiyeong.supplementroutine.shared.scheduling.SchedulingService
+
+enum class MissedIntakePeriod {
+    Morning,
+    Afternoon,
+    Evening,
+}
 
 data class DailyHistorySummary(
     val date: LocalDateValue,
     val doneCount: Int,
     val totalCount: Int,
+    val missedPeriodCounts: Map<MissedIntakePeriod, Int> = emptyMap(),
 ) {
     val completionRate: Double
         get() = if (totalCount == 0) 0.0 else doneCount.toDouble() / totalCount
@@ -43,11 +51,16 @@ object HistorySummaryService {
         val doneCount = scheduledRecords.count { item ->
             records[item.record.id]?.isDone == true
         }
+        val missedPeriodCounts = scheduledRecords
+            .filterNot { item -> records[item.record.id]?.isDone == true }
+            .groupingBy { item -> missedPeriodFor(item.record.scheduledTime) }
+            .eachCount()
 
         return DailyHistorySummary(
             date = date,
             doneCount = doneCount,
             totalCount = scheduledRecords.size,
+            missedPeriodCounts = missedPeriodCounts,
         )
     }
 
@@ -113,6 +126,14 @@ object HistorySummaryService {
             ),
             recentSummaries = recent.drop(1),
         )
+    }
+}
+
+private fun missedPeriodFor(time: TimeOfDayValue): MissedIntakePeriod {
+    return when {
+        time.hour < 12 -> MissedIntakePeriod.Morning
+        time.hour < 18 -> MissedIntakePeriod.Afternoon
+        else -> MissedIntakePeriod.Evening
     }
 }
 

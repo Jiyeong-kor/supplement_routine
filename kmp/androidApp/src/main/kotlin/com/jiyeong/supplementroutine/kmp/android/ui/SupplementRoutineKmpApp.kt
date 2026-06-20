@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.jiyeong.supplementroutine.kmp.android.notification.AndroidNotificationPermissionController
@@ -58,6 +59,7 @@ import com.jiyeong.supplementroutine.kmp.android.ui.settings.SettingsRoute
 import com.jiyeong.supplementroutine.kmp.android.ui.supplements.SupplementsRoute
 import com.jiyeong.supplementroutine.kmp.android.ui.today.TodayRoute
 import com.jiyeong.supplementroutine.shared.SupplementRoutineInfo
+import com.jiyeong.supplementroutine.shared.domain.LocalDateValue
 
 @Composable
 fun SupplementRoutineKmpApp(
@@ -68,6 +70,10 @@ fun SupplementRoutineKmpApp(
     var selectedDestinationKey by remember { mutableStateOf("today") }
     val uiState by viewModel.uiState.collectAsState()
     val hapticFeedback = rememberRoutineHapticFeedback()
+    var todayFeedbackMessage by remember { mutableStateOf<String?>(null) }
+    var todayHighlightedSupplementId by remember { mutableStateOf<String?>(null) }
+    var notificationAttentionDismissedDate by remember { mutableStateOf<LocalDateValue?>(null) }
+    var expandNotificationTroubleshooting by remember { mutableStateOf(false) }
     var notificationPermissionState by remember {
         mutableStateOf(permissionController.currentState())
     }
@@ -137,8 +143,29 @@ fun SupplementRoutineKmpApp(
                         contentPadding = paddingValues,
                         supplements = uiState.supplements,
                         defaultNotificationEnabled = uiState.notificationEnabled,
-                        onAddSupplement = viewModel::addSupplement,
-                        onUpdateSupplement = viewModel::updateSupplement,
+                        onAddSupplement = { supplement, onSuccess, onFailure ->
+                            val isFirstSupplement = uiState.supplements.isEmpty()
+                            viewModel.addSupplement(
+                                supplement = supplement,
+                                onSuccess = {
+                                    onSuccess()
+                                    todayHighlightedSupplementId = supplement.id
+                                    if (isFirstSupplement) {
+                                        todayFeedbackMessage = "오늘 일정에 추가됐어요."
+                                        notificationAttentionDismissedDate = uiState.today
+                                    }
+                                    selectedDestinationKey = "today"
+                                },
+                                onFailure = onFailure,
+                            )
+                        },
+                        onUpdateSupplement = { supplement, onSuccess, onFailure ->
+                            viewModel.updateSupplement(
+                                supplement = supplement,
+                                onSuccess = onSuccess,
+                                onFailure = onFailure,
+                            )
+                        },
                         onRemoveSupplement = viewModel::removeSupplement,
                         onToggleNotification = viewModel::toggleSupplementNotification,
                     )
@@ -146,12 +173,20 @@ fun SupplementRoutineKmpApp(
                         contentPadding = paddingValues,
                         today = uiState.today,
                         historyViewState = uiState.historyViewState,
+                        onOpenNotificationSettingsClick = {
+                            expandNotificationTroubleshooting = true
+                            selectedDestinationKey = "settings"
+                        },
                     )
                     "settings" -> SettingsRoute(
                         contentPadding = paddingValues,
                         mealTimeSettings = uiState.mealTimeSettings,
                         notificationEnabled = uiState.notificationEnabled,
                         notificationPermissionState = notificationPermissionState,
+                        expandNotificationTroubleshooting = expandNotificationTroubleshooting,
+                        onNotificationTroubleshootingExpanded = {
+                            expandNotificationTroubleshooting = false
+                        },
                         onBreakfastTimeChanged = viewModel::updateBreakfastTime,
                         onLunchTimeChanged = viewModel::updateLunchTime,
                         onDinnerTimeChanged = viewModel::updateDinnerTime,
@@ -188,7 +223,23 @@ fun SupplementRoutineKmpApp(
                         date = uiState.today,
                         items = uiState.todayItems,
                         errorMessage = uiState.errorMessage,
+                        notificationNeedsAttention = uiState.notificationEnabled &&
+                            uiState.supplements.any { it.isNotificationEnabled } &&
+                            (!notificationPermissionState.canPostNotifications ||
+                                !notificationPermissionState.canScheduleExactAlarms),
+                        notificationAttentionDismissed = notificationAttentionDismissedDate == uiState.today,
+                        onDismissNotificationAttention = {
+                            notificationAttentionDismissedDate = uiState.today
+                        },
+                        highlightedSupplementId = todayHighlightedSupplementId,
+                        onHighlightedSupplementConsumed = { todayHighlightedSupplementId = null },
+                        feedbackMessage = todayFeedbackMessage,
+                        onFeedbackMessageConsumed = { todayFeedbackMessage = null },
                         onAddSupplementClick = { selectedDestinationKey = "supplements" },
+                        onOpenNotificationSettingsClick = {
+                            expandNotificationTroubleshooting = true
+                            selectedDestinationKey = "settings"
+                        },
                         onToggleRecord = { record ->
                             if (!record.isDone) {
                                 hapticFeedback.intakeCompleted()
@@ -286,6 +337,8 @@ private fun RowScope.DestinationItem(
                 style = MaterialTheme.typography.labelSmall,
                 color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         }
     }

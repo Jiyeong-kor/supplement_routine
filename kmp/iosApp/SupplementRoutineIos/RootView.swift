@@ -1,19 +1,22 @@
 import SwiftUI
 
-private let routineBackground = Color(red: 1.00, green: 0.99, blue: 0.98)
-private let routineSurface = Color.white
-private let routineSurfaceSoft = Color(red: 0.97, green: 0.97, blue: 0.98)
-private let routineInk = Color(red: 0.13, green: 0.14, blue: 0.17)
-private let routineSubtle = Color(red: 0.40, green: 0.44, blue: 0.52)
-private let routinePrimary = Color(red: 0.91, green: 0.37, blue: 0.48)
-private let routinePrimarySoft = Color(red: 1.00, green: 0.90, blue: 0.93)
-private let routineSuccess = Color(red: 0.14, green: 0.72, blue: 0.54)
-private let routineWarning = Color(red: 0.96, green: 0.65, blue: 0.14)
+private let routineBackground = Color(red: 0.97, green: 0.96, blue: 0.93)
+private let routineSurface = Color(red: 1.00, green: 0.99, blue: 0.97)
+private let routineSurfaceSoft = Color(red: 0.98, green: 0.95, blue: 0.90)
+private let routineMistBlue = Color(red: 0.87, green: 0.92, blue: 0.95)
+private let routineLine = Color(red: 0.91, green: 0.87, blue: 0.80)
+private let routineInk = Color(red: 0.13, green: 0.13, blue: 0.14)
+private let routineSubtle = Color(red: 0.37, green: 0.36, blue: 0.33)
+private let routinePrimary = Color(red: 0.29, green: 0.43, blue: 1.00)
+private let routinePrimarySoft = routineMistBlue
+private let routineSuccess = Color(red: 0.36, green: 0.49, blue: 0.16)
+private let routineSuccessSoft = Color(red: 0.73, green: 0.87, blue: 0.40)
+private let routineWarning = Color(red: 0.96, green: 0.49, blue: 0.38)
 private let routineBackgroundGradient = LinearGradient(
     colors: [
         routineBackground,
-        Color(red: 1.00, green: 0.93, blue: 0.95),
-        Color(red: 0.97, green: 0.98, blue: 0.99),
+        routineMistBlue.opacity(0.64),
+        routineSurface,
     ],
     startPoint: .top,
     endPoint: .bottom
@@ -54,7 +57,7 @@ private struct TodayView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: 16) {
                     HeaderBlock(
                         title: "오늘",
                         subtitle: "복용할 항목을 확인하고 한 번에 기록합니다."
@@ -81,10 +84,11 @@ private struct TodayView: View {
                         }
                     }
                 }
-                .padding(20)
+                .screenPadding()
             }
             .background(routineBackgroundGradient)
             .navigationTitle("오늘")
+            .navigationBarTitleDisplayMode(.inline)
             .task {
                 await viewModel.refreshNotificationPermissionState()
             }
@@ -101,10 +105,10 @@ private struct SupplementsView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: 16) {
                     HeaderBlock(
                         title: "영양제",
-                        subtitle: "복용량, 시간, 알림 여부를 local store에 저장합니다."
+                        subtitle: "복용량, 시간, 알림을 정리합니다."
                     )
 
                     if viewModel.supplements.isEmpty {
@@ -129,10 +133,11 @@ private struct SupplementsView: View {
                         }
                     }
                 }
-                .padding(20)
+                .screenPadding()
             }
             .background(routineBackgroundGradient)
             .navigationTitle("영양제")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -202,7 +207,7 @@ private struct HistoryView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: 16) {
                     HeaderBlock(
                         title: "기록",
                         subtitle: "완료율과 최근 흐름을 한눈에 확인합니다."
@@ -222,10 +227,11 @@ private struct HistoryView: View {
                         }
                     }
                 }
-                .padding(20)
+                .screenPadding()
             }
             .background(routineBackgroundGradient)
             .navigationTitle("기록")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 }
@@ -247,7 +253,7 @@ private struct SettingsView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: 16) {
                     HeaderBlock(
                         title: "설정",
                         subtitle: "식사 시간, 알림 권한, 데이터 관리를 확인합니다."
@@ -328,10 +334,11 @@ private struct SettingsView: View {
                         .disabled(viewModel.supplements.isEmpty)
                     }
                 }
-                .padding(20)
+                .screenPadding()
             }
             .background(routineBackgroundGradient)
             .navigationTitle("설정")
+            .navigationBarTitleDisplayMode(.inline)
             .task {
                 await viewModel.refreshNotificationPermissionState()
             }
@@ -348,7 +355,7 @@ private struct SettingsView: View {
                 }
                 Button("취소", role: .cancel) {}
             } message: {
-                Text("영양제와 오늘 기록이 iOS local store에서 삭제됩니다.")
+                Text("영양제와 오늘 기록이 이 기기에서 삭제됩니다.")
             }
         }
     }
@@ -367,10 +374,10 @@ private struct HeaderBlock: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
-                .font(.largeTitle.bold())
+                .font(.title.bold())
                 .foregroundStyle(routineInk)
             Text(subtitle)
-                .font(.subheadline)
+                .font(.footnote)
                 .foregroundStyle(routineSubtle)
         }
     }
@@ -391,10 +398,10 @@ private struct ProgressCard: View {
                 }
                 Spacer()
                 Text(viewModel.progressText)
-                    .font(.subheadline.weight(.semibold))
+                    .font(.caption.weight(.semibold))
                     .foregroundStyle(routinePrimary)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 7)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
                     .background(routinePrimarySoft)
                     .clipShape(Capsule())
             }
@@ -418,14 +425,14 @@ private struct SupplementChecklistRow: View {
             HStack(spacing: 12) {
                 Image(systemName: isDone ? "checkmark.circle.fill" : "circle")
                     .font(.title3)
-                    .foregroundStyle(isDone ? routineSuccess : routineSubtle)
+                    .foregroundStyle(isDone ? routineSuccess : routinePrimary)
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(supplement.name)
                         .font(.body.weight(.semibold))
                         .foregroundStyle(routineInk)
                     Text("\(supplement.scheduledTimeText) · \(supplement.dosageText)")
-                        .font(.caption)
+                        .font(.caption2)
                         .foregroundStyle(routineSubtle)
                 }
 
@@ -433,7 +440,7 @@ private struct SupplementChecklistRow: View {
 
                 Text(isDone ? "완료됨" : "미완료")
                     .font(.caption.weight(.semibold))
-                    .foregroundStyle(isDone ? routineSuccess : routineSubtle)
+                    .foregroundStyle(isDone ? routineSuccess : routinePrimary)
             }
             .contentShape(Rectangle())
         }
@@ -560,7 +567,7 @@ private struct HistoryOverviewCard: View {
             Text("오늘 완료율")
                 .font(.headline)
             Text("\(Int(viewModel.completionRate * 100))%")
-                .font(.system(size: 42, weight: .bold))
+                .font(.system(size: 36, weight: .bold))
                 .foregroundStyle(routinePrimary)
             Text(viewModel.todaySummaryText)
                 .font(.subheadline)
@@ -576,7 +583,7 @@ private struct MonthGrid: View {
     let summaries: [DailyProgress]
     let weekdayLabels: [String]
 
-    private let columns = Array(repeating: GridItem(.flexible(), spacing: 6), count: 7)
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 7)
 
     var body: some View {
         VStack(spacing: 10) {
@@ -591,14 +598,14 @@ private struct MonthGrid: View {
                         MonthDayTile(summary: summary)
                     } else {
                         Color.clear
-                            .frame(height: 42)
+                            .frame(height: 36)
                     }
                 }
             }
             HStack(spacing: 12) {
-                LegendChip(color: routinePrimary, text: "높음")
+                LegendChip(color: routineSuccessSoft, text: "높음")
                 LegendChip(color: routineWarning, text: "보통")
-                LegendChip(color: routineSubtle, text: "낮음")
+                LegendChip(color: routineLine, text: "낮음")
                 LegendChip(color: routineSurfaceSoft, text: "없음")
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -641,7 +648,7 @@ private struct MonthDayTile: View {
                 .font(.caption2)
         }
         .foregroundStyle(foregroundColor)
-        .frame(maxWidth: .infinity, minHeight: 42)
+        .frame(maxWidth: .infinity, minHeight: 36)
         .background(backgroundColor)
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         .accessibilityLabel("\(dayText)일, \(summary.statusText)")
@@ -664,11 +671,11 @@ private struct MonthDayTile: View {
             return routineSurfaceSoft
         }
 
-        return summary.completionRate >= 0.8 ? routinePrimary : summary.completionRate >= 0.4 ? Color(red: 1.00, green: 0.93, blue: 0.82) : Color(red: 0.91, green: 0.91, blue: 0.93)
+        return summary.completionRate >= 0.8 ? routineSuccessSoft : summary.completionRate >= 0.4 ? Color(red: 0.96, green: 0.75, blue: 0.32) : routineLine
     }
 
     private var foregroundColor: Color {
-        summary.completionRate >= 0.8 && summary.totalCount > 0 ? .white : routineInk
+        routineInk
     }
 }
 
@@ -694,7 +701,7 @@ private struct RecentHistoryRow: View {
             Spacer()
 
             ProgressView(value: summary.completionRate)
-                .frame(width: 84)
+                .frame(width: 72)
                 .tint(routinePrimary)
         }
         .routineCard()
@@ -826,14 +833,20 @@ private struct LegendChip: View {
 private extension View {
     func routineCard() -> some View {
         self
-            .padding(16)
+            .padding(14)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .background(routineSurface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .stroke(routineSurface.opacity(0.62), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(routineLine, lineWidth: 1)
             )
-            .shadow(color: routinePrimary.opacity(0.08), radius: 18, x: 0, y: 10)
+    }
+
+    func screenPadding() -> some View {
+        self
+            .padding(.horizontal, 16)
+            .padding(.top, 12)
+            .padding(.bottom, 24)
     }
 }
 

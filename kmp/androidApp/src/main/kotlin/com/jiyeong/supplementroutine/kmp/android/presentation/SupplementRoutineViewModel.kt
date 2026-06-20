@@ -57,18 +57,32 @@ class SupplementRoutineViewModel @Inject constructor(
         }
     }
 
-    fun addSupplement(supplement: Supplement) {
+    fun addSupplement(
+        supplement: Supplement,
+        onSuccess: () -> Unit = {},
+        onFailure: (String) -> Unit = {},
+    ) {
         viewModelScope.launch {
-            runRepositoryAction {
+            runRepositoryAction(
+                onSuccess = onSuccess,
+                onFailure = onFailure,
+            ) {
                 supplementRepository.addSupplement(supplement)
                 loadState()
             }
         }
     }
 
-    fun updateSupplement(supplement: Supplement) {
+    fun updateSupplement(
+        supplement: Supplement,
+        onSuccess: () -> Unit = {},
+        onFailure: (String) -> Unit = {},
+    ) {
         viewModelScope.launch {
-            runRepositoryAction {
+            runRepositoryAction(
+                onSuccess = onSuccess,
+                onFailure = onFailure,
+            ) {
                 supplementRepository.updateSupplement(supplement)
                 loadState()
             }
@@ -137,7 +151,11 @@ class SupplementRoutineViewModel @Inject constructor(
         }
     }
 
-    private suspend fun runRepositoryAction(action: suspend () -> SupplementRoutineUiState) {
+    private suspend fun runRepositoryAction(
+        onSuccess: () -> Unit = {},
+        onFailure: (String) -> Unit = {},
+        action: suspend () -> SupplementRoutineUiState,
+    ) {
         val result = runCatching {
             withContext(Dispatchers.IO) { action() }
         }
@@ -145,14 +163,17 @@ class SupplementRoutineViewModel @Inject constructor(
         result.fold(
             onSuccess = { nextState ->
                 _uiState.value = nextState.copy(isLoading = false, errorMessage = null)
+                onSuccess()
             },
             onFailure = { throwable ->
+                val message = throwable.message ?: "저장된 데이터를 불러오지 못했습니다."
                 _uiState.update { state ->
                     state.copy(
                         isLoading = false,
-                        errorMessage = throwable.message ?: "저장된 데이터를 불러오지 못했습니다.",
+                        errorMessage = message,
                     )
                 }
+                onFailure(message)
             },
         )
     }

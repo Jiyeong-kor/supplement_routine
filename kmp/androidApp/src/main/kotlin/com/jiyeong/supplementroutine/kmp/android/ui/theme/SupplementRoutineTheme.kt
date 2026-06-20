@@ -10,9 +10,13 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jiyeong.supplementroutine.kmp.android.R
 
 private val LightColors: ColorScheme = lightColorScheme(
     primary = Color(0xFF496DFF),
@@ -82,21 +86,42 @@ private val DarkColors: ColorScheme = darkColorScheme(
     inversePrimary = Color(0xFF59B9DF),
 )
 
+private val Pretendard = FontFamily(
+    Font(R.font.pretendard_regular, FontWeight.Normal),
+    Font(R.font.pretendard_medium, FontWeight.Medium),
+    Font(R.font.pretendard_semibold, FontWeight.SemiBold),
+    Font(R.font.pretendard_bold, FontWeight.Bold),
+    Font(R.font.pretendard_bold, FontWeight.ExtraBold),
+)
+
+private fun TextStyle.withPretendard(
+    fontWeight: FontWeight,
+    fontSize: androidx.compose.ui.unit.TextUnit,
+    lineHeight: androidx.compose.ui.unit.TextUnit,
+): TextStyle {
+    return copy(
+        fontFamily = Pretendard,
+        fontWeight = fontWeight,
+        fontSize = fontSize,
+        lineHeight = lineHeight,
+    )
+}
+
 private val RoutineTypography = Typography().run {
     copy(
-        displayLarge = displayLarge.copy(fontWeight = FontWeight.ExtraBold, fontSize = 32.sp, lineHeight = 40.sp),
-        headlineLarge = headlineLarge.copy(fontWeight = FontWeight.ExtraBold, fontSize = 24.sp, lineHeight = 32.sp),
-        headlineMedium = headlineMedium.copy(fontWeight = FontWeight.ExtraBold, fontSize = 24.sp, lineHeight = 32.sp),
-        headlineSmall = headlineSmall.copy(fontWeight = FontWeight.ExtraBold, fontSize = 24.sp, lineHeight = 32.sp),
-        titleLarge = titleLarge.copy(fontWeight = FontWeight.Bold, fontSize = 20.sp, lineHeight = 28.sp),
-        titleMedium = titleMedium.copy(fontWeight = FontWeight.Bold, fontSize = 16.sp, lineHeight = 24.sp),
-        titleSmall = titleSmall.copy(fontWeight = FontWeight.Bold, fontSize = 14.sp, lineHeight = 20.sp),
-        bodyLarge = bodyLarge.copy(fontWeight = FontWeight.Medium, fontSize = 16.sp, lineHeight = 24.sp),
-        bodyMedium = bodyMedium.copy(fontWeight = FontWeight.Medium, fontSize = 14.sp, lineHeight = 20.sp),
-        bodySmall = bodySmall.copy(fontWeight = FontWeight.Medium, fontSize = 13.sp, lineHeight = 18.sp),
-        labelLarge = labelLarge.copy(fontWeight = FontWeight.Bold, fontSize = 13.sp, lineHeight = 18.sp),
-        labelMedium = labelMedium.copy(fontWeight = FontWeight.Bold, fontSize = 12.sp, lineHeight = 16.sp),
-        labelSmall = labelSmall.copy(fontWeight = FontWeight.Bold, fontSize = 12.sp, lineHeight = 16.sp),
+        displayLarge = displayLarge.withPretendard(FontWeight.ExtraBold, 32.sp, 40.sp),
+        headlineLarge = headlineLarge.withPretendard(FontWeight.ExtraBold, 24.sp, 32.sp),
+        headlineMedium = headlineMedium.withPretendard(FontWeight.ExtraBold, 24.sp, 32.sp),
+        headlineSmall = headlineSmall.withPretendard(FontWeight.ExtraBold, 24.sp, 32.sp),
+        titleLarge = titleLarge.withPretendard(FontWeight.SemiBold, 20.sp, 28.sp),
+        titleMedium = titleMedium.withPretendard(FontWeight.SemiBold, 16.sp, 24.sp),
+        titleSmall = titleSmall.withPretendard(FontWeight.SemiBold, 14.sp, 20.sp),
+        bodyLarge = bodyLarge.withPretendard(FontWeight.Normal, 16.sp, 24.sp),
+        bodyMedium = bodyMedium.withPretendard(FontWeight.Normal, 14.sp, 20.sp),
+        bodySmall = bodySmall.withPretendard(FontWeight.Normal, 13.sp, 18.sp),
+        labelLarge = labelLarge.withPretendard(FontWeight.SemiBold, 13.sp, 18.sp),
+        labelMedium = labelMedium.withPretendard(FontWeight.SemiBold, 12.sp, 16.sp),
+        labelSmall = labelSmall.withPretendard(FontWeight.SemiBold, 12.sp, 16.sp),
     )
 }
 

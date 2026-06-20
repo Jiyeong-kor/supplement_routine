@@ -29,6 +29,43 @@ class SupplementFormPolicyTest {
     }
 
     @Test
+    fun dosageInputAcceptsSimpleRoutineUnits() {
+        assertEquals(
+            ParsedDosage(value = 1.0, unit = "정"),
+            SupplementFormPolicy.parseDosageInput("1정"),
+        )
+        assertEquals(
+            ParsedDosage(value = 2.0, unit = "캡슐"),
+            SupplementFormPolicy.parseDosageInput("2caps"),
+        )
+        assertEquals(
+            ParsedDosage(value = 400.0, unit = "mg"),
+            SupplementFormPolicy.parseDosageInput("400mg"),
+        )
+        assertEquals(
+            ParsedDosage(value = 1000.0, unit = "IU"),
+            SupplementFormPolicy.parseDosageInput("1000 IU"),
+        )
+        assertEquals(
+            ParsedDosage(value = 50.0, unit = "mcg"),
+            SupplementFormPolicy.parseDosageInput("50µg"),
+        )
+    }
+
+    @Test
+    fun dosageInputRejectsUnknownAttachedUnits() {
+        assertNull(SupplementFormPolicy.parseDosageInput("5병"))
+        assertNull(SupplementFormPolicy.parseDosageInput("1scoop"))
+    }
+
+    @Test
+    fun legacyRoutineUnitsNormalizeForSelection() {
+        assertEquals("정", SupplementFormPolicy.normalizeDosageUnitForSelection("개"))
+        assertEquals("정", SupplementFormPolicy.normalizeDosageUnitForSelection("알"))
+        assertEquals("정", SupplementFormPolicy.normalizeDosageUnitForSelection("unknown"))
+    }
+
+    @Test
     fun routineBasedInputRequiresAtLeastOneSlot() {
         assertEquals(
             SupplementFormValidationError.EmptyRoutineSlots,
