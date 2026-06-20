@@ -53,6 +53,8 @@ jobs:
         run: |
           APP_PATH="$RUNNER_TEMP/SupplementRoutineIos.xcarchive/Products/Applications/SupplementRoutineIos.app"
           test -d "$APP_PATH"
+          codesign --force --sign - --timestamp=none "$APP_PATH"
+          codesign --verify --deep --strict "$APP_PATH"
           mkdir -p "$RUNNER_TEMP/Payload"
           cp -R "$APP_PATH" "$RUNNER_TEMP/Payload/"
           (cd "$RUNNER_TEMP" && zip -qry SupplementRoutineIos-unsigned.ipa Payload)
