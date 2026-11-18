@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -44,8 +45,12 @@ import com.jiyeong.supplementroutine.kmp.android.ui.common.DailyIntakeRow
 import com.jiyeong.supplementroutine.kmp.android.ui.common.DailyProgressSummary
 import com.jiyeong.supplementroutine.kmp.android.ui.common.DailyWelcomeCard
 
+internal class TodayScreenState {
+    var completionFeedback by mutableStateOf<CompletionFeedback?>(null)
+}
+
 @Composable
-fun TodayRoute(
+internal fun TodayRoute(
     contentPadding: PaddingValues,
     date: LocalDateValue,
     items: List<ScheduledIntakeRecord>,
@@ -60,6 +65,7 @@ fun TodayRoute(
     onAddSupplementClick: () -> Unit,
     onOpenNotificationSettingsClick: () -> Unit,
     onToggleRecord: (IntakeRecord) -> Unit,
+    state: TodayScreenState = remember { TodayScreenState() },
 ) {
     TodayScreen(
         contentPadding = contentPadding,
@@ -76,6 +82,7 @@ fun TodayRoute(
         onAddSupplementClick = onAddSupplementClick,
         onOpenNotificationSettingsClick = onOpenNotificationSettingsClick,
         onToggleRecord = onToggleRecord,
+        state = state,
     )
 }
 
@@ -95,8 +102,9 @@ private fun TodayScreen(
     onAddSupplementClick: () -> Unit,
     onOpenNotificationSettingsClick: () -> Unit,
     onToggleRecord: (IntakeRecord) -> Unit,
-) {
-    var completionFeedback by remember { mutableStateOf<CompletionFeedback?>(null) }
+    state: TodayScreenState,
+) = with(state) {
+    val inspectionMode = LocalInspectionMode.current
     val sortedItems = remember(items) {
         items.sortedWith(
             compareBy<ScheduledIntakeRecord> { it.record.scheduledTime.hour }
@@ -134,7 +142,7 @@ private fun TodayScreen(
     }
 
     LaunchedEffect(completionFeedback) {
-        completionFeedback?.let { feedback ->
+        completionFeedback?.takeUnless { inspectionMode }?.let { feedback ->
             delay(feedback.durationMillis)
             completionFeedback = null
         }
@@ -383,7 +391,7 @@ private fun CompletionFeedbackCard(
     )
 }
 
-private data class CompletionFeedback(
+internal data class CompletionFeedback(
     val message: String,
     val actionLabel: String? = null,
     val actionRecord: IntakeRecord? = null,

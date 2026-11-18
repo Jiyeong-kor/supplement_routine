@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
@@ -135,7 +137,7 @@ fun SupplementsRoute(
 }
 
 @Composable
-private fun SupplementsScreen(
+internal fun SupplementsScreen(
     contentPadding: PaddingValues,
     supplements: List<Supplement>,
     onAddClick: () -> Unit,
@@ -192,77 +194,61 @@ private fun SupplementsScreen(
     }
 }
 
+internal class SupplementFormState(
+    initialSupplement: Supplement? = null,
+    defaultNotificationEnabled: Boolean = true,
+) {
+    var name by mutableStateOf(initialSupplement?.name.orEmpty())
+    var dosageText by mutableStateOf(
+        initialSupplement?.dosageValue?.let(SupplementFormPolicy::formatDosage)
+            ?: SupplementFormPolicy.DEFAULT_DOSAGE_TEXT,
+    )
+    var dosageUnit by mutableStateOf(
+        initialSupplement?.dosageUnit?.let(SupplementFormPolicy::normalizeDosageUnitForSelection)
+            ?: SupplementFormPolicy.DEFAULT_UNIT,
+    )
+    var isRoutineBased by mutableStateOf(
+        initialSupplement?.method != IntakeMethod.FixedTime && initialSupplement?.method != IntakeMethod.Interval,
+    )
+    var isSpecificTime by mutableStateOf(initialSupplement?.method != IntakeMethod.Interval)
+    var selectedSlots by mutableStateOf(initialSupplement?.selectedSlots?.toSet() ?: SupplementFormPolicy.defaultRoutineSlots)
+    var fixedCount by mutableIntStateOf(initialSupplement?.fixedTimes?.size ?: SupplementFormPolicy.DEFAULT_COUNT)
+    val fixedTimes = mutableStateListOf<TimeOfDayValue>().apply {
+        addAll(initialSupplement?.fixedTimes ?: listOf(SupplementFormPolicy.defaultTime))
+    }
+    var startTime by mutableStateOf(initialSupplement?.startTime ?: SupplementFormPolicy.defaultTime)
+    var intervalHours by mutableIntStateOf(initialSupplement?.intervalHours ?: SupplementFormPolicy.DEFAULT_INTERVAL_HOURS)
+    var intervalCount by mutableIntStateOf(
+        if (initialSupplement?.method == IntakeMethod.Interval) initialSupplement.dailyCount
+        else SupplementFormPolicy.DEFAULT_COUNT,
+    )
+    var isNotificationEnabled by mutableStateOf(initialSupplement?.isNotificationEnabled ?: defaultNotificationEnabled)
+    var memo by mutableStateOf(initialSupplement?.memo.orEmpty())
+    var validationErrorMessage by mutableStateOf<String?>(null)
+    var saveFailureMessage by mutableStateOf<String?>(null)
+    var isSaving by mutableStateOf(false)
+    var showMoreDosageUnits by mutableStateOf(
+        initialSupplement?.dosageUnit
+            ?.let(SupplementFormPolicy::normalizeDosageUnitForSelection)
+            ?.let { it !in SupplementFormPolicy.primaryDosageUnits }
+            ?: false,
+    )
+}
+
 @Composable
-private fun SupplementFormScreen(
+internal fun SupplementFormScreen(
     contentPadding: PaddingValues,
     initialSupplement: Supplement?,
     defaultNotificationEnabled: Boolean,
     onDismiss: () -> Unit,
     onSubmit: (Supplement, onFailure: (String) -> Unit) -> Unit,
     onValidationError: () -> Unit,
-) {
+    state: SupplementFormState = remember(initialSupplement, defaultNotificationEnabled) {
+        SupplementFormState(initialSupplement, defaultNotificationEnabled)
+    },
+    listState: LazyListState = rememberLazyListState(),
+) = with(state) {
     val isEditMode = initialSupplement != null
-    var name by remember(initialSupplement) { mutableStateOf(initialSupplement?.name.orEmpty()) }
-    var dosageText by remember(initialSupplement) {
-        mutableStateOf(
-            initialSupplement?.dosageValue?.let(SupplementFormPolicy::formatDosage)
-                ?: SupplementFormPolicy.DEFAULT_DOSAGE_TEXT,
-        )
-    }
-    var dosageUnit by remember(initialSupplement) {
-        mutableStateOf(
-            initialSupplement?.dosageUnit?.let(SupplementFormPolicy::normalizeDosageUnitForSelection)
-                ?: SupplementFormPolicy.DEFAULT_UNIT,
-        )
-    }
-    var isRoutineBased by remember(initialSupplement) {
-        mutableStateOf(initialSupplement?.method != IntakeMethod.FixedTime && initialSupplement?.method != IntakeMethod.Interval)
-    }
-    var isSpecificTime by remember(initialSupplement) {
-        mutableStateOf(initialSupplement?.method != IntakeMethod.Interval)
-    }
-    var selectedSlots by remember(initialSupplement) {
-        mutableStateOf(initialSupplement?.selectedSlots?.toSet() ?: SupplementFormPolicy.defaultRoutineSlots)
-    }
-    var fixedCount by remember(initialSupplement) {
-        mutableIntStateOf(initialSupplement?.fixedTimes?.size ?: SupplementFormPolicy.DEFAULT_COUNT)
-    }
-    val fixedTimes = remember(initialSupplement) {
-        mutableStateListOf<TimeOfDayValue>().apply {
-            addAll(initialSupplement?.fixedTimes ?: listOf(SupplementFormPolicy.defaultTime))
-        }
-    }
-    var startTime by remember(initialSupplement) {
-        mutableStateOf(initialSupplement?.startTime ?: SupplementFormPolicy.defaultTime)
-    }
-    var intervalHours by remember(initialSupplement) {
-        mutableIntStateOf(initialSupplement?.intervalHours ?: SupplementFormPolicy.DEFAULT_INTERVAL_HOURS)
-    }
-    var intervalCount by remember(initialSupplement) {
-        mutableIntStateOf(
-            if (initialSupplement?.method == IntakeMethod.Interval) {
-                initialSupplement.dailyCount
-            } else {
-                SupplementFormPolicy.DEFAULT_COUNT
-            },
-        )
-    }
-    var isNotificationEnabled by remember(initialSupplement, defaultNotificationEnabled) {
-        mutableStateOf(initialSupplement?.isNotificationEnabled ?: defaultNotificationEnabled)
-    }
-    var memo by remember(initialSupplement) { mutableStateOf(initialSupplement?.memo.orEmpty()) }
-    var validationErrorMessage by remember { mutableStateOf<String?>(null) }
-    var saveFailureMessage by remember { mutableStateOf<String?>(null) }
-    var isSaving by remember { mutableStateOf(false) }
-    var showMoreDosageUnits by remember(initialSupplement) {
-        mutableStateOf(
-            initialSupplement?.dosageUnit
-                ?.let(SupplementFormPolicy::normalizeDosageUnitForSelection)
-                ?.let { it !in SupplementFormPolicy.primaryDosageUnits }
-                ?: false,
-        )
-    }
-
     fun syncFixedTimes(count: Int) {
         fixedCount = count
         while (fixedTimes.size < count) fixedTimes.add(fixedTimes.lastOrNull() ?: SupplementFormPolicy.defaultTime)
@@ -331,6 +317,7 @@ private fun SupplementFormScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxSize(),
             contentPadding = PaddingValues(
@@ -483,7 +470,7 @@ private fun SupplementFormScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Column {
+                        Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = "알림",
                                 style = MaterialTheme.typography.titleSmall,
@@ -576,10 +563,13 @@ private fun FormHeader(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.spacedBy(SrSpacing.Md),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(SrSpacing.Xxs)) {
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(SrSpacing.Xxs),
+        ) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.headlineMedium,
@@ -765,16 +755,30 @@ private fun TimeStepperRow(
                 )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(SrSpacing.Sm)) {
-                OutlinedButton(onClick = { onTimeChanged(time.plusHours(-1)) }) {
+                OutlinedButton(
+                    onClick = { onTimeChanged(time.plusHours(-1)) },
+                    modifier = Modifier.weight(1f),
+                ) {
                     Text("-1시간")
                 }
-                OutlinedButton(onClick = { onTimeChanged(time.plusHours(1)) }) {
+                OutlinedButton(
+                    onClick = { onTimeChanged(time.plusHours(1)) },
+                    modifier = Modifier.weight(1f),
+                ) {
                     Text("+1시간")
                 }
-                OutlinedButton(onClick = { onTimeChanged(time.plusMinutes(-10)) }) {
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(SrSpacing.Sm)) {
+                OutlinedButton(
+                    onClick = { onTimeChanged(time.plusMinutes(-10)) },
+                    modifier = Modifier.weight(1f),
+                ) {
                     Text("-10분")
                 }
-                OutlinedButton(onClick = { onTimeChanged(time.plusMinutes(10)) }) {
+                OutlinedButton(
+                    onClick = { onTimeChanged(time.plusMinutes(10)) },
+                    modifier = Modifier.weight(1f),
+                ) {
                     Text("+10분")
                 }
             }
@@ -924,7 +928,7 @@ private fun SupplementEmptyState() {
     RoutineStatusCard(
         icon = SrIcon.Bottle,
         title = "등록된 영양제가 없습니다",
-        description = "오른쪽 아래 + 버튼으로 복용할 영양제를 등록해보세요.",
+        description = "아래 + 버튼으로 추가해 주세요.",
         containerColor = GardenUi.SurfaceSoft,
         iconContainerColor = GardenUi.SkyBlue,
         iconTint = GardenUi.PrimaryBlue,
@@ -932,7 +936,7 @@ private fun SupplementEmptyState() {
 }
 
 @Composable
-private fun DeleteSupplementDialog(
+internal fun DeleteSupplementDialog(
     supplement: Supplement,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
@@ -958,7 +962,7 @@ private fun DeleteSupplementDialog(
     )
 }
 
-private fun validationMessage(error: SupplementFormValidationError): String {
+internal fun validationMessage(error: SupplementFormValidationError): String {
     return when (error) {
         SupplementFormValidationError.EmptyName -> "영양제 이름을 입력해주세요."
         SupplementFormValidationError.InvalidDosage -> "복용량은 0보다 큰 값과 지원 단위로 입력해주세요. 예: 1정, 400mg, 1000 IU"

@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
@@ -25,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -43,8 +46,16 @@ import com.jiyeong.supplementroutine.shared.domain.MealTimeSettings
 import com.jiyeong.supplementroutine.shared.domain.TimeOfDayValue
 import kotlinx.coroutines.delay
 
+internal class SettingsScreenState(mealTimeSettings: MealTimeSettings = MealTimeSettings()) {
+    var dialog by mutableStateOf<SettingsDialog?>(null)
+    var mealTimesEditing by mutableStateOf(false)
+    var draftMealTimeSettings by mutableStateOf(mealTimeSettings)
+    var resetFeedbackVisible by mutableStateOf(false)
+    var showTroubleshooting by mutableStateOf(false)
+}
+
 @Composable
-fun SettingsRoute(
+internal fun SettingsRoute(
     contentPadding: PaddingValues,
     mealTimeSettings: MealTimeSettings,
     notificationEnabled: Boolean,
@@ -61,12 +72,10 @@ fun SettingsRoute(
     onSendTestNotification: () -> Boolean,
     onScheduleTestNotification: () -> Boolean,
     onResetRoutineData: () -> Unit,
-) {
-    var dialog by remember { mutableStateOf<SettingsDialog?>(null) }
-    var mealTimesEditing by remember { mutableStateOf(false) }
-    var draftMealTimeSettings by remember { mutableStateOf(mealTimeSettings) }
-    var resetFeedbackVisible by remember { mutableStateOf(false) }
-    val listState = rememberLazyListState()
+    state: SettingsScreenState = remember { SettingsScreenState(mealTimeSettings) },
+    listState: LazyListState = rememberLazyListState(),
+) = with(state) {
+    val inspectionMode = LocalInspectionMode.current
 
     LaunchedEffect(mealTimeSettings, mealTimesEditing) {
         if (!mealTimesEditing) {
@@ -81,7 +90,7 @@ fun SettingsRoute(
     }
 
     LaunchedEffect(resetFeedbackVisible) {
-        if (resetFeedbackVisible) {
+        if (resetFeedbackVisible && !inspectionMode) {
             delay(2400)
             resetFeedbackVisible = false
         }
@@ -150,6 +159,8 @@ fun SettingsRoute(
                 NotificationSettingsCard(
                     notificationEnabled = notificationEnabled,
                     notificationPermissionState = notificationPermissionState,
+                    showTroubleshooting = showTroubleshooting,
+                    onShowTroubleshootingChanged = { showTroubleshooting = it },
                     expandTroubleshooting = expandNotificationTroubleshooting,
                     onTroubleshootingExpanded = onNotificationTroubleshootingExpanded,
                     onNotificationEnabledChanged = onNotificationEnabledChanged,
@@ -242,7 +253,10 @@ private fun MealTimesCard(
 ) {
     RoutineCard {
         Column(
-            modifier = Modifier.padding(vertical = SrSpacing.Xs),
+            modifier = Modifier.padding(
+                horizontal = if (editing) SrSpacing.Md else 0.dp,
+                vertical = SrSpacing.Xs,
+            ),
         ) {
             if (!editing) {
                 CompactSettingsRow(
@@ -254,24 +268,18 @@ private fun MealTimesCard(
                 )
             } else {
                 MealTimeDisplayRow(
-                    icon = SrIcon.Clock,
                     title = "아침",
                     time = mealTimeSettings.breakfastTime,
-                    editing = true,
                     onTimeChanged = onBreakfastTimeChanged,
                 )
                 MealTimeDisplayRow(
-                    icon = SrIcon.Clock,
                     title = "점심",
                     time = mealTimeSettings.lunchTime,
-                    editing = true,
                     onTimeChanged = onLunchTimeChanged,
                 )
                 MealTimeDisplayRow(
-                    icon = SrIcon.Clock,
                     title = "저녁",
                     time = mealTimeSettings.dinnerTime,
-                    editing = true,
                     onTimeChanged = onDinnerTimeChanged,
                 )
                 RoutinePillButton(
@@ -303,48 +311,38 @@ private fun MealTimesCard(
 
 @Composable
 private fun MealTimeDisplayRow(
-    icon: SrIcon,
     title: String,
     time: TimeOfDayValue,
-    editing: Boolean,
     onTimeChanged: (TimeOfDayValue) -> Unit,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(SrSpacing.Md),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = SrSpacing.Xs),
+        horizontalArrangement = Arrangement.spacedBy(SrSpacing.Sm),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        RoutineIconBadge(
-            icon = icon,
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            tint = MaterialTheme.colorScheme.secondary,
-        )
-        Text(
-            text = title,
+        Column(
             modifier = Modifier.weight(1f),
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.Bold,
-        )
-        if (editing) {
+            verticalArrangement = Arrangement.spacedBy(SrSpacing.Xxs),
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+            )
             Text(
                 text = formatTime(time),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
             )
-            TextButton(onClick = { onTimeChanged(time.plusMinutes(-10)) }) {
-                Text("-10")
-            }
-            TextButton(onClick = { onTimeChanged(time.plusMinutes(10)) }) {
-                Text("+10")
-            }
-        } else {
-            Text(
-                text = formatTime(time),
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontWeight = FontWeight.Bold,
-            )
+        }
+        TextButton(onClick = { onTimeChanged(time.plusMinutes(-10)) }) {
+            Text("-10")
+        }
+        TextButton(onClick = { onTimeChanged(time.plusMinutes(10)) }) {
+            Text("+10")
         }
     }
 }
@@ -353,6 +351,8 @@ private fun MealTimeDisplayRow(
 private fun NotificationSettingsCard(
     notificationEnabled: Boolean,
     notificationPermissionState: NotificationPermissionState,
+    showTroubleshooting: Boolean,
+    onShowTroubleshootingChanged: (Boolean) -> Unit,
     expandTroubleshooting: Boolean,
     onTroubleshootingExpanded: () -> Unit,
     onNotificationEnabledChanged: (Boolean) -> Unit,
@@ -362,11 +362,9 @@ private fun NotificationSettingsCard(
     onSendTestNotification: () -> Unit,
     onScheduleTestNotification: () -> Unit,
 ) {
-    var showTroubleshooting by remember { mutableStateOf(false) }
-
     LaunchedEffect(expandTroubleshooting) {
         if (expandTroubleshooting) {
-            showTroubleshooting = true
+            onShowTroubleshootingChanged(true)
             onTroubleshootingExpanded()
         }
     }
@@ -395,7 +393,7 @@ private fun NotificationSettingsCard(
                 title = if (showTroubleshooting) "알림 문제 해결 접기" else "알림 문제 해결",
                 description = "테스트 알림과 권한 상태를 확인합니다.",
                 trailing = "›",
-                onClick = { showTroubleshooting = !showTroubleshooting },
+                onClick = { onShowTroubleshootingChanged(!showTroubleshooting) },
             )
             if (showTroubleshooting) {
                 PermissionActionRow(
@@ -724,8 +722,9 @@ private fun ResetDialog(
             TextButton(
                 onClick = onConfirm,
                 enabled = canReset,
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
             ) {
-                Text("초기화", color = MaterialTheme.colorScheme.error)
+                Text("초기화")
             }
         },
         dismissButton = {
@@ -758,7 +757,7 @@ private fun InfoDialog(
     )
 }
 
-private enum class SettingsDialog {
+internal enum class SettingsDialog {
     Reset,
     Guide,
     Disclaimer,

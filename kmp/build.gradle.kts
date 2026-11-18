@@ -7,4 +7,5 @@ plugins {
     id("org.jetbrains.compose") version "1.11.0" apply false
     id("com.google.devtools.ksp") version "2.2.20-2.0.4" apply false
     id("com.google.dagger.hilt.android") version "2.57.1" apply false
+    id("io.github.takahirom.roborazzi") version "1.79.0" apply false
 }

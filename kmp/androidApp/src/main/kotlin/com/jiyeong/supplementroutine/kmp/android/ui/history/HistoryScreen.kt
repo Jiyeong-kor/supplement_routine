@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -54,17 +55,19 @@ import com.jiyeong.supplementroutine.shared.history.MissedIntakePeriod
 import java.util.Calendar
 import kotlin.math.roundToInt
 
+internal class HistoryScreenState(date: LocalDateValue) {
+    var selectedDate by mutableStateOf(date)
+}
+
 @Composable
-fun HistoryRoute(
+internal fun HistoryRoute(
     contentPadding: PaddingValues,
     today: LocalDateValue,
     historyViewState: HistoryViewState,
     onOpenNotificationSettingsClick: () -> Unit,
-) {
-    val listState = rememberLazyListState()
-    var selectedDate by remember(today.year, today.month) {
-        mutableStateOf(today)
-    }
+    state: HistoryScreenState = remember(today.year, today.month) { HistoryScreenState(today) },
+    listState: LazyListState = rememberLazyListState(),
+) = with(state) {
     val selectedSummary = remember(historyViewState.monthSummaries, historyViewState.todaySummary, selectedDate) {
         historyViewState.monthSummaries.firstOrNull { it.date == selectedDate }
             ?: if (historyViewState.todaySummary.date == selectedDate) {
@@ -471,7 +474,7 @@ private fun HistoryEmptyState() {
     RoutineStatusCard(
         icon = SrIcon.Calendar,
         title = "아직 기록이 없습니다",
-        description = "오늘 화면에서 복용을 체크하면 최근 기록이 쌓입니다.",
+        description = "오늘 화면에서 체크한 복용 기록이 쌓입니다.",
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
         iconContainerColor = MaterialTheme.colorScheme.primaryContainer,
         iconTint = MaterialTheme.colorScheme.primary,
