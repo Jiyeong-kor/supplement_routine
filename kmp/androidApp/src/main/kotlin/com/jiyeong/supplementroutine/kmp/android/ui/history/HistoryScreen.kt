@@ -1,36 +1,28 @@
 package com.jiyeong.supplementroutine.kmp.android.ui.history
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.HorizontalRule
-import androidx.compose.material.icons.outlined.CalendarMonth
-import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,26 +31,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineCard
-import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineEmptyCard
 import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutinePageHeader
 import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutinePillButton
 import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineSectionLabel
-import com.jiyeong.supplementroutine.kmp.android.ui.common.FruitAvatar
-import com.jiyeong.supplementroutine.kmp.android.ui.common.FruitVariant
-import com.jiyeong.supplementroutine.kmp.android.ui.common.GardenUi
+import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineSlotCard
+import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineStatusCard
+import com.jiyeong.supplementroutine.kmp.android.ui.theme.SrIcon
+import com.jiyeong.supplementroutine.kmp.android.ui.theme.SrSize
+import com.jiyeong.supplementroutine.kmp.android.ui.theme.SrSpacing
+import com.jiyeong.supplementroutine.kmp.android.ui.theme.SrStroke
 import com.jiyeong.supplementroutine.shared.domain.LocalDateValue
 import com.jiyeong.supplementroutine.shared.history.DailyHistorySummary
 import com.jiyeong.supplementroutine.shared.history.HistoryViewState
 import com.jiyeong.supplementroutine.shared.history.MissedIntakePeriod
-import kotlinx.coroutines.launch
 import java.util.Calendar
+import kotlin.math.roundToInt
 
 @Composable
 fun HistoryRoute(
@@ -68,7 +62,6 @@ fun HistoryRoute(
     onOpenNotificationSettingsClick: () -> Unit,
 ) {
     val listState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
     var selectedDate by remember(today.year, today.month) {
         mutableStateOf(today)
     }
@@ -85,25 +78,22 @@ fun HistoryRoute(
         state = listState,
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(
-            start = 20.dp,
-            top = 16.dp,
-            end = 20.dp,
-            bottom = contentPadding.calculateBottomPadding() + 24.dp,
+            start = SrSpacing.ScreenHorizontal,
+            top = SrSpacing.Lg,
+            end = SrSpacing.ScreenHorizontal,
+            bottom = contentPadding.calculateBottomPadding() + SrSpacing.Xxl,
         ),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(SrSpacing.Lg),
     ) {
         item {
             RoutinePageHeader(
                 title = "기록",
-                subtitle = "루틴이 얼마나 잘 지켜졌는지 살펴봐요",
+                eyebrow = "${today.year}년 ${today.month}월",
             )
         }
         item { HistoryOverviewCard(summary = historyViewState.todaySummary) }
         item {
-            SectionHeader(
-                title = "월간 기록",
-                description = "날짜별 복용 완료 상태를 한눈에 봅니다.",
-            )
+            RoutineSectionLabel(title = "이번 달 완료 상태")
         }
         item {
             MonthHistoryCard(
@@ -115,21 +105,15 @@ fun HistoryRoute(
         }
         item { SelectedDateSummaryCard(summary = selectedSummary) }
         item {
-            RoutinePatternCard(
-                summaries = historyViewState.recentSummaries,
-                onReviewRecentClick = {
-                    coroutineScope.launch {
-                        listState.animateScrollToItem(6)
-                    }
-                },
-                onOpenNotificationSettingsClick = onOpenNotificationSettingsClick,
-            )
+            RoutineSectionLabel(title = "최근 2주 기록")
         }
-        item {
-            SectionHeader(
-                title = "최근 기록",
-                description = "최근 2주 동안의 완료율을 확인합니다.",
-            )
+        if (!historyViewState.isEmpty) {
+            item {
+                RoutinePatternCard(
+                    summaries = historyViewState.recentSummaries,
+                    onOpenNotificationSettingsClick = onOpenNotificationSettingsClick,
+                )
+            }
         }
         if (historyViewState.isEmpty) {
             item { HistoryEmptyState() }
@@ -144,52 +128,39 @@ fun HistoryRoute(
 }
 
 @Composable
-private fun SectionHeader(title: String, description: String) {
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        RoutineSectionLabel(title = title)
-        Text(
-            text = description,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-    }
-}
-
-@Composable
 private fun HistoryOverviewCard(summary: DailyHistorySummary) {
-    val percent = (summary.completionRate * 100).toInt()
+    val percent = (summary.completionRate * 100).roundToInt()
 
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .height(132.dp),
+            .heightIn(min = 152.dp),
         shape = MaterialTheme.shapes.extraLarge,
-        color = GardenUi.PrimaryBlue,
+        color = MaterialTheme.colorScheme.primaryContainer,
     ) {
         Row(
-            modifier = Modifier.padding(20.dp),
+            modifier = Modifier.padding(SrSpacing.Lg),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "오늘 완료율",
+                    text = "오늘의 기록",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     fontWeight = FontWeight.SemiBold,
                 )
                 Text(
-                    text = "$percent%",
-                    style = MaterialTheme.typography.displayLarge,
-                    color = Color.White,
+                    text = if (summary.isEmpty) "아직 기록이 없습니다" else "$percent%",
+                    style = if (summary.isEmpty) MaterialTheme.typography.titleLarge else MaterialTheme.typography.displayLarge,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     fontWeight = FontWeight.ExtraBold,
                 )
                 Text(
-                    text = "${summary.doneCount} / ${summary.totalCount} 완료",
+                    text = if (summary.isEmpty) "복용 후 오늘 화면에서 체크해 주세요." else "${summary.totalCount}개 중 ${summary.doneCount}개 완료",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
             }
-            FruitAvatar(FruitVariant.EggFlower, Modifier.size(74.dp))
         }
     }
 }
@@ -208,26 +179,9 @@ private fun MonthHistoryCard(
 
     RoutineCard {
         Column(
-            modifier = Modifier.padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier.padding(SrSpacing.Md),
+            verticalArrangement = Arrangement.spacedBy(SrSpacing.Md),
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = "${today.year}년 ${today.month}월",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
-                    text = "월간 완료 상태",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
             Row {
                 listOf("일", "월", "화", "수", "목", "금", "토").forEach { label ->
                     Text(
@@ -241,7 +195,7 @@ private fun MonthHistoryCard(
                 }
             }
             tiles.chunked(7).forEach { week ->
-                Row(horizontalArrangement = Arrangement.spacedBy(0.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(SrSpacing.None)) {
                     week.forEach { summary ->
                         Box(modifier = Modifier.weight(1f)) {
                             if (summary != null) {
@@ -275,21 +229,21 @@ private fun MonthDayTile(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp)
+            .heightIn(min = SrSize.MinTouchTarget)
             .clickable(onClick = onClick)
             .semantics {
-                contentDescription = "${summary.date.day}일, ${status.label}, ${summary.doneCount}개 중 ${summary.totalCount}개 완료"
+                contentDescription = "${summary.date.day}일, ${status.label}, ${summary.totalCount}개 중 ${summary.doneCount}개 완료"
             },
         contentAlignment = Alignment.Center,
     ) {
         Surface(
-            modifier = Modifier.size(32.dp),
+            modifier = Modifier.size(SrSize.CalendarDay),
             shape = CircleShape,
             color = status.background,
             border = when {
-                selected -> BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
-                isToday -> BorderStroke(2.dp, GardenUi.Ink)
-                summary.isEmpty -> BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                selected -> BorderStroke(SrStroke.Strong, MaterialTheme.colorScheme.primary)
+                isToday -> BorderStroke(SrStroke.Strong, MaterialTheme.colorScheme.onSurface)
+                summary.isEmpty -> BorderStroke(SrStroke.Thin, MaterialTheme.colorScheme.outlineVariant)
                 else -> null
             },
         ) {
@@ -308,7 +262,6 @@ private fun MonthDayTile(
 @Composable
 private fun RoutinePatternCard(
     summaries: List<DailyHistorySummary>,
-    onReviewRecentClick: () -> Unit,
     onOpenNotificationSettingsClick: () -> Unit,
 ) {
     val daysWithSchedule = summaries.filterNot { it.isEmpty }
@@ -329,12 +282,12 @@ private fun RoutinePatternCard(
 
     RoutineCard(
         colors = androidx.compose.material3.CardDefaults.cardColors(
-            containerColor = GardenUi.SurfaceSoft,
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
         ),
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier.padding(SrSpacing.Lg),
+            verticalArrangement = Arrangement.spacedBy(SrSpacing.Xs),
         ) {
             Text(
                 text = "최근 루틴 흐름",
@@ -354,16 +307,9 @@ private fun RoutinePatternCard(
             )
             if (canOfferSettingsAction) {
                 RoutinePillButton(
-                    text = "최근 기록 먼저 보기",
-                    onClick = onReviewRecentClick,
-                    height = 34.dp,
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    contentColor = GardenUi.Ink,
-                )
-                RoutinePillButton(
                     text = "알림/식사 시간 조정",
                     onClick = onOpenNotificationSettingsClick,
-                    height = 34.dp,
+                    height = SrSize.ControlCompact,
                     containerColor = MaterialTheme.colorScheme.surface,
                     contentColor = MaterialTheme.colorScheme.primary,
                 )
@@ -391,140 +337,144 @@ private fun missedPeriodHint(summaries: List<DailyHistorySummary>): String {
 
 @Composable
 private fun SelectedDateSummaryCard(summary: DailyHistorySummary) {
-    val percent = (summary.completionRate * 100).toInt()
+    val percent = (summary.completionRate * 100).roundToInt()
     val status = historyStatus(summary)
 
-    RoutineCard {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
+    RoutineSlotCard(
+        leading = {
             Surface(
-                modifier = Modifier.size(44.dp),
+                modifier = Modifier.size(SrSize.IconBadge),
                 shape = CircleShape,
                 color = status.background,
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                border = BorderStroke(SrStroke.Thin, MaterialTheme.colorScheme.outlineVariant),
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
-                        imageVector = status.icon,
+                        painter = painterResource(status.icon.drawableRes),
                         contentDescription = null,
                         tint = status.foreground,
-                        modifier = Modifier.size(20.dp),
+                        modifier = Modifier.size(SrSize.Icon),
                     )
                 }
             }
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(
-                    text = "${summary.date.month}월 ${summary.date.day}일",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
-                    text = if (summary.isEmpty) {
-                        "이날은 복용 일정이 없습니다."
-                    } else {
-                        "$percent% 완료 · ${summary.doneCount} / ${summary.totalCount} 완료"
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
-    }
+        },
+        title = {
+            Text(
+                text = "${summary.date.month}월 ${summary.date.day}일",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+            )
+        },
+        supporting = {
+            Text(
+                text = if (summary.isEmpty) {
+                    "이날은 복용 일정이 없습니다."
+                } else {
+                    "$percent% / ${summary.totalCount}개 중 ${summary.doneCount}개 완료"
+                },
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        },
+    )
 }
 
 @Composable
 private fun Legend() {
-    Row(
+    val colors = MaterialTheme.colorScheme
+    FlowRow(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.spacedBy(SrSpacing.Sm),
+        verticalArrangement = Arrangement.spacedBy(SrSpacing.Sm),
     ) {
-        LegendItem(Icons.Filled.Check, MaterialTheme.colorScheme.primary, "높음")
-        LegendItem(Icons.Filled.HorizontalRule, MaterialTheme.colorScheme.tertiary, "보통")
-        LegendItem(Icons.Filled.Close, MaterialTheme.colorScheme.outline, "낮음")
-        LegendItem(Icons.Outlined.Remove, MaterialTheme.colorScheme.onSurfaceVariant, "없음")
+        LegendItem(SrIcon.Check, colors.primary, colors.onPrimary, "높음")
+        LegendItem(SrIcon.Chevron, colors.secondaryContainer, colors.onSecondaryContainer, "보통")
+        LegendItem(SrIcon.Close, colors.tertiaryContainer, colors.onTertiaryContainer, "낮음")
+        LegendItem(SrIcon.Close, colors.surfaceContainer, colors.onSurfaceVariant, "없음")
     }
 }
 
 @Composable
 private fun LegendItem(
-    icon: ImageVector,
-    color: Color,
+    icon: SrIcon,
+    background: Color,
+    foreground: Color,
     label: String,
 ) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(SrSpacing.Xxs),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = color,
-            modifier = Modifier.size(14.dp),
-        )
+        Surface(color = background, shape = CircleShape) {
+            Icon(
+                painter = painterResource(icon.drawableRes),
+                contentDescription = null,
+                tint = foreground,
+                modifier = Modifier.padding(SrSpacing.Xxs).size(SrSize.IconTiny),
+            )
+        }
         Text(text = label, style = MaterialTheme.typography.labelSmall)
     }
 }
 
 @Composable
 private fun HistoryItem(summary: DailyHistorySummary) {
-    val percent = (summary.completionRate * 100).toInt()
+    val percent = (summary.completionRate * 100).roundToInt()
+    val status = historyStatus(summary)
 
-    RoutineCard {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
+    RoutineSlotCard(
+        leading = {
             Surface(
-                modifier = Modifier.size(44.dp),
+                modifier = Modifier.size(SrSize.IconBadge),
                 shape = CircleShape,
-                color = MaterialTheme.colorScheme.primaryContainer,
+                color = status.background,
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Text(
                         text = percent.toString(),
-                        color = historyStatus(summary).accent,
+                        color = status.foreground,
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
                     )
                 }
             }
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                Text(
-                    text = "${summary.date.month}월 ${summary.date.day}일",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                Text(
-                    text = "$percent% 완료 · ${summary.doneCount} / ${summary.totalCount} 완료",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                LinearProgressIndicator(
-                    progress = { summary.completionRate.toFloat() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(6.dp)
-                        .clip(CircleShape),
-                    trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                )
-            }
-        }
-    }
+        },
+        title = {
+            Text(
+                text = "${summary.date.month}월 ${summary.date.day}일",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+        },
+        supporting = {
+            Text(
+                text = "$percent% / ${summary.totalCount}개 중 ${summary.doneCount}개 완료",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        },
+        actions = {
+            LinearProgressIndicator(
+                progress = { summary.completionRate.toFloat() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(SrSize.ProgressLineHeight)
+                    .clip(CircleShape),
+                trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+            )
+        },
+    )
 }
 
 @Composable
 private fun HistoryEmptyState() {
-    RoutineEmptyCard(
-        icon = Icons.Outlined.CalendarMonth,
+    RoutineStatusCard(
+        icon = SrIcon.Calendar,
         title = "아직 기록이 없습니다",
         description = "오늘 화면에서 복용을 체크하면 최근 기록이 쌓입니다.",
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        iconContainerColor = MaterialTheme.colorScheme.primaryContainer,
+        iconTint = MaterialTheme.colorScheme.primary,
     )
 }
 
@@ -534,41 +484,36 @@ private fun historyStatus(summary: DailyHistorySummary): HistoryStatus {
     return when {
         summary.isEmpty -> HistoryStatus(
             label = "일정 없음",
-            icon = Icons.Outlined.Remove,
-            background = GardenUi.Paper,
-            foreground = GardenUi.InkMuted,
-            accent = GardenUi.Line,
+            icon = SrIcon.Close,
+            background = colorScheme.surfaceContainer,
+            foreground = colorScheme.onSurfaceVariant,
         )
         summary.completionRate >= 0.8 -> HistoryStatus(
             label = "완료율 높음",
-            icon = Icons.Filled.Check,
-            background = GardenUi.PrimaryBlue,
-            foreground = Color.White,
-            accent = GardenUi.PrimaryBlue,
+            icon = SrIcon.Check,
+            background = colorScheme.primary,
+            foreground = colorScheme.onPrimary,
         )
         summary.completionRate >= 0.4 -> HistoryStatus(
             label = "완료율 보통",
-            icon = Icons.Filled.HorizontalRule,
-            background = GardenUi.LeafGreen,
-            foreground = GardenUi.Ink,
-            accent = GardenUi.LeafGreenDark,
+            icon = SrIcon.Chevron,
+            background = colorScheme.secondaryContainer,
+            foreground = colorScheme.onSecondaryContainer,
         )
         else -> HistoryStatus(
             label = "완료율 낮음",
-            icon = Icons.Filled.Close,
-            background = GardenUi.EggYellow,
-            foreground = GardenUi.Ink,
-            accent = GardenUi.EggYellow,
+            icon = SrIcon.Close,
+            background = colorScheme.tertiaryContainer,
+            foreground = colorScheme.onTertiaryContainer,
         )
     }
 }
 
 private data class HistoryStatus(
     val label: String,
-    val icon: ImageVector,
+    val icon: SrIcon,
     val background: Color,
     val foreground: Color,
-    val accent: Color,
 )
 
 private fun weekdayIndex(date: LocalDateValue): Int {

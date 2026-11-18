@@ -7,7 +7,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,15 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Spa
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.History
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.Spa
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -43,20 +36,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.jiyeong.supplementroutine.kmp.android.notification.AndroidNotificationPermissionController
 import com.jiyeong.supplementroutine.kmp.android.notification.AndroidReminderScheduler
-import com.jiyeong.supplementroutine.kmp.android.notification.NotificationPermissionState
 import com.jiyeong.supplementroutine.kmp.android.presentation.SupplementRoutineViewModel
 import com.jiyeong.supplementroutine.kmp.android.ui.haptic.rememberRoutineHapticFeedback
 import com.jiyeong.supplementroutine.kmp.android.ui.history.HistoryRoute
 import com.jiyeong.supplementroutine.kmp.android.ui.settings.SettingsRoute
 import com.jiyeong.supplementroutine.kmp.android.ui.supplements.SupplementsRoute
+import com.jiyeong.supplementroutine.kmp.android.ui.theme.SrIcon
+import com.jiyeong.supplementroutine.kmp.android.ui.theme.SrSize
+import com.jiyeong.supplementroutine.kmp.android.ui.theme.SrSpacing
+import com.jiyeong.supplementroutine.kmp.android.ui.theme.SrStroke
 import com.jiyeong.supplementroutine.kmp.android.ui.today.TodayRoute
 import com.jiyeong.supplementroutine.shared.SupplementRoutineInfo
 import com.jiyeong.supplementroutine.shared.domain.LocalDateValue
@@ -68,6 +63,7 @@ fun SupplementRoutineKmpApp(
     viewModel: SupplementRoutineViewModel = hiltViewModel(),
 ) {
     var selectedDestinationKey by remember { mutableStateOf("today") }
+    var isSupplementManagementOpen by remember { mutableStateOf(false) }
     val uiState by viewModel.uiState.collectAsState()
     val hapticFeedback = rememberRoutineHapticFeedback()
     var todayFeedbackMessage by remember { mutableStateOf<String?>(null) }
@@ -117,20 +113,23 @@ fun SupplementRoutineKmpApp(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(72.dp)
+                        .height(SrSize.BottomNavigationHeight)
                         .background(MaterialTheme.colorScheme.surface)
                         .drawBehind {
                             drawLine(
                                 color = navigationTopLine,
                                 start = Offset.Zero,
                                 end = Offset(size.width, 0f),
-                                strokeWidth = 1.dp.toPx(),
+                                strokeWidth = SrStroke.Thin.toPx(),
                             )
                         },
                 ) {
                     DestinationItems(
                         selectedDestinationKey = selectedDestinationKey,
-                        onDestinationSelected = { key -> selectedDestinationKey = key },
+                        onDestinationSelected = { key ->
+                            isSupplementManagementOpen = false
+                            selectedDestinationKey = key
+                        },
                     )
                 }
             },
@@ -138,8 +137,8 @@ fun SupplementRoutineKmpApp(
             if (uiState.isLoading) {
                 LoadingState(modifier = Modifier.padding(paddingValues))
             } else {
-                when (selectedDestinationKey) {
-                    "supplements" -> SupplementsRoute(
+                when {
+                    isSupplementManagementOpen -> SupplementsRoute(
                         contentPadding = paddingValues,
                         supplements = uiState.supplements,
                         defaultNotificationEnabled = uiState.notificationEnabled,
@@ -154,6 +153,7 @@ fun SupplementRoutineKmpApp(
                                         todayFeedbackMessage = "오늘 일정에 추가됐어요."
                                         notificationAttentionDismissedDate = uiState.today
                                     }
+                                    isSupplementManagementOpen = false
                                     selectedDestinationKey = "today"
                                 },
                                 onFailure = onFailure,
@@ -169,16 +169,17 @@ fun SupplementRoutineKmpApp(
                         onRemoveSupplement = viewModel::removeSupplement,
                         onToggleNotification = viewModel::toggleSupplementNotification,
                     )
-                    "history" -> HistoryRoute(
+                    selectedDestinationKey == "history" -> HistoryRoute(
                         contentPadding = paddingValues,
                         today = uiState.today,
                         historyViewState = uiState.historyViewState,
                         onOpenNotificationSettingsClick = {
                             expandNotificationTroubleshooting = true
+                            isSupplementManagementOpen = false
                             selectedDestinationKey = "settings"
                         },
                     )
-                    "settings" -> SettingsRoute(
+                    selectedDestinationKey == "settings" -> SettingsRoute(
                         contentPadding = paddingValues,
                         mealTimeSettings = uiState.mealTimeSettings,
                         notificationEnabled = uiState.notificationEnabled,
@@ -235,9 +236,10 @@ fun SupplementRoutineKmpApp(
                         onHighlightedSupplementConsumed = { todayHighlightedSupplementId = null },
                         feedbackMessage = todayFeedbackMessage,
                         onFeedbackMessageConsumed = { todayFeedbackMessage = null },
-                        onAddSupplementClick = { selectedDestinationKey = "supplements" },
+                        onAddSupplementClick = { isSupplementManagementOpen = true },
                         onOpenNotificationSettingsClick = {
                             expandNotificationTroubleshooting = true
+                            isSupplementManagementOpen = false
                             selectedDestinationKey = "settings"
                         },
                         onToggleRecord = { record ->
@@ -255,15 +257,52 @@ fun SupplementRoutineKmpApp(
 
 @Composable
 private fun LoadingState(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(
+                start = SrSpacing.ScreenHorizontal,
+                top = SrSpacing.Lg,
+                end = SrSpacing.ScreenHorizontal,
+            ),
+        verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(SrSpacing.Md),
     ) {
         Text(
             text = "루틴을 불러오는 중입니다.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onBackground,
         )
+        repeat(5) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(SrSize.SkeletonRowHeight),
+                shape = MaterialTheme.shapes.medium,
+                color = MaterialTheme.colorScheme.surfaceContainer,
+                border = BorderStroke(SrStroke.Thin, MaterialTheme.colorScheme.outlineVariant),
+            ) {
+                Row(
+                    modifier = Modifier.padding(SrSpacing.Md),
+                    horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(SrSpacing.Md),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Surface(
+                        modifier = Modifier.size(SrSize.SkeletonAvatar),
+                        shape = CircleShape,
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                        content = {},
+                    )
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(SrSize.IconSmall),
+                        shape = CircleShape,
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                        content = {},
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -273,13 +312,12 @@ private fun RowScope.DestinationItems(
     onDestinationSelected: (String) -> Unit,
 ) {
     val icons = listOf(
-        DestinationIcon(Icons.Filled.Home, Icons.Outlined.Home),
-        DestinationIcon(Icons.Filled.Spa, Icons.Outlined.Spa),
-        DestinationIcon(Icons.Filled.History, Icons.Outlined.History),
-        DestinationIcon(Icons.Filled.Settings, Icons.Outlined.Settings),
+        DestinationIcon(SrIcon.Home, SrIcon.Home),
+        DestinationIcon(SrIcon.History, SrIcon.History),
+        DestinationIcon(SrIcon.Settings, SrIcon.Settings),
     )
 
-    SupplementRoutineInfo.topLevelDestinations.forEachIndexed { index, destination ->
+    SupplementRoutineInfo.topLevelDestinations.filter { it.key != "supplements" }.forEachIndexed { index, destination ->
         val selected = destination.key == selectedDestinationKey
         DestinationItem(
             selected = selected,
@@ -294,41 +332,48 @@ private fun RowScope.DestinationItems(
 @Composable
 private fun RowScope.DestinationItem(
     selected: Boolean,
-    selectedIcon: ImageVector,
-    unselectedIcon: ImageVector,
+    selectedIcon: SrIcon,
+    unselectedIcon: SrIcon,
     label: String,
     onClick: () -> Unit,
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+
     Box(
         modifier = Modifier
             .weight(1f)
             .selectable(
                 selected = selected,
+                interactionSource = interactionSource,
+                indication = null,
                 onClick = onClick,
                 role = Role.Tab,
             )
-            .padding(top = 8.dp, bottom = 7.dp),
+            .padding(top = SrSpacing.Sm, bottom = SrSpacing.Xs),
         contentAlignment = Alignment.Center,
     ) {
         androidx.compose.foundation.layout.Column(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Surface(
-                modifier = Modifier.size(width = 52.dp, height = 30.dp),
+                modifier = Modifier.size(
+                    width = SrSize.BottomNavigationIndicatorWidth,
+                    height = SrSize.BottomNavigationIndicatorHeight,
+                ),
                 shape = CircleShape,
                 color = if (selected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
-                border = if (selected) null else BorderStroke(0.dp, Color.Transparent),
+                border = if (selected) null else BorderStroke(SrStroke.None, Color.Transparent),
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
-                        imageVector = if (selected) selectedIcon else unselectedIcon,
-                        contentDescription = label,
+                        painter = painterResource(if (selected) selectedIcon.drawableRes else unselectedIcon.drawableRes),
+                        contentDescription = null,
                         tint = if (selected) {
                             MaterialTheme.colorScheme.primary
                         } else {
                             MaterialTheme.colorScheme.onSurfaceVariant
                         },
-                        modifier = Modifier.size(22.dp),
+                        modifier = Modifier.size(SrSize.IconMedium),
                     )
                 }
             }
@@ -345,6 +390,6 @@ private fun RowScope.DestinationItem(
 }
 
 private data class DestinationIcon(
-    val selected: ImageVector,
-    val unselected: ImageVector,
+    val selected: SrIcon,
+    val unselected: SrIcon,
 )

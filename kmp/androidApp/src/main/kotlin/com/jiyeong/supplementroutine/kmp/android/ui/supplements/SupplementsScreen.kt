@@ -1,7 +1,5 @@
 package com.jiyeong.supplementroutine.kmp.android.ui.supplements
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,19 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.outlined.AddCircle
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Inventory2
-import androidx.compose.material.icons.outlined.Medication
-import androidx.compose.material.icons.outlined.NotificationsActive
-import androidx.compose.material.icons.outlined.NotificationsOff
-import androidx.compose.material.icons.outlined.RemoveCircle
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
@@ -54,26 +40,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import com.jiyeong.supplementroutine.kmp.android.ui.common.formatDosage
 import com.jiyeong.supplementroutine.kmp.android.ui.common.formatTime
 import com.jiyeong.supplementroutine.kmp.android.ui.common.methodLabelText
 import com.jiyeong.supplementroutine.kmp.android.ui.common.FruitAvatar
 import com.jiyeong.supplementroutine.kmp.android.ui.common.GardenUi
 import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineCard
-import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineEmptyCard
 import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineFab
-import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineIconBadge
-import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineMetaChip
 import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineMoreButton
 import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutinePageHeader
 import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutinePillButton
+import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineSlotCard
+import com.jiyeong.supplementroutine.kmp.android.ui.common.RoutineStatusCard
 import com.jiyeong.supplementroutine.kmp.android.ui.common.fruitVariantFor
 import com.jiyeong.supplementroutine.kmp.android.ui.common.slotLabelText
 import com.jiyeong.supplementroutine.kmp.android.ui.haptic.rememberRoutineHapticFeedback
+import com.jiyeong.supplementroutine.kmp.android.ui.theme.SrIcon
+import com.jiyeong.supplementroutine.kmp.android.ui.theme.SrOpacity
+import com.jiyeong.supplementroutine.kmp.android.ui.theme.SrSize
+import com.jiyeong.supplementroutine.kmp.android.ui.theme.SrSpacing
 import com.jiyeong.supplementroutine.shared.domain.IntakeMethod
 import com.jiyeong.supplementroutine.shared.domain.IntakeSlot
 import com.jiyeong.supplementroutine.shared.domain.Supplement
@@ -159,12 +148,12 @@ private fun SupplementsScreen(
             modifier = Modifier
                 .fillMaxSize(),
             contentPadding = PaddingValues(
-                start = 20.dp,
-                top = 16.dp,
-                end = 20.dp,
-                bottom = contentPadding.calculateBottomPadding() + 104.dp,
+                start = SrSpacing.ScreenHorizontal,
+                top = SrSpacing.Lg,
+                end = SrSpacing.ScreenHorizontal,
+                bottom = contentPadding.calculateBottomPadding() + SrSize.BottomNavigationHeight + SrSpacing.ScreenBottomBuffer,
             ),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            verticalArrangement = Arrangement.spacedBy(SrSpacing.Lg),
         ) {
             item {
                 RoutinePageHeader(
@@ -191,13 +180,13 @@ private fun SupplementsScreen(
 
         RoutineFab(
             onClick = onAddClick,
-            icon = Icons.Filled.Add,
+            icon = SrIcon.Plus,
             contentDescription = "영양제 추가",
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(
-                    end = 20.dp,
-                    bottom = contentPadding.calculateBottomPadding() + 16.dp,
+                    end = SrSpacing.ScreenHorizontal,
+                    bottom = contentPadding.calculateBottomPadding() + SrSpacing.Lg,
                 ),
         )
     }
@@ -345,12 +334,12 @@ private fun SupplementFormScreen(
             modifier = Modifier
                 .fillMaxSize(),
             contentPadding = PaddingValues(
-                start = 20.dp,
-                top = 16.dp,
-                end = 20.dp,
-                bottom = contentPadding.calculateBottomPadding() + 132.dp,
+                start = SrSpacing.ScreenHorizontal,
+                top = SrSpacing.Lg,
+                end = SrSpacing.ScreenHorizontal,
+                bottom = contentPadding.calculateBottomPadding() + SrSize.BottomNavigationHeight + SrSize.Fab,
             ),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            verticalArrangement = Arrangement.spacedBy(SrSpacing.Lg),
         ) {
             item {
                 FormHeader(
@@ -371,7 +360,7 @@ private fun SupplementFormScreen(
                         label = { Text("영양제 이름") },
                         singleLine = true,
                     )
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(SrSpacing.Md)) {
                         OutlinedTextField(
                             value = dosageText,
                             onValueChange = { dosageText = it },
@@ -383,7 +372,7 @@ private fun SupplementFormScreen(
                         )
                         Column(
                             modifier = Modifier.weight(1f),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(SrSpacing.Sm),
                         ) {
                             Text(
                                 text = "단위",
@@ -391,8 +380,8 @@ private fun SupplementFormScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             androidx.compose.foundation.layout.FlowRow(
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(SrSpacing.Sm),
+                                verticalArrangement = Arrangement.spacedBy(SrSpacing.Sm),
                             ) {
                                 val visibleDosageUnits = if (showMoreDosageUnits) {
                                     SupplementFormPolicy.dosageUnits
@@ -526,23 +515,23 @@ private fun SupplementFormScreen(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth(),
-            color = MaterialTheme.colorScheme.background.copy(alpha = 0.96f),
+            color = MaterialTheme.colorScheme.background.copy(alpha = SrOpacity.FloatingSurface),
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-                        start = 20.dp,
-                        end = 20.dp,
-                        bottom = contentPadding.calculateBottomPadding() + 14.dp,
-                        top = 12.dp,
+                        start = SrSpacing.ScreenHorizontal,
+                        end = SrSpacing.ScreenHorizontal,
+                        bottom = contentPadding.calculateBottomPadding() + SrSpacing.Md,
+                        top = SrSpacing.Md,
                     ),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(SrSpacing.Sm),
             ) {
                 saveFailureMessage?.let { message ->
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(SrSpacing.Sm),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
@@ -590,7 +579,7 @@ private fun FormHeader(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(SrSpacing.Xxs)) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.headlineMedium,
@@ -620,8 +609,8 @@ private fun FormSection(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+                .padding(SrSpacing.Lg),
+            verticalArrangement = Arrangement.spacedBy(SrSpacing.Md),
         ) {
             Text(
                 text = title,
@@ -640,7 +629,7 @@ private fun FormErrorCard(message: String) {
     ) {
         Text(
             text = message,
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(SrSpacing.Lg),
             color = MaterialTheme.colorScheme.onErrorContainer,
             style = MaterialTheme.typography.bodyMedium,
         )
@@ -655,7 +644,7 @@ private fun ChoiceRow(
     onFirstSelected: () -> Unit,
     onSecondSelected: () -> Unit,
 ) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(horizontalArrangement = Arrangement.spacedBy(SrSpacing.Sm)) {
         FilterChip(
             selected = firstSelected,
             onClick = onFirstSelected,
@@ -674,15 +663,15 @@ private fun RoutineSlotSelector(
     selectedSlots: Set<IntakeSlot>,
     onToggleSlot: (IntakeSlot) -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(SrSpacing.Sm)) {
         Text(
             text = "복용 타이밍",
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         androidx.compose.foundation.layout.FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(SrSpacing.Sm),
+            verticalArrangement = Arrangement.spacedBy(SrSpacing.Sm),
         ) {
             SupplementFormPolicy.routineSlots.forEach { slot ->
                 FilterChip(
@@ -719,11 +708,14 @@ private fun CounterRow(
                 onClick = { onChanged(value - 1) },
                 enabled = value > min,
             ) {
-                Icon(Icons.Outlined.RemoveCircle, contentDescription = "$title 줄이기")
+                Icon(
+                    painter = painterResource(SrIcon.Close.drawableRes),
+                    contentDescription = "$title 줄이기",
+                )
             }
             Text(
                 text = if (suffix.isEmpty()) value.toString() else "$value$suffix",
-                modifier = Modifier.padding(horizontal = 8.dp),
+                modifier = Modifier.padding(horizontal = SrSpacing.Sm),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
@@ -731,7 +723,10 @@ private fun CounterRow(
                 onClick = { onChanged(value + 1) },
                 enabled = value < max,
             ) {
-                Icon(Icons.Outlined.AddCircle, contentDescription = "$title 늘리기")
+                Icon(
+                    painter = painterResource(SrIcon.Plus.drawableRes),
+                    contentDescription = "$title 늘리기",
+                )
             }
         }
     }
@@ -745,12 +740,12 @@ private fun TimeStepperRow(
 ) {
     RoutineCard(
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.58f),
+            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = SrOpacity.SoftContainer),
         ),
     ) {
         Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(SrSpacing.Md),
+            verticalArrangement = Arrangement.spacedBy(SrSpacing.Sm),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -769,7 +764,7 @@ private fun TimeStepperRow(
                     fontWeight = FontWeight.Bold,
                 )
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(SrSpacing.Sm)) {
                 OutlinedButton(onClick = { onTimeChanged(time.plusHours(-1)) }) {
                     Text("-1시간")
                 }
@@ -800,86 +795,76 @@ private fun SupplementCard(
         "알림 꺼짐"
     }
 
-    RoutineCard(
+    RoutineSlotCard(
         modifier = Modifier
             .semantics {
                 contentDescription = "${supplement.name}, ${methodLabelText(supplement.method)}, 하루 ${supplement.dailyCount}회, $notificationText"
             },
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalAlignment = Alignment.Top,
-            ) {
-                FruitAvatar(
-                    variant = fruitVariantFor(supplement.id.ifBlank { supplement.name }),
-                    modifier = Modifier.size(44.dp),
-                )
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    Text(
-                        text = supplement.name,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Text(
-                        text = "${methodLabelText(supplement.method)} · 하루 ${supplement.dailyCount}회 · ${formatDosage(supplement.dosageValue)} ${supplement.dosageUnit}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        RoutineMetaChip(text = "${supplement.dailyCount}회 / 일")
-                        NotificationState(enabled = supplement.isNotificationEnabled)
-                    }
-                    supplement.memo?.let { memo ->
-                        Text(
-                            text = memo,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.tertiary,
-                        )
-                    }
-                }
-                SupplementActions(
-                    isNotificationEnabled = supplement.isNotificationEnabled,
-                    onDeleteClick = onDeleteClick,
-                    onToggleNotification = onToggleNotification,
+        leading = {
+            FruitAvatar(
+                variant = fruitVariantFor(supplement.id.ifBlank { supplement.name }),
+                modifier = Modifier.size(SrSize.IconBadge),
+            )
+        },
+        title = {
+            Text(
+                text = supplement.name,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+            )
+        },
+        supporting = {
+            Text(
+                text = "${methodLabelText(supplement.method)} / 하루 ${supplement.dailyCount}회\n1회 ${formatDosage(supplement.dosageValue)} ${supplement.dosageUnit}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(SrSpacing.Xs)) {
+                NotificationState(enabled = supplement.isNotificationEnabled)
+            }
+            supplement.memo?.let { memo ->
+                Text(
+                    text = memo,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
+        },
+        trailing = {
+            SupplementActions(
+                isNotificationEnabled = supplement.isNotificationEnabled,
+                onDeleteClick = onDeleteClick,
+                onToggleNotification = onToggleNotification,
+            )
+        },
+        actions = {
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
             RoutinePillButton(
                 text = "복용 규칙 수정",
-                icon = Icons.Outlined.Edit,
+                icon = SrIcon.Edit,
                 onClick = onEditClick,
-                height = 34.dp,
+                height = SrSize.ControlCompact,
                 containerColor = GardenUi.SurfaceSoft,
                 contentColor = GardenUi.Ink,
             )
-        }
-    }
+        },
+    )
 }
 
 @Composable
 private fun NotificationState(enabled: Boolean) {
     val text = if (enabled) "알림 켜짐" else "알림 꺼짐"
-    val icon = if (enabled) Icons.Outlined.NotificationsActive else Icons.Outlined.NotificationsOff
     val tint = if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
 
     Row(
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        horizontalArrangement = Arrangement.spacedBy(SrSpacing.Xs),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            imageVector = icon,
+            painter = painterResource(SrIcon.Bell.drawableRes),
             contentDescription = null,
             tint = tint,
-            modifier = Modifier.size(18.dp),
+            modifier = Modifier.size(SrSize.IconSmall),
         )
         Text(
             text = text,
@@ -907,11 +892,7 @@ private fun SupplementActions(
                 text = { Text(if (isNotificationEnabled) "알림 끄기" else "알림 켜기") },
                 leadingIcon = {
                     Icon(
-                        imageVector = if (isNotificationEnabled) {
-                            Icons.Outlined.NotificationsOff
-                        } else {
-                            Icons.Outlined.NotificationsActive
-                        },
+                        painter = painterResource(SrIcon.Bell.drawableRes),
                         contentDescription = null,
                     )
                 },
@@ -924,7 +905,7 @@ private fun SupplementActions(
                 text = { Text("삭제", color = MaterialTheme.colorScheme.error) },
                 leadingIcon = {
                     Icon(
-                        imageVector = Icons.Outlined.Delete,
+                        painter = painterResource(SrIcon.Trash.drawableRes),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.error,
                     )
@@ -940,10 +921,13 @@ private fun SupplementActions(
 
 @Composable
 private fun SupplementEmptyState() {
-    RoutineEmptyCard(
-        icon = Icons.Outlined.Inventory2,
+    RoutineStatusCard(
+        icon = SrIcon.Bottle,
         title = "등록된 영양제가 없습니다",
         description = "오른쪽 아래 + 버튼으로 복용할 영양제를 등록해보세요.",
+        containerColor = GardenUi.SurfaceSoft,
+        iconContainerColor = GardenUi.SkyBlue,
+        iconTint = GardenUi.PrimaryBlue,
     )
 }
 
@@ -955,6 +939,10 @@ private fun DeleteSupplementDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
+        shape = MaterialTheme.shapes.extraLarge,
+        containerColor = MaterialTheme.colorScheme.surface,
+        titleContentColor = MaterialTheme.colorScheme.onSurface,
+        textContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
         title = { Text("영양제 삭제") },
         text = { Text("${supplement.name}을 삭제하면 관련 복용 기록도 함께 정리됩니다.") },
         confirmButton = {
