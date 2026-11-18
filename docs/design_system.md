@@ -47,33 +47,22 @@ Supplement Routine은 의료 조언 앱이 아니라 사용자가 직접 정한 
 
 ## 4. 컬러 시스템
 
-기존 보라/라벤더 중심 팔레트는 새 방향에서 제외합니다. 2026-06 `Supplement Routine Release UI Handoff 1.0.0` 기준 팔레트는 warm paper 배경, hand-made fruit/flower avatar, seed/leaf progress, 선명한 berry blue, leaf green, flower red, egg yellow 포인트를 사용합니다.
+[확정 팔레트](https://colorhunt.co/palette/0061998acff8f4eb6cffd444)의 네 가지 포인트색을 사용합니다. 라이트 모드의 화면과 기본 카드 배경은 흰색으로 유지합니다.
 
-| 분류 | 토큰 | 값 | 용도 | 미리보기 |
-| --- | --- | --- | --- | --- |
-| Base | `GardenUi.WarmWhite` | `#F8F4EC` | 앱 배경 | ![Background](assets/colors/background.svg) |
-| Base | `GardenUi.Paper` | `#F2EBDD` | 낮은 강조 배경 | |
-| Base | `GardenUi.Surface` | `#FFFDF8` | 카드, sheet, dialog | |
-| Base | `GardenUi.SurfaceSoft` | `#FAF3E6` | pill, 검색, 낮은 강조 표면 | |
-| Brand | `GardenUi.MistBlue` | `#DDEAF1` | Today organic hero, 선택 indicator | |
-| Brand | `GardenUi.PrimaryBlue` | `#496DFF` | 주요 CTA, 기록 hero, 선택 navigation | ![Seed](assets/colors/seed.svg) |
-| Brand | `GardenUi.PrimaryBlueDark` | `#AEBBFF` | reverse/accent blue | |
-| Brand | `GardenUi.LeafGreen` | `#B9DE65` | 완료 체크, leaf progress | ![Success](assets/colors/success.svg) |
-| Brand | `GardenUi.LeafGreenDark` | `#5E7E2A` | active seed/leaf fill | |
-| Brand | `GardenUi.FlowerRed` | `#FF4A3D` | 삭제, 위험 상태, flower avatar | ![Error](assets/colors/error.svg) |
-| Brand | `GardenUi.Coral` | `#FF7A62` | 보조 경고 accent | |
-| Brand | `GardenUi.EggYellow` | `#F4C052` | 주의, egg flower avatar, 낮은 완료율 | ![Warning](assets/colors/warning.svg) |
-| Text | `GardenUi.Ink` | `#202124` | 주요 텍스트 | ![Ink](assets/colors/ink.svg) |
-| Text | `GardenUi.InkMuted` | `#5F5B53` | 보조 텍스트 | |
-| Line | `GardenUi.Line` | `#E7DDCC` | 카드/입력 outline | |
+| 역할 | 값 | 용도 |
+| --- | --- | --- |
+| 기본 배경 | `#FFFFFF` | 화면, 카드, 하단 탐색, 대화상자에 사용합니다. |
+| 주요 파랑 | `#006199` | 주요 버튼, 선택 아이콘, 진행률, 체크에 사용합니다. |
+| 하늘색 | `#8ACFF8` | 오늘 요약과 선택된 항목 배경에 사용합니다. |
+| 레몬색 | `#F4EB6C` | 완료 항목과 보조 영역의 배경에 사용합니다. |
+| 노랑 | `#FFD444` | 작은 완료 배지와 달력 상태 표시에 사용합니다. |
+| 주요 글자 | `#172B3A` | 이름, 수치, 밝은 포인트색 위의 글자에 사용합니다. |
+| 보조 글자 | `#536675` | 시간, 설명, 선택하지 않은 탐색 항목에 사용합니다. |
+| 중립 표면 | `#F3F6F8` | 입력 영역과 낮은 강조 영역에 사용합니다. |
+| 구분선 | `#D4DFE6` | 카드와 항목의 경계를 표시합니다. |
+| 오류 | `#B3261E` | 오류와 삭제처럼 주의가 필요한 행동에 사용합니다. |
 
-컬러 사용 규칙:
-
-- Primary는 CTA와 중요한 완료 신호에만 사용합니다.
-- 과일/정원 장식은 정보 구조를 밀어내지 않는 leading avatar, empty state, hero 보조 요소로 제한합니다.
-- 완료 상태는 leaf green, check icon, text/semantics를 함께 사용합니다.
-- 배경은 warm paper 계열로 유지하고, 카드와 bottom navigation은 `#FFFDF8` surface로 분리합니다.
-- 상태 의미는 색상만으로 전달하지 않고 text, icon, semantics를 함께 사용합니다.
+주요 파랑 위에는 흰 글자를, 하늘색과 두 노랑 위에는 짙은 글자를 사용합니다. 완료 상태는 배경색, 체크 아이콘, 문구와 접근성 설명으로 함께 표시합니다. 포인트색은 행동과 상태에 집중하고, 흰색 영역을 충분히 유지합니다. 다크 모드는 파랑과 노랑의 구분을 유지하면서 어두운 표면과 하늘색 주요 행동을 사용합니다.
 
 ## 5. Typography
 

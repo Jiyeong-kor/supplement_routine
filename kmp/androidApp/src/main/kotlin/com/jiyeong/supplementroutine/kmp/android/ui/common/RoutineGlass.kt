@@ -9,7 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
+import com.jiyeong.supplementroutine.kmp.android.ui.theme.SrElevation
+import com.jiyeong.supplementroutine.kmp.android.ui.theme.SrStroke
 
 @Composable
 internal fun routineGlassCardColors(
@@ -21,16 +22,16 @@ internal fun routineGlassCardColors(
 @Composable
 internal fun routineGlassCardElevation(): CardElevation {
     return CardDefaults.cardElevation(
-        defaultElevation = 0.dp,
-        pressedElevation = 0.dp,
-        focusedElevation = 0.dp,
-        hoveredElevation = 0.dp,
+        defaultElevation = SrElevation.None,
+        pressedElevation = SrElevation.None,
+        focusedElevation = SrElevation.None,
+        hoveredElevation = SrElevation.None,
     )
 }
 
 @Composable
 internal fun routineGlassBorder(alpha: Float = 1f): BorderStroke {
-    return BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = alpha))
+    return BorderStroke(SrStroke.Thin, MaterialTheme.colorScheme.outline.copy(alpha = alpha))
 }
 
 internal fun Modifier.routineGlassSheen(): Modifier {
