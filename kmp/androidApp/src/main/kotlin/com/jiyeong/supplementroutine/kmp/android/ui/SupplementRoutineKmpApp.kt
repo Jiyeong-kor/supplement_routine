@@ -10,6 +10,7 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -40,6 +42,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.jiyeong.supplementroutine.kmp.android.notification.AndroidNotificationPermissionController
 import com.jiyeong.supplementroutine.kmp.android.notification.AndroidReminderScheduler
@@ -96,6 +99,139 @@ fun SupplementRoutineKmpApp(
             reminderScheduler.syncTodayReminders(uiState.todayItems)
         }
     }
+    RoutineAppScaffold(
+        selectedDestinationKey = selectedDestinationKey,
+        onDestinationSelected = { key ->
+            isSupplementManagementOpen = false
+            selectedDestinationKey = key
+        },
+    ) { paddingValues ->
+        if (uiState.isLoading) {
+            LoadingState(modifier = Modifier.padding(paddingValues))
+        } else {
+            when {
+                isSupplementManagementOpen -> SupplementsRoute(
+                    contentPadding = paddingValues,
+                    supplements = uiState.supplements,
+                    defaultNotificationEnabled = uiState.notificationEnabled,
+                    onAddSupplement = { supplement, onSuccess, onFailure ->
+                        val isFirstSupplement = uiState.supplements.isEmpty()
+                        viewModel.addSupplement(
+                            supplement = supplement,
+                            onSuccess = {
+                                onSuccess()
+                                todayHighlightedSupplementId = supplement.id
+                                if (isFirstSupplement) {
+                                    todayFeedbackMessage = "오늘 일정에 추가됐어요."
+                                    notificationAttentionDismissedDate = uiState.today
+                                }
+                                isSupplementManagementOpen = false
+                                selectedDestinationKey = "today"
+                            },
+                            onFailure = onFailure,
+                        )
+                    },
+                    onUpdateSupplement = { supplement, onSuccess, onFailure ->
+                        viewModel.updateSupplement(
+                            supplement = supplement,
+                            onSuccess = onSuccess,
+                            onFailure = onFailure,
+                        )
+                    },
+                    onRemoveSupplement = viewModel::removeSupplement,
+                    onToggleNotification = viewModel::toggleSupplementNotification,
+                )
+                selectedDestinationKey == "history" -> HistoryRoute(
+                    contentPadding = paddingValues,
+                    today = uiState.today,
+                    historyViewState = uiState.historyViewState,
+                    onOpenNotificationSettingsClick = {
+                        expandNotificationTroubleshooting = true
+                        isSupplementManagementOpen = false
+                        selectedDestinationKey = "settings"
+                    },
+                )
+                selectedDestinationKey == "settings" -> SettingsRoute(
+                    contentPadding = paddingValues,
+                    mealTimeSettings = uiState.mealTimeSettings,
+                    notificationEnabled = uiState.notificationEnabled,
+                    notificationPermissionState = notificationPermissionState,
+                    expandNotificationTroubleshooting = expandNotificationTroubleshooting,
+                    onNotificationTroubleshootingExpanded = {
+                        expandNotificationTroubleshooting = false
+                    },
+                    onBreakfastTimeChanged = viewModel::updateBreakfastTime,
+                    onLunchTimeChanged = viewModel::updateLunchTime,
+                    onDinnerTimeChanged = viewModel::updateDinnerTime,
+                    onNotificationEnabledChanged = viewModel::updateNotificationEnabled,
+                    onRequestNotificationPermission = {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        } else {
+                            notificationPermissionState = permissionController.currentState()
+                        }
+                    },
+                    onRequestExactAlarmPermission = {
+                        permissionController.openExactAlarmSettings()
+                        notificationPermissionState = permissionController.currentState()
+                    },
+                    onRefreshNotificationPermissions = {
+                        notificationPermissionState = permissionController.currentState()
+                    },
+                    onSendTestNotification = {
+                        notificationPermissionState = permissionController.currentState()
+                        reminderScheduler.sendTestReminder()
+                    },
+                    onScheduleTestNotification = {
+                        notificationPermissionState = permissionController.currentState()
+                        reminderScheduler.scheduleTestReminder()
+                    },
+                    onResetRoutineData = {
+                        hapticFeedback.destructiveConfirmed()
+                        viewModel.resetRoutineData()
+                    },
+                )
+                else -> TodayRoute(
+                    contentPadding = paddingValues,
+                    date = uiState.today,
+                    items = uiState.todayItems,
+                    errorMessage = uiState.errorMessage,
+                    notificationNeedsAttention = uiState.notificationEnabled &&
+                        uiState.supplements.any { it.isNotificationEnabled } &&
+                        (!notificationPermissionState.canPostNotifications ||
+                            !notificationPermissionState.canScheduleExactAlarms),
+                    notificationAttentionDismissed = notificationAttentionDismissedDate == uiState.today,
+                    onDismissNotificationAttention = {
+                        notificationAttentionDismissedDate = uiState.today
+                    },
+                    highlightedSupplementId = todayHighlightedSupplementId,
+                    onHighlightedSupplementConsumed = { todayHighlightedSupplementId = null },
+                    feedbackMessage = todayFeedbackMessage,
+                    onFeedbackMessageConsumed = { todayFeedbackMessage = null },
+                    onAddSupplementClick = { isSupplementManagementOpen = true },
+                    onOpenNotificationSettingsClick = {
+                        expandNotificationTroubleshooting = true
+                        isSupplementManagementOpen = false
+                        selectedDestinationKey = "settings"
+                    },
+                    onToggleRecord = { record ->
+                        if (!record.isDone) {
+                            hapticFeedback.intakeCompleted()
+                        }
+                        viewModel.toggleRecord(record)
+                    },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+internal fun RoutineAppScaffold(
+    selectedDestinationKey: String,
+    onDestinationSelected: (String) -> Unit,
+    content: @Composable (PaddingValues) -> Unit,
+) {
     val colorScheme = MaterialTheme.colorScheme
     val navigationTopLine = colorScheme.outlineVariant
 
@@ -110,7 +246,7 @@ fun SupplementRoutineKmpApp(
                 .safeDrawingPadding(),
             containerColor = Color.Transparent,
             bottomBar = {
-                Row(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(SrSize.BottomNavigationHeight)
@@ -123,132 +259,20 @@ fun SupplementRoutineKmpApp(
                                 strokeWidth = SrStroke.Thin.toPx(),
                             )
                         },
+                    contentAlignment = Alignment.Center,
                 ) {
-                    DestinationItems(
-                        selectedDestinationKey = selectedDestinationKey,
-                        onDestinationSelected = { key ->
-                            isSupplementManagementOpen = false
-                            selectedDestinationKey = key
-                        },
-                    )
+                    Row(modifier = Modifier.widthIn(max = 720.dp).fillMaxSize()) {
+                        DestinationItems(
+                            selectedDestinationKey = selectedDestinationKey,
+                            onDestinationSelected = onDestinationSelected,
+                        )
+                    }
                 }
             },
         ) { paddingValues ->
-            if (uiState.isLoading) {
-                LoadingState(modifier = Modifier.padding(paddingValues))
-            } else {
-                when {
-                    isSupplementManagementOpen -> SupplementsRoute(
-                        contentPadding = paddingValues,
-                        supplements = uiState.supplements,
-                        defaultNotificationEnabled = uiState.notificationEnabled,
-                        onAddSupplement = { supplement, onSuccess, onFailure ->
-                            val isFirstSupplement = uiState.supplements.isEmpty()
-                            viewModel.addSupplement(
-                                supplement = supplement,
-                                onSuccess = {
-                                    onSuccess()
-                                    todayHighlightedSupplementId = supplement.id
-                                    if (isFirstSupplement) {
-                                        todayFeedbackMessage = "오늘 일정에 추가됐어요."
-                                        notificationAttentionDismissedDate = uiState.today
-                                    }
-                                    isSupplementManagementOpen = false
-                                    selectedDestinationKey = "today"
-                                },
-                                onFailure = onFailure,
-                            )
-                        },
-                        onUpdateSupplement = { supplement, onSuccess, onFailure ->
-                            viewModel.updateSupplement(
-                                supplement = supplement,
-                                onSuccess = onSuccess,
-                                onFailure = onFailure,
-                            )
-                        },
-                        onRemoveSupplement = viewModel::removeSupplement,
-                        onToggleNotification = viewModel::toggleSupplementNotification,
-                    )
-                    selectedDestinationKey == "history" -> HistoryRoute(
-                        contentPadding = paddingValues,
-                        today = uiState.today,
-                        historyViewState = uiState.historyViewState,
-                        onOpenNotificationSettingsClick = {
-                            expandNotificationTroubleshooting = true
-                            isSupplementManagementOpen = false
-                            selectedDestinationKey = "settings"
-                        },
-                    )
-                    selectedDestinationKey == "settings" -> SettingsRoute(
-                        contentPadding = paddingValues,
-                        mealTimeSettings = uiState.mealTimeSettings,
-                        notificationEnabled = uiState.notificationEnabled,
-                        notificationPermissionState = notificationPermissionState,
-                        expandNotificationTroubleshooting = expandNotificationTroubleshooting,
-                        onNotificationTroubleshootingExpanded = {
-                            expandNotificationTroubleshooting = false
-                        },
-                        onBreakfastTimeChanged = viewModel::updateBreakfastTime,
-                        onLunchTimeChanged = viewModel::updateLunchTime,
-                        onDinnerTimeChanged = viewModel::updateDinnerTime,
-                        onNotificationEnabledChanged = viewModel::updateNotificationEnabled,
-                        onRequestNotificationPermission = {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                            } else {
-                                notificationPermissionState = permissionController.currentState()
-                            }
-                        },
-                        onRequestExactAlarmPermission = {
-                            permissionController.openExactAlarmSettings()
-                            notificationPermissionState = permissionController.currentState()
-                        },
-                        onRefreshNotificationPermissions = {
-                            notificationPermissionState = permissionController.currentState()
-                        },
-                        onSendTestNotification = {
-                            notificationPermissionState = permissionController.currentState()
-                            reminderScheduler.sendTestReminder()
-                        },
-                        onScheduleTestNotification = {
-                            notificationPermissionState = permissionController.currentState()
-                            reminderScheduler.scheduleTestReminder()
-                        },
-                        onResetRoutineData = {
-                            hapticFeedback.destructiveConfirmed()
-                            viewModel.resetRoutineData()
-                        },
-                    )
-                    else -> TodayRoute(
-                        contentPadding = paddingValues,
-                        date = uiState.today,
-                        items = uiState.todayItems,
-                        errorMessage = uiState.errorMessage,
-                        notificationNeedsAttention = uiState.notificationEnabled &&
-                            uiState.supplements.any { it.isNotificationEnabled } &&
-                            (!notificationPermissionState.canPostNotifications ||
-                                !notificationPermissionState.canScheduleExactAlarms),
-                        notificationAttentionDismissed = notificationAttentionDismissedDate == uiState.today,
-                        onDismissNotificationAttention = {
-                            notificationAttentionDismissedDate = uiState.today
-                        },
-                        highlightedSupplementId = todayHighlightedSupplementId,
-                        onHighlightedSupplementConsumed = { todayHighlightedSupplementId = null },
-                        feedbackMessage = todayFeedbackMessage,
-                        onFeedbackMessageConsumed = { todayFeedbackMessage = null },
-                        onAddSupplementClick = { isSupplementManagementOpen = true },
-                        onOpenNotificationSettingsClick = {
-                            expandNotificationTroubleshooting = true
-                            isSupplementManagementOpen = false
-                            selectedDestinationKey = "settings"
-                        },
-                        onToggleRecord = { record ->
-                            if (!record.isDone) {
-                                hapticFeedback.intakeCompleted()
-                            }
-                            viewModel.toggleRecord(record)
-                        },
-                    )
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+                Box(modifier = Modifier.widthIn(max = 720.dp).fillMaxSize()) {
+                    content(paddingValues)
                 }
             }
         }
@@ -256,7 +280,7 @@ fun SupplementRoutineKmpApp(
 }
 
 @Composable
-private fun LoadingState(modifier: Modifier = Modifier) {
+internal fun LoadingState(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxSize()

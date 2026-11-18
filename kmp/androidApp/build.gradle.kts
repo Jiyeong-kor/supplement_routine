@@ -1,5 +1,6 @@
 import java.io.FileInputStream
 import java.util.Properties
+import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
 
 plugins {
     id("com.android.application")
@@ -8,6 +9,7 @@ plugins {
     id("org.jetbrains.compose")
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
+    id("io.github.takahirom.roborazzi")
 }
 
 val keystoreProperties = Properties()
@@ -59,6 +61,29 @@ android {
             }
         }
     }
+
+    testOptions.unitTests {
+        isIncludeAndroidResources = true
+        all {
+            it.maxHeapSize = "1536m"
+            it.maxParallelForks = 1
+            it.systemProperties["robolectric.pixelCopyRenderMode"] = "hardware"
+        }
+    }
+}
+
+roborazzi {
+    outputDir.set(file("../../docs/assets/screenshots/compose-previews"))
+    @OptIn(ExperimentalRoborazziApi::class)
+    generateComposePreviewRobolectricTests {
+        enable = true
+        packages = listOf("com.jiyeong.supplementroutine.kmp.android.ui.preview")
+        robolectricConfig = mapOf(
+            "sdk" to "[35]",
+            "application" to "android.app.Application::class",
+            "qualifiers" to "\"w400dp-h900dp-xhdpi\"",
+        )
+    }
 }
 
 dependencies {
@@ -74,4 +99,23 @@ dependencies {
     implementation(compose.materialIconsExtended)
     implementation(compose.material3)
     implementation(compose.ui)
+    // Keep tooling and tests on the app's Compose 1.11 runtime line.
+    //noinspection NewerVersionAvailable
+    debugImplementation("org.jetbrains.compose.ui:ui-tooling-preview:1.11.0")
+    //noinspection NewerVersionAvailable
+    debugImplementation("org.jetbrains.compose.ui:ui-tooling:1.11.0")
+    //noinspection GradleDependency
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.11.1")
+    // Capture annotations are read by JVM tests and do not belong in the APK.
+    debugCompileOnly("io.github.takahirom.roborazzi:roborazzi-annotations:1.79.0")
+    testImplementation("junit:junit:4.13.2")
+    // Keep the verified API 35 renderer stable; review captures when upgrading it.
+    //noinspection NewerVersionAvailable
+    testImplementation("org.robolectric:robolectric:4.16.1")
+    //noinspection NewerVersionAvailable
+    testImplementation("org.jetbrains.compose.ui:ui-test-junit4:1.11.0")
+    testImplementation("io.github.takahirom.roborazzi:roborazzi-compose-preview-scanner-support:1.79.0")
+    // Roborazzi 1.79.0 calls the preview invocation API provided by scanner 0.9.1.
+    //noinspection NewerVersionAvailable
+    testImplementation("io.github.sergio-sastre.ComposablePreviewScanner:android:0.9.1")
 }
