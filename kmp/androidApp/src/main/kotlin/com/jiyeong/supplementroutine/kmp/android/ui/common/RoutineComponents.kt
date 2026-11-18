@@ -10,14 +10,10 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
@@ -34,34 +30,30 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.rotate
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import com.jiyeong.supplementroutine.kmp.android.ui.theme.SrPrimitiveColor
+import com.jiyeong.supplementroutine.kmp.android.ui.theme.SrElevation
+import com.jiyeong.supplementroutine.kmp.android.ui.theme.SrIcon
+import com.jiyeong.supplementroutine.kmp.android.ui.theme.SrSize
+import com.jiyeong.supplementroutine.kmp.android.ui.theme.SrSpacing
+import com.jiyeong.supplementroutine.kmp.android.ui.theme.SrStroke
 import kotlin.math.cos
 import kotlin.math.sin
 
 internal object GardenUi {
-    val WarmWhite = Color(0xFFF8F4EC)
-    val Surface = Color(0xFFFFFDF8)
-    val Paper = Color(0xFFF2EBDD)
-    val SurfaceSoft = Color(0xFFFAF3E6)
-    val MistBlue = Color(0xFFDDEAF1)
-    val PrimaryBlue = Color(0xFF496DFF)
-    val PrimaryBlueDark = Color(0xFFAEBBFF)
-    val LeafGreen = Color(0xFFB9DE65)
-    val LeafGreenDark = Color(0xFF5E7E2A)
-    val FlowerRed = Color(0xFFFF4A3D)
-    val Coral = Color(0xFFFF7A62)
-    val EggYellow = Color(0xFFF4C052)
-    val Ink = Color(0xFF202124)
-    val InkMuted = Color(0xFF5F5B53)
-    val Line = Color(0xFFE7DDCC)
-    val Success = Color(0xFF6BBF73)
-    val Danger = Color(0xFFD84C3F)
-    val SuccessSurface = Color(0xFFF0FAEE)
-    val DangerSurface = Color(0xFFFFF0EE)
+    val SurfaceSoft = SrPrimitiveColor.SurfaceSoft
+    val SkyBlue = SrPrimitiveColor.SkyBlue
+    val PrimaryBlue = SrPrimitiveColor.PrimaryBlue
+    val Lemon = SrPrimitiveColor.Lemon
+    val SunYellow = SrPrimitiveColor.SunYellow
+    val Ink = SrPrimitiveColor.Ink
 }
 
 internal enum class FruitVariant { Blueberry, Flower, Apple, EggFlower }
@@ -69,17 +61,17 @@ internal enum class FruitVariant { Blueberry, Flower, Apple, EggFlower }
 @Composable
 internal fun RoutinePageHeader(
     title: String,
+    modifier: Modifier = Modifier,
     subtitle: String? = null,
     eyebrow: String? = null,
     trailing: (@Composable () -> Unit)? = null,
-    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.Top,
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(SrSpacing.Xs)) {
             eyebrow?.let {
                 Text(
                     text = it,
@@ -90,7 +82,8 @@ internal fun RoutinePageHeader(
             }
             Text(
                 text = title,
-                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.semantics { heading() },
+                style = MaterialTheme.typography.displayLarge,
                 color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Bold,
             )
@@ -110,8 +103,8 @@ internal fun RoutinePageHeader(
 @Composable
 internal fun RoutineSectionLabel(
     title: String,
-    trailing: String? = null,
     modifier: Modifier = Modifier,
+    trailing: String? = null,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -120,8 +113,9 @@ internal fun RoutineSectionLabel(
     ) {
         Text(
             text = title,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(1f).semantics { heading() },
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold,
         )
         trailing?.let {
@@ -145,117 +139,175 @@ internal fun RoutineCard(
         modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
         colors = colors,
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+        elevation = CardDefaults.cardElevation(defaultElevation = SrElevation.None),
+        border = BorderStroke(SrStroke.Thin, MaterialTheme.colorScheme.outlineVariant),
         content = content,
     )
 }
 
 @Composable
+internal fun RoutineSlotCard(
+    modifier: Modifier = Modifier,
+    leading: (@Composable () -> Unit)? = null,
+    title: @Composable ColumnScope.() -> Unit,
+    supporting: (@Composable ColumnScope.() -> Unit)? = null,
+    trailing: (@Composable () -> Unit)? = null,
+    actions: (@Composable ColumnScope.() -> Unit)? = null,
+    containerColor: Color = MaterialTheme.colorScheme.surface,
+    contentDescription: String? = null,
+    onClick: (() -> Unit)? = null,
+) {
+    RoutineCard(
+        modifier = modifier.then(
+            if (contentDescription == null) {
+                Modifier
+            } else {
+                Modifier.semantics { this.contentDescription = contentDescription }
+            },
+        ),
+        colors = CardDefaults.cardColors(containerColor = containerColor),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .then(if (onClick == null) Modifier else Modifier.clickable(onClick = onClick))
+                .padding(SrSpacing.Lg),
+            verticalArrangement = Arrangement.spacedBy(SrSpacing.Md),
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(SrSpacing.Md),
+                verticalAlignment = Alignment.Top,
+            ) {
+                leading?.invoke()
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(SrSpacing.Xs),
+                ) {
+                    title()
+                    supporting?.invoke(this)
+                }
+                trailing?.invoke()
+            }
+            actions?.invoke(this)
+        }
+    }
+}
+
+@Composable
+internal fun RoutineStatusCard(
+    title: String,
+    description: String,
+    icon: SrIcon,
+    modifier: Modifier = Modifier,
+    actionLabel: String? = null,
+    onActionClick: (() -> Unit)? = null,
+    containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
+    iconContainerColor: Color = MaterialTheme.colorScheme.primaryContainer,
+    iconTint: Color = MaterialTheme.colorScheme.primary,
+) {
+    RoutineSlotCard(
+        modifier = modifier,
+        leading = {
+            RoutineIconBadge(
+                icon = icon,
+                containerColor = iconContainerColor,
+                tint = iconTint,
+            )
+        },
+        title = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Bold,
+            )
+        },
+        supporting = {
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.Medium,
+            )
+        },
+        actions = if (actionLabel == null || onActionClick == null) {
+            null
+        } else {
+            {
+                RoutinePillButton(
+                    text = actionLabel,
+                    onClick = onActionClick,
+                    height = SrSize.ControlSmall,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                )
+            }
+        },
+        containerColor = containerColor,
+    )
+}
+
+@Composable
 internal fun RoutineIconBadge(
-    icon: ImageVector,
+    icon: SrIcon,
     modifier: Modifier = Modifier,
     containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
     tint: Color = MaterialTheme.colorScheme.primary,
     contentDescription: String? = null,
 ) {
     Surface(
-        modifier = modifier.size(44.dp),
+        modifier = modifier.size(SrSize.IconBadge),
         shape = CircleShape,
         color = containerColor,
     ) {
         Box(contentAlignment = Alignment.Center) {
             Icon(
-                imageVector = icon,
+                painter = painterResource(icon.drawableRes),
                 contentDescription = contentDescription,
                 tint = tint,
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(SrSize.Icon),
             )
         }
-    }
-}
-
-@Composable
-internal fun RoutineMetaChip(
-    text: String,
-    modifier: Modifier = Modifier,
-    containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
-    contentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
-) {
-    Surface(
-        modifier = modifier,
-        shape = CircleShape,
-        color = containerColor,
-    ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-            style = MaterialTheme.typography.labelSmall,
-            color = contentColor,
-            fontWeight = FontWeight.Bold,
-        )
     }
 }
 
 @Composable
 internal fun RoutinePillButton(
     text: String,
-    icon: ImageVector? = null,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    icon: SrIcon? = null,
     containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
     contentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
-    height: Dp = 44.dp,
+    height: Dp = SrSize.Control,
 ) {
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .height(height)
-            .clickable(onClick = onClick),
+            .heightIn(min = height.coerceAtLeast(SrSize.MinTouchTarget))
+            .clickable(role = Role.Button, onClick = onClick),
         shape = CircleShape,
         color = containerColor,
     ) {
         Row(
+            modifier = Modifier.padding(horizontal = SrSpacing.Lg, vertical = SrSpacing.Md),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             icon?.let {
                 Icon(
-                    imageVector = it,
+                    painter = painterResource(it.drawableRes),
                     contentDescription = null,
                     tint = contentColor,
-                    modifier = Modifier.size(15.dp),
+                    modifier = Modifier.size(SrSize.IconSmall),
                 )
             }
             Text(
                 text = text,
-                modifier = Modifier.padding(start = if (icon == null) 0.dp else 6.dp),
+                modifier = Modifier.padding(start = if (icon == null) SrSpacing.None else SrSpacing.Xs),
                 style = MaterialTheme.typography.labelLarge,
                 color = contentColor,
                 fontWeight = FontWeight.Bold,
-            )
-        }
-    }
-}
-
-@Composable
-internal fun RoutineCheckButton(
-    checked: Boolean,
-    modifier: Modifier = Modifier,
-    contentDescription: String,
-) {
-    Surface(
-        modifier = modifier.size(34.dp),
-        shape = CircleShape,
-        color = if (checked) GardenUi.LeafGreen else MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, if (checked) GardenUi.LeafGreen else MaterialTheme.colorScheme.outline),
-    ) {
-        Box(contentAlignment = Alignment.Center) {
-            Icon(
-                imageVector = if (checked) Icons.Filled.Check else Icons.Outlined.Check,
-                contentDescription = contentDescription,
-                tint = if (checked) GardenUi.Ink else MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(19.dp),
             )
         }
     }
@@ -268,17 +320,17 @@ internal fun RoutineMoreButton(
 ) {
     Surface(
         modifier = modifier
-            .size(30.dp)
-            .clickable(onClick = onClick),
+            .size(SrSize.MinTouchTarget)
+            .clickable(role = Role.Button, onClick = onClick),
         shape = CircleShape,
         color = Color.Transparent,
     ) {
         Box(contentAlignment = Alignment.Center) {
             Icon(
-                imageVector = Icons.Outlined.MoreHoriz,
+                painter = painterResource(SrIcon.Chevron.drawableRes),
                 contentDescription = "더보기",
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(18.dp),
+                modifier = Modifier.size(SrSize.IconSmall),
             )
         }
     }
@@ -287,61 +339,28 @@ internal fun RoutineMoreButton(
 @Composable
 internal fun RoutineFab(
     onClick: () -> Unit,
-    icon: ImageVector,
+    icon: SrIcon,
     contentDescription: String,
     modifier: Modifier = Modifier,
 ) {
     FloatingActionButton(
         onClick = onClick,
-        modifier = modifier.size(64.dp),
+        modifier = modifier.size(SrSize.Fab),
         shape = MaterialTheme.shapes.large,
         containerColor = MaterialTheme.colorScheme.primary,
         contentColor = MaterialTheme.colorScheme.onPrimary,
         elevation = FloatingActionButtonDefaults.elevation(
-            defaultElevation = 2.dp,
-            pressedElevation = 4.dp,
-            focusedElevation = 2.dp,
-            hoveredElevation = 2.dp,
+            defaultElevation = SrElevation.Low,
+            pressedElevation = SrElevation.Pressed,
+            focusedElevation = SrElevation.Low,
+            hoveredElevation = SrElevation.Low,
         ),
     ) {
         Icon(
-            imageVector = icon,
+            painter = painterResource(icon.drawableRes),
             contentDescription = contentDescription,
-            modifier = Modifier.size(30.dp),
+            modifier = Modifier.size(SrSize.IconLarge),
         )
-    }
-}
-
-@Composable
-internal fun RoutineEmptyCard(
-    icon: ImageVector,
-    title: String,
-    description: String,
-    modifier: Modifier = Modifier,
-) {
-    RoutineCard(modifier = modifier) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 18.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            FruitAvatar(variant = FruitVariant.EggFlower, modifier = Modifier.size(58.dp))
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                text = description,
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontWeight = FontWeight.Medium,
-            )
-        }
     }
 }
 
@@ -366,7 +385,7 @@ internal fun FruitAvatar(
     variant: FruitVariant,
     modifier: Modifier = Modifier,
 ) {
-    Canvas(modifier = modifier.size(44.dp)) {
+    Canvas(modifier = modifier.size(SrSize.IconBadge)) {
         when (variant) {
             FruitVariant.Blueberry -> {
                 drawOval(GardenUi.PrimaryBlue, size = size)
@@ -387,7 +406,7 @@ internal fun FruitAvatar(
                 repeat(6) { index ->
                     rotate(index * 60f, pivot = center) {
                         drawOval(
-                            color = GardenUi.FlowerRed,
+                            color = GardenUi.SunYellow,
                             topLeft = Offset(size.width * 0.36f, 0f),
                             size = Size(size.width * 0.28f, size.height * 0.62f),
                         )
@@ -397,12 +416,12 @@ internal fun FruitAvatar(
             }
             FruitVariant.Apple -> {
                 drawOval(
-                    color = GardenUi.LeafGreen,
+                    color = GardenUi.Lemon,
                     topLeft = Offset(size.width * 0.1f, size.height * 0.22f),
                     size = Size(size.width * 0.8f, size.height * 0.72f),
                 )
                 drawLine(
-                    color = Color(0xFF8A5A24),
+                    color = GardenUi.Ink,
                     start = Offset(center.x + size.width * 0.04f, size.height * 0.28f),
                     end = Offset(center.x + size.width * 0.18f, size.height * 0.04f),
                     strokeWidth = size.minDimension * 0.09f,
@@ -418,35 +437,8 @@ internal fun FruitAvatar(
                         )
                     }
                 }
-                drawCircle(GardenUi.EggYellow, radius = size.minDimension * 0.18f)
+                drawCircle(GardenUi.SunYellow, radius = size.minDimension * 0.18f)
             }
-        }
-    }
-}
-
-@Composable
-internal fun RoutineProgressLeaves(
-    done: Int,
-    total: Int,
-    modifier: Modifier = Modifier,
-) {
-    val visibleTotal = total.coerceAtLeast(5).coerceAtMost(8)
-    Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        repeat(visibleTotal) { index ->
-            LeafDot(active = index < done)
-        }
-    }
-}
-
-@Composable
-private fun LeafDot(active: Boolean) {
-    Canvas(modifier = Modifier.size(18.dp)) {
-        rotate(degrees = -28f) {
-            drawOval(
-                color = if (active) GardenUi.LeafGreenDark else GardenUi.Line,
-                topLeft = Offset(size.width * 0.22f, size.height * 0.06f),
-                size = Size(size.width * 0.56f, size.height * 0.88f),
-            )
         }
     }
 }

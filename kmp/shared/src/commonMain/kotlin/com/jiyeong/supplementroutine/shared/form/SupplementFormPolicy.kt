@@ -29,10 +29,16 @@ data class SupplementFormInput(
     val memo: String?,
 )
 
+data class ParsedDosage(
+    val value: Double,
+    val unit: String?,
+)
+
 object SupplementFormPolicy {
     const val DEFAULT_DOSAGE_TEXT = "1"
-    const val DEFAULT_UNIT = "개"
-    val dosageUnits = listOf("개", "ml")
+    const val DEFAULT_UNIT = "정"
+    val primaryDosageUnits = listOf("정", "mg", "IU")
+    val dosageUnits = listOf("정", "캡슐", "포", "방울", "mg", "g", "mcg", "IU", "ml")
 
     const val DEFAULT_COUNT = 1
     const val MIN_COUNT = 1
@@ -67,8 +73,27 @@ object SupplementFormPolicy {
     }
 
     fun parseDosage(value: String): Double? {
-        val dosageValue = value.trim().toDoubleOrNull()
-        return dosageValue?.takeIf { it > 0.0 }
+        return parseDosageInput(value)?.value
+    }
+
+    fun parseDosageInput(value: String): ParsedDosage? {
+        val compact = value.trim().replace(" ", "")
+        val match = Regex("""^([0-9]+(?:[.,][0-9]+)?)([A-Za-z가-힣µμ]+)?$""").matchEntire(compact)
+            ?: return null
+        val dosageValue = match.groupValues[1].replace(",", ".").toDoubleOrNull()
+            ?.takeIf { it > 0.0 }
+            ?: return null
+        val rawUnit = match.groupValues.getOrNull(2)
+            ?.takeIf { it.isNotBlank() }
+        val parsedUnit = rawUnit?.let(::normalizeDosageUnit)
+        if (rawUnit != null && parsedUnit == null) {
+            return null
+        }
+
+        return ParsedDosage(
+            value = dosageValue,
+            unit = parsedUnit,
+        )
     }
 
     fun validateRoutineSlots(slots: Set<IntakeSlot>): SupplementFormValidationError? {
@@ -84,6 +109,39 @@ object SupplementFormPolicy {
             value.toInt().toString()
         } else {
             value.toString()
+        }
+    }
+
+    fun normalizeDosageUnitForSelection(unit: String): String {
+        return normalizeDosageUnit(unit) ?: DEFAULT_UNIT
+    }
+
+    private fun normalizeDosageUnit(unit: String): String? {
+        val aliases = mapOf(
+            "개" to "정",
+            "알" to "정",
+            "tablet" to "정",
+            "tablets" to "정",
+            "tab" to "정",
+            "tabs" to "정",
+            "capsule" to "캡슐",
+            "capsules" to "캡슐",
+            "cap" to "캡슐",
+            "caps" to "캡슐",
+            "pack" to "포",
+            "packs" to "포",
+            "packet" to "포",
+            "packets" to "포",
+            "drop" to "방울",
+            "drops" to "방울",
+            "ug" to "mcg",
+            "µg" to "mcg",
+            "μg" to "mcg",
+        )
+        aliases[unit.lowercase()]?.let { return it }
+
+        return dosageUnits.firstOrNull { candidate ->
+            candidate.equals(unit, ignoreCase = true)
         }
     }
 }
